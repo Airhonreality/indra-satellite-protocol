@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indra Satellite - Discovery Demo</title>
+    <style>
+        body { background: #0a0a0a; color: #00ffcc; font-family: monospace; padding: 40px; }
+        .card { border: 1px solid #00ffcc; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+        button { background: #00ffcc; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        pre { background: #111; padding: 10px; border-radius: 4px; overflow-x: auto; color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Satellite Ignition</h1>
+        <p>Este es un satélite virgen. Haz clic para descubrir tu Core.</p>
+        <button id="loginBtn">LOGUEAR CON GOOGLE</button>
+        <div id="status" style="margin-top: 20px; font-size: 12px;">Estado: Esperando acción...</div>
+        <pre id="output"></pre>
+    </div>
+
+    <script type="module">
+        import IndraBridge from '../core/IndraBridge.js';
+
+        const bridge = new IndraBridge();
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+
+        document.getElementById('loginBtn').onclick = async () => {
+            status.innerText = "Estado: Abriendo flujo OAuth...";
+            
+            // NOTA: Aquí iría tu lógica de Google Login (GSI o Firebase)
+            // Simulamos que ya tenemos el token:
+            const fakeToken = "YA_TIENES_EL_TOKEN_TRAS_LOGIN";
+            
+            status.innerText = "Estado: Buscando Manifiesto en Drive...";
+            
+            // bridge.discover(fakeToken).then(...)
+            console.log("Discovery invocado. Revisa la consola.");
+            output.innerText = "// Ejecutando: bridge.discover(token)\n// El sistema buscará INDRA_MANIFEST.json";
+        };
+    </script>
+</body>
+</html>
