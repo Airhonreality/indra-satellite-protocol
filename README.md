@@ -1,6 +1,6 @@
-# Indra Satellite Protocol (ISP) v1.7 — Orchestration Edition
+# Indra Satellite Protocol (ISP) v1.8 — Smart Jurisdiction
 
-## 🛰️ Ignición del Satélite
+## 🚀 Ignición del Satélite
 
 Este protocolo soporta tres modos de inicio, dependiendo de la autonomía del satélite.
 
@@ -8,7 +8,7 @@ Este protocolo soporta tres modos de inicio, dependiendo de la autonomía del sa
 Para satélites que viven dentro de un Iframe o son abiertos desde la Shell Madre oficial de Indra. **No requiere configurar Google Auth ni Client IDs.**
 
 ```javascript
-import IndraBridge from './core/IndraBridge.js';
+import IndraBridge from './core-indra/core/IndraBridge.js';
 const bridge = new IndraBridge();
 
 // El satélite espera a que la Shell Madre le pase el token y la URL
@@ -16,25 +16,24 @@ bridge.listenFromShell();
 
 window.addEventListener("indra-ready", (event) => {
   console.log("¡Resonancia establecida!", event.detail);
-  // Empieza a operar aquí
+  
+  // Ejemplo: Leer proyectos del sistema
+  bridge.execute({
+    provider: 'system',  // Jurisdicción (obligatorio si quieres ser explícito)
+    protocol: 'ATOM_READ',
+    context_id: 'proyectos'
+  }).then(res => console.log(res.items));
 });
 ```
 
 ### 2. El Modo "Discovery" (Zero-Touch)
-Si el satélite es independiente pero el usuario ya tiene Indra instalado en su Drive.
-
 ```javascript
 // Tras loguear al usuario en tu propio satélite:
 await bridge.discover(googleToken);
 ```
 
-### 3. El Modo "Manual" (Legacy)
-```javascript
-await bridge.init({
-  coreUrl: 'https://script.google.com/...',
-  satelliteToken: 'tu_llave_secreta'
-});
-```
+### 3. Inteligencia de Jurisdicción (v1.8)
+A partir de la v1.8, el `IndraBridge` intentará usar el provider `'system'` por defecto si el desarrollador lo omite, para evitar bloqueos del Core. No obstante, se recomienda ser explícito para aplicaciones multi-proveedor (Notion, etc).
 
 ---
 
@@ -55,4 +54,4 @@ satelliteWindow.postMessage({
 ```
 
 ---
-*Indra: La arquitectura donde la forma es agnóstico y el poder es otorgado.*
+*Indra: La arquitectura donde el transporte es inteligente y la soberanía es compartida.*

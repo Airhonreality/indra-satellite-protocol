@@ -1,9 +1,9 @@
 /**
  * =============================================================================
- * INDRA SATELLITE BRIDGE (v1.7) - ORCHESTRATION EDITION
+ * INDRA SATELLITE BRIDGE (v1.8) - SMART JURISDICTION EDITION
  * =============================================================================
- * Responsabilidad: Gestión soberana y orquestada (Shell <-> Satellite).
- * Axioma: Un satélite puede nacer huérfano y ser "adoptado" por la Shell Madre.
+ * Responsabilidad: Gestión soberana, orquestada y resiliente.
+ * Mejora: Inteligencia de Jurisdicción (Auto-Provider).
  * =============================================================================
  */
 
@@ -12,8 +12,8 @@ const ADR_ERROR_MAP = {
     'NOT_FOUND': 'El recurso fue movido o borrado del almacenamiento.',
     'AUTH_REQUIRED': 'Se requiere una sesión activa o ticket válido.',
     'CONTRACT_VIOLATION': 'Error de integridad en los datos (viola el ADR-001).',
-    'GENESIS_FAILED': 'No se pudo crear la infraestructura física. Revisa permisos.',
-    'LOCK_TIMEOUT': 'El Core está ocupado procesando otra solicitud.',
+    'GENESIS_FAILED': 'No se pudo crear la infraestructura física.',
+    'LOCK_TIMEOUT': 'El Core está ocupado. Intenta de nuevo en unos segundos.',
     'SECURITY_VIOLATION': 'Acceso denegado. El token no tiene jurisdicción.',
     'GATEWAY_TIMEOUT': 'El servidor de Google tardó demasiado en responder.',
     'NETWORK_ERROR': 'No se pudo establecer conexión con el Core (Offline?).'
@@ -29,7 +29,6 @@ class IndraBridge {
         this.satelliteToken = config.satelliteToken || null;
         this.shareTicket = config.shareTicket || null;
         this.coreVersion = null;
-        this.sessionSecret = null;
         this.logger = config.logger || console;
         this.capabilities = { providers: [], core_version: '0.0' };
 
@@ -39,37 +38,25 @@ class IndraBridge {
     }
 
     /**
-     * ESCUCHA DE RESONANCIA (Para Satélites en Iframes o Pestañas Hijas)
-     * Permite que la Shell Oficial inyecte la configuración y el token.
+     * ESCUCHA DE RESONANCIA
      */
     listenFromShell(allowedOrigin = "*") {
         this.logger.info("[IndraBridge] Escuchando resonancia desde la Shell Madre...");
-        
         window.addEventListener("message", async (event) => {
-            // Seguridad: Solo aceptar mensajes de orígenes autorizados
             if (allowedOrigin !== "*" && event.origin !== allowedOrigin) return;
-
             const { type, payload } = event.data;
-
             if (type === "INDRA_RESONANCE_GRANT") {
                 this.logger.info("[IndraBridge] Resonancia recibida. Ignitando motor...");
-                
                 this.coreUrl = payload.core_url;
                 this.satelliteToken = payload.satellite_key;
-                
-                // Si viene un token de Google, podemos intentar el handshake de inmediato
-                if (payload.google_token || payload.core_url) {
-                    await this.init();
-                }
-
-                // Disparar evento local para que el satélite sepa que ya puede operar
+                if (payload.google_token || payload.core_url) await this.init();
                 window.dispatchEvent(new CustomEvent("indra-ready", { detail: this.capabilities }));
             }
         });
     }
 
     /**
-     * PROTOCOLO DISCOVERY (Zero-Touch)
+     * PROTOCOLO DISCOVERY
      */
     async discover(googleAccessToken) {
         if (!googleAccessToken) throw new Error("DISCOVERY_REQUIRES_GOOGLE_TOKEN");
@@ -98,16 +85,13 @@ class IndraBridge {
     }
 
     async init(config = {}) {
-        this.coreUrl = config.coreUrl || this.coreUrl || window.INDRA_CORE_URL;
-        this.satelliteToken = config.satelliteToken || this.satelliteToken || window.INDRA_SATELLITE_TOKEN;
-
+        this.coreUrl = config.coreUrl || this.coreUrl;
+        this.satelliteToken = config.satelliteToken || this.satelliteToken;
         if (!this.coreUrl || !this.satelliteToken) return false;
 
         try {
             const handshake = await this.execute({ protocol: 'SYSTEM_INSTALL_HANDSHAKE' });
-            this.capabilities.core_version = handshake.metadata?.core_version || '4.0';
-            this.coreVersion = this.capabilities.core_version;
-            
+            this.coreVersion = handshake.metadata?.core_version || '4.0';
             const manifest = await this.execute({ protocol: 'SYSTEM_MANIFEST' });
             this.capabilities.providers = manifest.items.map(p => p.handle?.alias || p.id);
             return true;
@@ -117,7 +101,17 @@ class IndraBridge {
         }
     }
 
+    /**
+     * EJECUCIÓN SOBERANA (UQO)
+     * Auto-inyecta 'system' como provider si se omite para evitar bloqueos ADR-001.
+     */
     async execute(uqo, options = {}) {
+        // --- 🛡️ PARCHE DE JURISDICCIÓN (v1.8) ---
+        if (!uqo.provider && uqo.protocol !== 'SYSTEM_INSTALL_HANDSHAKE' && uqo.protocol !== 'SYSTEM_MANIFEST') {
+            this.logger.warn(`[IndraBridge] Aviso: Protocolo ${uqo.protocol} invocado sin 'provider'. Usando 'system' por defecto.`);
+            uqo.provider = 'system';
+        }
+
         const maxRetries = options.maxRetries ?? 3;
         if (this.activeRequests >= this.MAX_CONCURRENT) {
             await new Promise(resolve => this.requestQueue.push(resolve));
