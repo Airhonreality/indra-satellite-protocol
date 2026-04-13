@@ -1,43 +1,58 @@
-# Indra Satellite Protocol (ISP) — Starter Kit v1.6
+# Indra Satellite Protocol (ISP) v1.7 — Orchestration Edition
 
-Este es el repositorio **Semilla (Seed)** para la creación de Satélites Indra.
+## 🛰️ Ignición del Satélite
 
-## 🚀 Ignición del Satélite (El Modo Indra)
+Este protocolo soporta tres modos de inicio, dependiendo de la autonomía del satélite.
 
-A diferencia de las aplicaciones tradicionales, un satélite Indra no requiere configurar URLs o Keys manualmente. Utiliza el **Protocolo Discovery** para una experiencia Zero-Touch.
-
-### 1. Flujo de Inicio para Desarrolladores
+### 1. El Modo "Huérfano Orquestado" (Recomendado)
+Para satélites que viven dentro de un Iframe o son abiertos desde la Shell Madre oficial de Indra. **No requiere configurar Google Auth ni Client IDs.**
 
 ```javascript
 import IndraBridge from './core/IndraBridge.js';
-
 const bridge = new IndraBridge();
 
-// Tras el login de Google en tu satélite:
-async function onGoogleLogin(accessToken) {
-  try {
-    // El Bridge busca el Manifiesto en el Drive del usuario,
-    // extrae la Core URL y la Satellite Key automáticamente.
-    await bridge.discover(accessToken);
-    
-    console.log("¡Conexión establecida con el Core de forma automática!");
-  } catch (err) {
-    console.error("No se encontró un Núcleo Indra en esta cuenta.");
-  }
-}
+// El satélite espera a que la Shell Madre le pase el token y la URL
+bridge.listenFromShell();
+
+window.addEventListener("indra-ready", (event) => {
+  console.log("¡Resonancia establecida!", event.detail);
+  // Empieza a operar aquí
+});
 ```
 
-### 2. ¿Por qué usar Discovery?
-- **Soberanía del Usuario**: El usuario solo necesita su cuenta de Google. No necesita saber qué es una URL técnica.
-- **Resiliencia**: Si el usuario reinstala su Core o cambia de dirección, el Satélite siempre lo encontrará gracias al Manifiesto en Drive.
-- **Seguridad**: La `satellite_key` (el password) se recupera de forma segura desde el Drive del usuario, nunca viaja por canales inseguros.
+### 2. El Modo "Discovery" (Zero-Touch)
+Si el satélite es independiente pero el usuario ya tiene Indra instalado en su Drive.
 
-## 🏗️ Estructura
-- **`/core/`**: Biblioteca de transporte soberano (`IndraBridge.js`).
-- **`/ui-canonical/`**: Componentes HUD de salud y notificaciones.
-- **`/docs/`**: Patrones de diseño (`SATELLITE_PATTERNS.md`).
+```javascript
+// Tras loguear al usuario en tu propio satélite:
+await bridge.discover(googleToken);
+```
 
-## 📡 Distribución
-Este repositorio debe ser usado como **Template** para nuevos proyectos. 
+### 3. El Modo "Manual" (Legacy)
+```javascript
+await bridge.init({
+  coreUrl: 'https://script.google.com/...',
+  satelliteToken: 'tu_llave_secreta'
+});
+```
 
-*Indra: La arquitectura donde la identidad es el acceso y la materia es la soberanía.*
+---
+
+## 🏗️ Cómo la Shell Madre otorga resonancia
+Para los desarrolladores de la Shell principal, así se envía el token al satélite (Iframe):
+
+```javascript
+const satelliteWindow = document.getElementById('mi-iframe').contentWindow;
+
+satelliteWindow.postMessage({
+  type: "INDRA_RESONANCE_GRANT",
+  payload: {
+    core_url: "https://...",
+    satellite_key: "abc_123",
+    google_token: "ya_tengo_el_token"
+  }
+}, "*");
+```
+
+---
+*Indra: La arquitectura donde la forma es agnóstico y el poder es otorgado.*
