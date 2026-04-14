@@ -10,7 +10,7 @@
 import IndraBridge from '../_INDRA_PROTOCOL_/core/IndraBridge.js';
 import WorkflowEngine from '../_INDRA_PROTOCOL_/core/WorkflowEngine.js';
 import ContractReader from '../_INDRA_PROTOCOL_/core/ContractReader.js';
-import '../_INDRA_PROTOCOL_/ui/IndraConfigForge.js';
+import '../_INDRA_PROTOCOL_/ui/IndraBridgeHUD.js';
 
 async function ignite() {
     console.log("🚀 Ignición del Satélite...");
@@ -29,11 +29,16 @@ async function ignite() {
     const reader = await ContractReader.loadLocal('../_INDRA_PROTOCOL_/indra_contract.json');
     console.log(`📦 Capacidades asimiladas: ${reader.contract.capabilities.protocols.length} protocolos.`);
 
-    // 4. Inyectar en UI (La Fragua)
-    const forge = document.getElementById('main-forge');
-    if (forge) {
-        const response = await fetch('../src/score/pottery_business.json');
-        forge.workflow = await response.json();
+    // 4. Proyectar en la Estación de Control (HUD)
+    const hud = document.getElementById('main-hud');
+    if (hud) {
+        hud.config = {
+            contract: reader.contract,
+            core: {
+                id: coreMeta.core_id,
+                sat_name: 'VETA DE ORO ERP'
+            }
+        };
     }
 }
 

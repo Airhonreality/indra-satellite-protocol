@@ -79,6 +79,28 @@ class IndraBridge {
     }
 
     /**
+     * @dharma Gestión de Espacios de Trabajo.
+     * @param {string} name - Nombre del nuevo entorno.
+     */
+    async createWorkspace(name) {
+        return this.execute({
+            protocol: 'SYSTEM_WORKSPACE_CREATE',
+            provider: 'system',
+            data: { name: name }
+        });
+    }
+
+    /**
+     * @dharma Sincronizar el listado de entornos disponibles.
+     */
+    async listWorkspaces() {
+        return this.execute({
+            protocol: 'SYSTEM_MANIFEST',
+            provider: 'system'
+        }).then(res => res.items.filter(i => i.class === 'WORKSPACE'));
+    }
+
+    /**
      * @dharma Cargar y persistir archivos en silos de datos.
      * @restriction Solo admite transporte en Base64.
      */
