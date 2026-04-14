@@ -35,6 +35,56 @@ class IndraBridge {
         this.MAX_CONCURRENT = config.maxConcurrent || 5;
         this.activeRequests = 0;
         this.requestQueue = [];
+        
+        // MOTOR DE FLUJOS (Blueprint v2.0)
+        this.workflow = null; // Se inicializará bajo demanda
+    }
+
+    /**
+     * AXIOMA DE NOMBRAMIENTO (Card I del Blueprint)
+     * Sugiere un nombre de workspace basado en la identidad del satélite.
+     */
+    suggestWorkspaceName(satelliteName = "Satellite") {
+        const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        return `WS_${satelliteName.toUpperCase().replace(/\s/g, '_')}_${date}`;
+    }
+
+    /**
+     * Sube un archivo al Core (ej: Drive) de forma canónica.
+     * @param {string} fileName - Nombre del archivo con extensión.
+     * @param {string} base64Data - Contenido en Base64 (sin el prefijo data:...)
+     * @param {string} folderId - ID del contenedor (opcional).
+     * @param {string} provider - El silo de destino (default: drive).
+     */
+    async uploadFile(fileName, base64Data, folderId = null, provider = 'drive') {
+        return this.execute({
+            protocol: 'ATOM_CREATE',
+            provider: provider,
+            context_id: folderId,
+            data: {
+                name: fileName,
+                file_base64: base64Data,
+                mime_type: this._inferMimeType(fileName)
+            }
+        });
+    }
+
+    _inferMimeType(name) {
+        const ext = name.split('.').pop().toLowerCase();
+        const map = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', json: 'application/json' };
+        return map[ext] || 'application/octet-stream';
+    }
+
+    /**
+     * ORQUESTACIÓN DE FLUJOS (Roadmap Punto 1)
+     * Ejecuta una partitura JSON usando el WorkflowEngine interno.
+     */
+    async runWorkflow(workflowJson, triggerData = {}) {
+        if (!this.workflowEngine) {
+            const { IndraWorkflowEngine } = await import('./WorkflowEngine.js');
+            this.workflowEngine = new IndraWorkflowEngine(this);
+        }
+        return await this.workflowEngine.run(workflowJson, triggerData);
     }
 
     /**
@@ -145,13 +195,17 @@ class IndraBridge {
         const envelope = { satellite_token: this.satelliteToken, ...uqo };
         if (this.shareTicket) envelope.share_ticket = this.shareTicket;
 
+        let rawText = '';
         try {
             const response = await fetch(this.coreUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(envelope)
             });
-            const result = await response.json();
+
+            rawText = await response.text();
+            const result = JSON.parse(rawText);
+
             if (result.metadata?.status === 'ERROR') {
                 const error = new Error(this._mapError(result.metadata.error));
                 error.code = result.metadata.error;
@@ -159,6 +213,14 @@ class IndraBridge {
             }
             return result;
         } catch (e) {
+            if (e instanceof SyntaxError) {
+                this.logger.error("[IndraBridge] Error de Parseo. El servidor no devolvió JSON.");
+                this.logger.debug("Raw Response Content:", rawText.slice(0, 500));
+                
+                if (rawText.includes("<!DOCTYPE html>") || rawText.includes("<html")) {
+                    throw new Error("ERROR_SERVIDOR: Google devolvió una página de error (posible 403 o sesión expirada).");
+                }
+            }
             if (!e.code) e.code = 'NETWORK_ERROR';
             throw e;
         }

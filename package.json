@@ -1,0 +1,18 @@
+{
+  "name": "indra-satellite-protocol",
+  "version": "1.9.0",
+  "description": "Indra Satellite Protocol (ISP) - El tejido conectivo para arquitecturas soberanas.",
+  "type": "module",
+  "main": "core/IndraBridge.js",
+  "scripts": {
+    "sync": "node sync_core.js"
+  },
+  "keywords": [
+    "indra",
+    "satellite",
+    "protocol",
+    "agnotic"
+  ],
+  "author": "Indra Core Team",
+  "license": "MIT"
+}

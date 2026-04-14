@@ -1,0 +1,107 @@
+{
+  "synced_at": "2026-04-14T15:57:42.585Z",
+  "core_id": "hgarciagonzalezsas@gmail.com",
+  "core_version": "0.4.0",
+  "capabilities": {
+    "protocols": [
+      "ATOM_READ",
+      "ATOM_CREATE",
+      "ATOM_UPDATE",
+      "ATOM_DELETE",
+      "TABULAR_STREAM",
+      "HIERARCHY_TREE",
+      "CALENDAR_BATCH",
+      "ACCOUNT_RESOLVE",
+      "SYSTEM_CONNECTION_TEST",
+      "SEARCH_DEEP",
+      "MEDIA_RESOLVE",
+      "TRANSFER_HANDSHAKE",
+      "INTELLIGENCE_CHAT",
+      "INTELLIGENCE_DISCOVERY",
+      "SCHEMA_MUTATE",
+      "TRANSFORM_FILTER",
+      "TRANSFORM_MAP",
+      "TRANSFORM_COMPUTE",
+      "TRANSFORM_AGGREGATE",
+      "TRANSFORM_SORT",
+      "TRANSFORM_TEMPLATE",
+      "ATOM_EXISTS",
+      "ATOM_ALIAS_RENAME",
+      "SCHEMA_FIELD_ALIAS_RENAME",
+      "ALIAS_COLLISION_SCAN",
+      "SYSTEM_PIN",
+      "SYSTEM_UNPIN",
+      "SYSTEM_PINS_READ",
+      "SYSTEM_WORKSPACE_REPAIR",
+      "GETMCEPMANIFEST",
+      "FORMULA_EVAL",
+      "SCHEMA_SUBMIT",
+      "SCHEMA_FIELD_OPTIONS",
+      "SYSTEM_AUDIT",
+      "REVISIONS_LIST",
+      "ATOM_ROLLBACK",
+      "INDUCTION_START",
+      "INDUCTION_INDUCE_FULL_STACK",
+      "INDUCTION_STATUS",
+      "INDUCTION_CANCEL",
+      "INDUCTION_DRIFT_CHECK",
+      "SYSTEM_BLUEPRINT_SYNC",
+      "NATIVE_DOCUMENT_RENDER",
+      "SYSTEM_SCHEMA_IGNITE",
+      "SYSTEM_CORE_DISCOVERY"
+    ],
+    "providers": [],
+    "workspaces": []
+  },
+  "schemas": [
+    {
+      "id": "intelligence",
+      "handle": {
+        "ns": "com.indra.system.config",
+        "alias": "config_intelligence",
+        "label": "Configuración de Indra Intelligence",
+        "icon": "COGNITIVE"
+      },
+      "class": "CONFIG_SCHEMA",
+      "provider": "system",
+      "protocols": [
+        "SYSTEM_CONFIG_WRITE"
+      ],
+      "fields": [
+        {
+          "id": "default_provider",
+          "label": "Proveedor por Defecto",
+          "type": "TEXT",
+          "default": "gemini"
+        },
+        {
+          "id": "custom_base_url",
+          "label": "URL Base (OpenAI Compatible)",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "id": "notion",
+      "handle": {
+        "ns": "com.indra.system.config",
+        "alias": "config_notion",
+        "label": "Configuración de Notion",
+        "icon": "DATABASE"
+      },
+      "class": "CONFIG_SCHEMA",
+      "provider": "system",
+      "protocols": [
+        "SYSTEM_CONFIG_WRITE"
+      ],
+      "fields": [
+        {
+          "key": "NOTION_API_KEY",
+          "type": "password",
+          "label": "API Key de Notion",
+          "required": true
+        }
+      ]
+    }
+  ]
+}
