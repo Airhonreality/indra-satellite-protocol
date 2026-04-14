@@ -366,7 +366,7 @@ class IndraBridgeHUD extends HTMLElement {
 
     set config(data) {
         this._config = data;
-        if (this.shadowRoot && this.shadowRoot.getElementById('core-id')) {
+        if (this.shadowRoot && this.shadowRoot.getElementById('core-status')) {
             this.applyConfig(data);
         }
     }
