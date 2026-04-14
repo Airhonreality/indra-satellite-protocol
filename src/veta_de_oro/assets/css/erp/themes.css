@@ -1,0 +1,43 @@
+/**
+ * INDRA AXIOMATIC UI - Theme Logic
+ * Sistema inteligente de inversión de color.
+ */
+
+/* Por defecto: Light Theme (Sutil) */
+.erp-veta {
+    --axiom-panel-bg: var(--color-surface);
+    --axiom-text-primary: var(--color-ink);
+    --axiom-text-secondary: var(--color-ink-faint);
+    --axiom-border: var(--color-boundary);
+    --axiom-canvas: var(--color-canvas);
+}
+
+/* Dark Theme: Activación Simple */
+.erp-veta[data-theme="dark"] {
+    --axiom-panel-bg: #151515;
+    --axiom-text-primary: #f0f0f0;
+    --axiom-text-secondary: #888;
+    --axiom-border: rgba(255, 255, 255, 0.08);
+    --axiom-canvas: #0f0f0f;
+    
+    /* Overrides globales del ERP */
+    background-color: var(--axiom-canvas) !important;
+    color: var(--axiom-text-primary);
+}
+
+.erp-veta[data-theme="dark"] .axiom-panel {
+    background: var(--axiom-panel-bg);
+    border-color: var(--axiom-border);
+}
+
+.erp-veta[data-theme="dark"] .axiom-input,
+.erp-veta[data-theme="dark"] .axiom-select,
+.erp-veta[data-theme="dark"] .axiom-textarea {
+    background: rgba(255,255,255,0.03);
+    color: var(--axiom-text-primary);
+    border-bottom-color: var(--axiom-border);
+}
+
+.erp-veta[data-theme="dark"] .axiom-label {
+    color: var(--axiom-text-secondary);
+}

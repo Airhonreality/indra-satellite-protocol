@@ -1,0 +1,106 @@
+/* 
+   INDRA AXIOMATIC UI - Field Dashboard Styles
+   All dimensions based on Phi tokens. 
+*/
+
+.axiom-media-strip {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-phi-2);
+    overflow-x: auto;
+    padding: var(--gap-phi-1);
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-arch);
+    border: var(--border-hairline);
+}
+
+.media-actions {
+    display: flex;
+    gap: var(--gap-phi-1);
+    padding-right: var(--gap-phi-1);
+    border-right: var(--border-hairline);
+}
+
+.media-scroll {
+    display: flex;
+    gap: var(--gap-phi-1);
+    flex-grow: 1;
+}
+
+.thumb-capsule {
+    min-width: var(--gap-phi-4);
+    height: var(--gap-phi-4);
+    border-radius: var(--radius-arch);
+    background: var(--color-canvas);
+    position: relative;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+}
+
+.thumb-capsule:hover { border-color: var(--color-brass); }
+
+.space-tag {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: var(--color-brass);
+    color: var(--color-surface);
+    font-size: 8px;
+    font-family: var(--font-technical);
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+.axiom-mic-discrete {
+    width: var(--gap-phi-3);
+    height: var(--gap-phi-3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--color-surface);
+    border: var(--border-hairline);
+    transition: var(--transition-fast);
+}
+
+.rec-led {
+    width: 6px;
+    height: 6px;
+    background: var(--color-error);
+    border-radius: 50%;
+    position: absolute;
+    top: calc(var(--gap-phi-1) / 2);
+    right: calc(var(--gap-phi-1) / 2);
+    display: none;
+}
+
+.rec-active .rec-led {
+    display: block;
+    animation: axiom-pulse 1.5s infinite;
+}
+
+@keyframes axiom-pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.ia-report-placeholder {
+    padding: var(--gap-phi-2);
+    background: var(--color-surface-soft);
+    border-left: 2px solid var(--color-brass);
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--color-ink);
+}
+
+/* Contenedor del Submódulo Propuestas */
+.submodule-container {
+    width: 100%;
+    height: 600px;
+    border: var(--border-hairline);
+    border-radius: var(--radius-arch);
+    overflow: hidden;
+}

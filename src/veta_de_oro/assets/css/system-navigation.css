@@ -1,0 +1,157 @@
+/* System Navigation — Estética Axiomática / Indra v5.0 */
+
+:root {
+    --nav-height: 48px;
+}
+
+#system-navigation-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.system-nav-bar {
+    pointer-events: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 15, 15, 0.85);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    height: var(--nav-height);
+    padding: 0 var(--gap-phi-3);
+    border-bottom: var(--border-hairline);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-autor);
+}
+
+.system-nav-logo {
+    color: var(--color-brass);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-family: var(--font-rational);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.system-nav-logo::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--color-brass);
+    transform: rotate(45deg);
+}
+
+.system-nav-items {
+    display: flex;
+    gap: var(--gap-phi-3);
+    height: 100%;
+}
+
+.system-nav-item {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.5;
+    transition: var(--transition-fast);
+    padding: 0 10px;
+    position: relative;
+    border-bottom: 2px solid transparent;
+}
+
+.system-nav-item:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.system-nav-item.active {
+    opacity: 1;
+    border-bottom: 2px solid var(--color-brass);
+}
+
+.system-nav-label {
+    color: var(--color-surface);
+    font-size: 0.65rem;
+    font-family: var(--font-rational);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.system-nav-icon {
+    font-size: 0.9rem;
+    color: var(--color-brass);
+    display: flex;
+    align-items: center;
+}
+
+.system-nav-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px 10px;
+    border-radius: var(--radius-arch);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--color-success);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--color-success);
+    animation: status-pulse 2s infinite;
+}
+
+@keyframes status-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.system-nav-status .technical-data {
+    color: var(--color-ink-faint);
+    font-size: 0.55rem;
+    font-family: var(--font-technical);
+    letter-spacing: 0.5px;
+}
+
+/* Compensación de Body */
+body.erp-veta {
+    padding-top: var(--nav-height) !important;
+}
+
+/* Móvil: Ocultar etiquetas, dejar iconos */
+@media (max-width: 768px) {
+    .system-nav-label { display: none; }
+    .system-nav-items { gap: 5px; }
+    .system-nav-bar { padding: 0 var(--gap-phi-2); }
+}
+
+/* Estilo para temas claros (si el body no tiene dark theme) */
+[data-theme="light"] .system-nav-bar {
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+[data-theme="light"] .system-nav-label {
+    color: var(--color-ink);
+}
+
+[data-theme="light"] .status-indicator {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}

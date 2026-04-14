@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Técnico | Veta de Oro</title>
+    <!-- Los estilos base se heredan del diseño sistémico existente -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/style-iterator.css">
+
+    <!-- INDRA CORE CONFIGURATION -->
+    <script>
+      window.VETA_CONFIG = {
+        CORE_URL: 'https://script.google.com/macros/s/AKfycbyhEucpkr6GtpMqQ0LnenhP4SIUXOUJ2M4ycFIVGLBmUuxWYL6hXRTUOBESiC6LlpfA/exec',
+        SATELLITE_TOKEN: 'indra_satellite_omega'
+      };
+    </script>
+    <style>
+        /* Estilos específicos del laboratorio - Siguiendo el Blueprint UI Master */
+        :root {
+            --step-transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        body {
+            background-color: var(--color-canvas);
+            color: var(--color-ink);
+            overflow-x: hidden;
+        }
+
+        .cotizador-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--gap-phi-4);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .step-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--color-brass);
+            transition: width 0.6s ease;
+            z-index: 1000;
+        }
+
+        .step {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.8s var(--transition-autor);
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title-display {
+            font-family: var(--font-signature);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            line-height: 1.1;
+            margin-bottom: var(--gap-phi-3);
+            text-align: center;
+        }
+
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--gap-phi-2);
+            width: 100%;
+        }
+
+        /* Card Axiomática - Sin Hardcode de Estilos Locales */
+        .option-card {
+            background: transparent;
+            border: var(--border-hairline);
+            padding: var(--gap-phi-3);
+            cursor: pointer;
+            transition: var(--transition-autor);
+            text-align: left;
+            position: relative;
+        }
+
+        .option-card:hover {
+            border-color: var(--color-brass);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .option-card.selected {
+            border-color: var(--color-brass);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .option-card label {
+            font-family: var(--font-rational);
+            font-weight: 500;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .option-card span {
+            font-family: var(--font-rational);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .nav-actions {
+            margin-top: var(--gap-phi-4);
+            display: flex;
+            gap: var(--gap-phi-2);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-veta {
+            font-family: var(--font-rational);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            padding: 15px 40px;
+            border: var(--border-hairline);
+            background: transparent;
+            color: var(--color-ink);
+            cursor: pointer;
+            transition: var(--transition-autor);
+        }
+
+        .btn-veta:hover:not(:disabled) {
+            background: var(--color-ink);
+            color: var(--color-canvas);
+        }
+
+        .btn-veta:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            border-color: var(--color-brass);
+        }
+
+        /* Muestra de Imagen Estilo Blueprint */
+        .image-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #D1CD00; /* Color distintivo del blueprint para muestras */
+            margin-bottom: var(--gap-phi-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: var(--font-technical);
+            font-size: 0.8rem;
+        }
+
+        .form-group {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: var(--border-hairline);
+            padding: 12px 0;
+            font-family: var(--font-rational);
+            font-size: 1.1rem;
+            margin-bottom: var(--gap-phi-3);
+            outline: none;
+            transition: var(--transition-autor);
+        }
+
+        .form-group input:focus {
+            border-bottom-color: var(--color-brass);
+        }
+
+        /* Pantalla Final Presupuestal */
+        .summary-box {
+            background: var(--color-ink);
+            color: var(--color-canvas);
+            padding: var(--gap-phi-4);
+            width: 100%;
+            text-align: center;
+            margin-top: var(--gap-phi-3);
+        }
+
+        .projection-value {
+            font-family: var(--font-technical);
+            font-size: 2rem;
+            color: var(--color-brass);
+            margin: var(--gap-phi-2) 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="step-progress" id="progress"></div>
+
+    <div class="cotizador-container">
+        
+        <!-- PANTALLA 1: SELECCIÓN DE PROYECTO -->
+        <div class="step active" id="step1">
+            <h1 class="title-display">Seleccione el tipo de mobiliario para el diseño y fabricación:</h1>
+            <div class="grid-options">
+                <div class="option-card" onclick="selectOption('proyecto', 'Cocina Integral', this)">
+                    <label>Cocina Integral</label>
+                    <span>Sistemas de almacenamiento y preparación.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('proyecto', 'Vestier / Clóset', this)">
+                    <label>Vestier / Clóset</label>
+                    <span>Optimización de espacios y alcobas.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('proyecto', 'Mobiliario de Baño', this)">
+                    <label>Mobiliario de Baño</label>
+                    <span>Resistencia y diseño funcional.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('proyecto', 'Proyecto Arquitectónico Integral', this)">
+                    <label>Proyecto Integral</label>
+                    <span>Remodelación completa de espacios.</span>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-veta btn-primary" id="btn-next-1" disabled onclick="nextStep(2)">Siguiente Paso →</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: ESPECIFICACIONES DE MATERIAL -->
+        <div class="step" id="step2">
+            <h1 class="title-display">Seleccione el acabado de superficie para su <span id="display-proyecto">{ Mobiliario }</span>:</h1>
+            <div class="grid-options">
+                <div class="option-card" onclick="selectOption('acabado', 'Piedra Sinterizada', this)">
+                    <div class="image-placeholder">[ MUESTRA PIEDRA ]</div>
+                    <label>Piedra Sinterizada</label>
+                    <span>Neolith, Dekton, Cuarzos de alta gama.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('acabado', 'Madera / Laminada', this)">
+                    <div class="image-placeholder">[ MUESTRA MADERA ]</div>
+                    <label>Madera / Laminada</label>
+                    <span>Robles, Nogales y Melaminas HD.</span>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-veta" onclick="prevStep(1)">← Volver</button>
+                <button class="btn-veta btn-primary" id="btn-next-2" disabled onclick="nextStep(3)">Siguiente Paso →</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: DIMENSIONES Y ESTADO TÉCNICO -->
+        <div class="step" id="step3">
+            <h1 class="title-display">Especifique las dimensiones y disponibilidad de planos.</h1>
+            <div class="grid-options">
+                <div class="option-card" onclick="selectOption('dimension', 'Pequeña', this)">
+                    <label>Área Pequeña</label>
+                    <span>Menos de 8 m² de superficie.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('dimension', 'Mediana', this)">
+                    <label>Área Mediana</label>
+                    <span>Entre 8 y 15 m² de superficie.</span>
+                </div>
+                <div class="option-card" onclick="selectOption('dimension', 'Grande', this)">
+                    <label>Área Grande</label>
+                    <span>Más de 15 m² de superficie.</span>
+                </div>
+            </div>
+            <div class="nav-actions" style="flex-direction: column; align-items: center;">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-family: var(--font-rational); font-size: 0.9rem; opacity: 0.7;">Información Técnica Disponible:</label>
+                    <div style="margin-top: 10px; display: flex; gap: 20px;">
+                        <label><input type="radio" name="planos" value="no" checked> Requiere levantamiento</label>
+                        <label><input type="radio" name="planos" value="si"> Cuenta con planos</label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 20px;">
+                    <button class="btn-veta" onclick="prevStep(2)">← Volver</button>
+                    <button class="btn-veta btn-primary" id="btn-next-3" disabled onclick="nextStep(4)">Calcular Proyección →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 4: CONTACTO Y UBICACIÓN -->
+        <div class="step" id="step4">
+            <h1 class="title-display">Información de contacto para envío de propuesta formal.</h1>
+            <div class="form-group">
+                <input type="text" id="nombre" placeholder="Nombre Completo" oninput="validateForm()">
+                <input type="tel" id="whatsapp" placeholder="Número de WhatsApp" oninput="validateForm()">
+                <input type="text" id="zona" placeholder="Dirección o Zona del Proyecto" oninput="validateForm()">
+            </div>
+            <div class="nav-actions">
+                <button class="btn-veta" onclick="prevStep(3)">← Volver</button>
+                <button class="btn-veta btn-primary" id="btn-submit" disabled onclick="submitRequest()">⚡ REGISTRAR SOLICITUD TÉCNICA</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA FINAL -->
+        <div class="step" id="stepFinal">
+            <h1 class="title-display" id="conf-nombre">¡Confirmado!</h1>
+            <p style="text-align: center; font-family: var(--font-rational);">
+                Configuración: <span id="res-proyecto">-</span> | 
+                Escala: <span id="res-dimension">-</span> | 
+                Acabado: <span id="res-acabado">-</span>
+            </p>
+            <div class="summary-box">
+                <h2 style="font-family: var(--font-rational); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.2em;">Proyección Estimada de Inversión</h2>
+                <div class="projection-value" id="val-proyeccion">$ 0.000.000</div>
+                <p style="font-size: 0.8rem; opacity: 0.6; max-width: 400px; margin: 0 auto;">
+                    * El acabado seleccionado aplica un ajuste delta según catálogo de materiales de alto formato.
+                </p>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-veta btn-primary" onclick="location.reload()">Ver resumen en WhatsApp</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { Indra } from '../veta-v3-frontend/infra/indra-bridge.js';
+
+        // ESTADO AXIOMÁTICO DEL COTIZADOR
+        const state = {
+            proyecto: null,
+            acabado: null,
+            dimension: null,
+            nombre: '',
+            whatsapp: '',
+            zona: ''
+        };
+
+        window.selectOption = function(key, value, element) {
+            state[key] = value;
+            
+            // UI Update
+            const siblings = element.parentElement.querySelectorAll('.option-card');
+            siblings.forEach(s => s.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // Habilitar botones según step
+            if(key === 'proyecto') {
+                document.getElementById('btn-next-1').disabled = false;
+                document.getElementById('display-proyecto').innerText = value;
+            }
+            if(key === 'acabado') document.getElementById('btn-next-2').disabled = false;
+            if(key === 'dimension') document.getElementById('btn-next-3').disabled = false;
+        }
+
+        window.nextStep = function(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const next = step === 5 ? 'stepFinal' : 'step' + step;
+            document.getElementById(next).classList.add('active');
+            updateProgress(step);
+        }
+
+        window.prevStep = function(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            updateProgress(step);
+        }
+
+        function updateProgress(step) {
+            const width = (step - 1) * 25;
+            document.getElementById('progress').style.width = width + '%';
+        }
+
+        window.validateForm = function() {
+            const n = document.getElementById('nombre').value;
+            const w = document.getElementById('whatsapp').value;
+            const z = document.getElementById('zona').value;
+            document.getElementById('btn-submit').disabled = !(n && w && z);
+            state.nombre = n;
+            state.whatsapp = w;
+            state.zona = z;
+        }
+
+        window.submitRequest = async function() {
+            // Lógica de Proyección Delta
+            let base = 12000000;
+            if(state.dimension === 'Pequeña') base = 12000000;
+            if(state.dimension === 'Mediana') base = 25000000;
+            if(state.dimension === 'Grande') base = 45000000;
+            if(state.acabado === 'Piedra Sinterizada') base *= 1.4;
+
+            const monto = Math.floor(base);
+
+            // Optimistic UI Update
+            document.getElementById('val-proyeccion').innerText = '$ ' + monto.toLocaleString('es-CO');
+            document.getElementById('res-proyecto').innerText = state.proyecto;
+            document.getElementById('res-dimension').innerText = state.dimension;
+            document.getElementById('res-acabado').innerText = state.acabado;
+            document.getElementById('conf-nombre').innerText = '✔ Solicitud registrada, ' + state.nombre.split(' ')[0];
+
+            nextStep(5);
+
+            // Persistencia en Indra
+            try {
+                await Indra.writeRecord('veta_cotizaciones_v1', {
+                    cliente_nombre: state.nombre,
+                    cliente_tel: state.whatsapp,
+                    cliente_zona: state.zona,
+                    tipo_proyecto: state.proyecto,
+                    acabado: state.acabado,
+                    escala: state.dimension,
+                    monto_estimado: monto,
+                    json_payload: JSON.stringify(state),
+                    estado: 'NUEVA',
+                    asesor: 'Web_Cotizador_Demo'
+                });
+                console.log('[Veta] Registro exitoso en Indra');
+            } catch (e) {
+                console.error('[Veta] Error de persistencia:', e.message);
+            }
+        }
+
+        window.setTheme = function(theme) {
+            if(theme === 'default') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+        }
+    </script>
+</body>
+</html>

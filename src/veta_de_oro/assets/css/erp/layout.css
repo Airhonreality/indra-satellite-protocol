@@ -1,0 +1,98 @@
+/**
+ * INDRA AXIOMATIC UI - Layout Engine
+ * Arquitectura basada en Proporción Áurea y Flexbox.
+ * Mobile-First por diseño.
+ */
+
+.axiom-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-phi-3);
+    padding: var(--gap-phi-3);
+    min-height: 100vh;
+    background: var(--color-canvas);
+    transition: var(--transition-autor);
+}
+
+/* El Panel: Bloque base de Lego */
+.axiom-panel {
+    background: var(--color-surface);
+    border: var(--border-hairline);
+    border-radius: var(--radius-arch);
+    padding: var(--gap-phi-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-phi-2);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-autor);
+    position: relative;
+    overflow: hidden;
+}
+
+.axiom-panel:hover {
+    border-color: var(--color-brass);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- RESPONSIVE ENGINE (Axiomatic v2.1) --- */
+
+/* 1. TABLET BREAKPOINT (iPad / Pantallas Medianas) */
+@media (min-width: 768px) {
+    .axiom-grid-3col {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 2 Col en Tablet */
+        gap: var(--gap-phi-3);
+    }
+}
+
+/* 2. DESKTOP BREAKPOINT (Proporción Áurea) */
+@media (min-width: 1024px) {
+    .axiom-grid-aureo {
+        display: grid;
+        grid-template-columns: 1.618fr 1fr; /* Áurea Pura */
+        gap: var(--gap-phi-3);
+    }
+
+    .axiom-grid-inverse {
+        display: grid;
+        grid-template-columns: 1fr 1.618fr;
+        gap: var(--gap-phi-3);
+    }
+
+    .axiom-grid-3col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* 3 Col en Desktop */
+        gap: var(--gap-phi-2);
+    }
+
+    .axiom-dashboard {
+        padding: var(--gap-phi-4);
+    }
+}
+
+/* Utilidades Flexbox Axiomáticas */
+.axiom-flex-row { display: flex; align-items: center; gap: var(--gap-phi-2); }
+.axiom-flex-column { display: flex; flex-direction: column; gap: var(--gap-phi-2); }
+.axiom-space-between { justify-content: space-between; }
+.axiom-align-end { align-items: flex-end; }
+
+/* Tipografía de Componentes (Axiomática) */
+.axiom-title-lg { font-family: var(--font-signature); font-size: 3.5rem; margin: 0; line-height: 1; }
+.axiom-title-sm { font-family: var(--font-signature); font-size: 1.5rem; margin: 0; font-weight: 400; }
+.axiom-text-muted { font-size: 0.85rem; opacity: 0.7; line-height: 1.5; }
+.axiom-label { font-family: var(--font-technical); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.5; }
+
+/* Divisores y Separadores */
+.axiom-divider { border: none; border-bottom: var(--border-hairline); margin: var(--gap-phi-3) 0; width: 100%; }
+
+/* Contenedores de Margen Seguro */
+.v-safe-zone { padding: var(--gap-phi-3); }
+
+/* Ajuste de Apilabilidad para Footer/Headers */
+@media (max-width: 767px) {
+    .axiom-flex-row.axiom-space-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--gap-phi-2);
+    }
+}

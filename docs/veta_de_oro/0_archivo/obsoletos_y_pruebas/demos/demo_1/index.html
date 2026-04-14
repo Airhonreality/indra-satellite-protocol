@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veta de Oro — Generador Técnico</title>
+    <link rel="stylesheet" href="tokens.css">
+</head>
+<body class="animate-entrance">
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR: CONTROL CENTRAL -->
+    <aside class="sidebar-main">
+      
+      <div class="sidebar-header">
+        <h1 class="brand-title">Veta de Oro</h1>
+        <p class="brand-subtitle">Generador de Propuestas</p>
+      </div>
+
+      <!-- PANEL 1: CLIENTE (Identidad Prioritaria) -->
+      <div class="panel panel-master-card">
+        <span class="panel-title">Identidad del Cliente</span>
+        <div class="master-inputs-group">
+           <input type="text" id="input-proposal-name" class="v-input-clean" placeholder="Nombre de Proyecto (ej: Cocina Garcia)">
+           <div id="container-client-picker" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: ESCENARIOS (Control de Versiones) -->
+      <div class="panel">
+        <span class="panel-title">Versiones de Cotización</span>
+        <div id="target-scenario-switcher" class="scenario-switcher"></div>
+        <button id="btn-add-alternative" class="btn-ghost-dash" style="font-size: 0.65rem;">+ Crear Alternativa (Branch)</button>
+      </div>
+
+      <!-- PANEL 3: ALCANCE (Navegación Vertical) -->
+      <div class="panel">
+        <span class="panel-title">Distribución de Espacios</span>
+        <div id="target-spaces-list" class="spaces-nav" style="margin-bottom:15px;"></div>
+        <button id="btn-add-space" class="btn-main" style="width:100%;">+ Añadir Espacio</button>
+      </div>
+
+      <!-- PANEL 4: DASHBOARD (Resumen Comparativo) -->
+      <div class="panel-fixed-bottom">
+        <div class="stats-row">
+          <span class="label">Inversión Final</span>
+          <span id="target-total-base" class="total-big" style="font-size: 1.8rem;">$ 0</span>
+        </div>
+        <div id="target-deltas-list" class="deltas-area"></div>
+        <button class="btn-main" style="width:100%; margin-top:20px; background:var(--color-gold); border-color:var(--color-gold);">Finalizar Cotización</button>
+      </div>
+
+    </aside>
+
+    <!-- CANVAS: Área de Trabajo Técnico -->
+    <main class="canvas-main">
+      <div id="target-canvas-iterator"></div>
+    </main>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

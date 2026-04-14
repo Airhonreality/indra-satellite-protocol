@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veta de Oro | Maestros del Ensamble | Diseño Autoral</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@100;400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Modular CSS -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- INDRA CORE CONFIGURATION -->
+    <script>
+      window.VETA_CONFIG = {
+        CORE_URL: 'https://script.google.com/macros/s/AKfycbyhEucpkr6GtpMqQ0LnenhP4SIUXOUJ2M4ycFIVGLBmUuxWYL6hXRTUOBESiC6LlpfA/exec',
+        SATELLITE_TOKEN: 'indra_satellite_omega'
+      };
+    </script>
+</head>
+<body class="grid-lines">
+
+    <header class="main-header">
+        <div class="container header-inner">
+            <a href="/" class="logo-type">Veta de Oro.</a>
+            <nav class="nav-links">
+                <a href="#metodo">[01] Método</a>
+                <a href="#obras">[02] Hemeroteca</a>
+                <a href="#agendar">[03] Agendar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO: MANIFIESTO + DUAL FRAME (3D & REALITY) -->
+        <section class="hero">
+            <div class="container">
+                <div style="max-width: 800px; margin-bottom: var(--gap-phi-4);">
+                    <div class="technical-data" style="margin-bottom: var(--gap-phi-3); display: flex; align-items: center; gap: 15px;">
+                        <span style="display: inline-block; width: 30px; height: 1px; background-color: var(--color-blueprint);"></span>
+                        V.3 / Estética & Función
+                    </div>
+
+                    <h1 style="font-size: clamp(3.5rem, 6.5vw, 7.5rem); line-height: 0.9; letter-spacing: -0.02em; margin-bottom: var(--gap-phi-3);">
+                        Habitar la <span style="font-style: italic; color: var(--color-clay);">Precisión.</span>
+                    </h1>
+                    <p style="font-size: 1.15rem; max-width: 500px; opacity: 0.8;">
+                        La sinergia entre el modelado digital milimétrico y la ebanistería de autor. Sin intermediarios, sin sobrecostos, solo diseño soberano.
+                    </p>
+                </div>
+
+                <!-- EL FRAME DUAL: 3D INTERACTIVO VS REALIDAD -->
+                <div class="hero-dual">
+                    <!-- Pane 1: Interactivo/Blueprint con Motor 3D Local -->
+                    <div class="hero-dual__pane pane-3d" id="canvas-3d-container">
+                        <span class="pane-label technical-data">SYSTEM_CORE_3D [V_02.X]</span>
+                        <!-- El canvas se inyectará aquí -->
+                        <canvas id="hero-3d-canvas" style="width: 100%; height: 100%; cursor: move;"></canvas>
+                        
+                        <div style="position: absolute; bottom: 20px; left: 20px; z-index: 10;" class="technical-data">
+                            GRID_STATUS: ACTIVE <br>
+                            RENDER_ENGINE: LOCAL_CORE
+                        </div>
+                    </div>
+                    <!-- Pane 2: Realidad/Resultado -->
+                    <div class="hero-dual__pane">
+                        <span class="pane-label technical-data">RESULTADO_FINAL [REALIDAD]</span>
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Mueble real Veta de Oro" class="dual-img">
+                    </div>
+                </div>
+
+                <a href="#agendar" class="btn-joinery"><i></i> Iniciar Mi Proyecto de Autor</a>
+            </div>
+        </section>
+
+        <!-- Script de Motor 3D Local (A prueba de errores) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script>
+            function init3D() {
+                const container = document.getElementById('canvas-3d-container');
+                const canvas = document.getElementById('hero-3d-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+
+                // Crear un objeto arquitectonico (Un mueble abstracto de lineas)
+                const geometry = new THREE.BoxGeometry(2, 3, 1);
+                const edges = new THREE.EdgesGeometry(geometry);
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x92998C, linewidth: 2 });
+                const cube = new THREE.LineSegments(edges, lineMaterial);
+                scene.add(cube);
+
+                // Grid de arquitectura
+                const gridHelper = new THREE.GridHelper(10, 10, 0x191A19, 0xd4af37);
+                gridHelper.position.y = -2;
+                gridHelper.opacity = 0.2;
+                gridHelper.transparent = true;
+                scene.add(gridHelper);
+
+                camera.position.z = 5;
+                camera.position.y = 1;
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.y += 0.005;
+                    renderer.render(scene, camera);
+                }
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                });
+
+                animate();
+            }
+            window.onload = init3D;
+        </script>
+
+        <!-- SECCIÓN SINTAXIS (Real Metadata) -->
+        <section id="metodo" class="syntax-section">
+            <div class="container" style="display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--gap-phi-6);">
+                <div>
+                    <div class="technical-data" style="margin-bottom: var(--gap-phi-3);">[ LÉXICO DE FÁBRICA ]</div>
+                    <h2 class="huge-title">La Sintaxis de la Materia.</h2>
+                    <p style="color: rgba(255,255,255,0.7); max-width: 450px; font-size: 1.1rem; margin-bottom: var(--gap-phi-4);">
+                        Dominamos el encuentro entre materiales disímiles. La piedra sinterizada que se funde con el nogal americano bajo una estructura invisible de acero.
+                    </p>
+                </div>
+                <div>
+                    <div class="spec-list" style="margin-top: var(--gap-phi-4);">
+                        <div class="spec-item">
+                            <span class="technical-data">01</span>
+                            <div>
+                                <h4 style="color: white; font-size: 1.5rem; font-family: var(--font-rational);">Modelado 3D</h4>
+                                <p class="technical-data" style="color: var(--color-brass);">Precisión Algorítmica</p>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <span class="technical-data">02</span>
+                            <div>
+                                <h4 style="color: white; font-size: 1.5rem; font-family: var(--font-rational);">Piedra Sinterizada</h4>
+                                <p class="technical-data" style="color: var(--color-brass);">Eternidad Táctica</p>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <span class="technical-data">03</span>
+                            <div>
+                                <h4 style="color: white; font-size: 1.5rem; font-family: var(--font-rational);">Punto de Fábrica</h4>
+                                <p class="technical-data" style="color: var(--color-brass);">Soberanía Local</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN HEMEROTECA (Grilla Brutalista / Portafolio Profundo) -->
+        <section id="obras" style="padding: var(--gap-phi-6) 0;">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--gap-phi-4);">
+                    <h2 style="font-size: 3.5rem; margin: 0; line-height: 1;">Hemeroteca de Proyectos.</h2>
+                    <span class="technical-data">ARCHIVO 2024 / BOGOTÁ - COTA</span>
+                </div>
+
+                <div class="atelier-grid">
+                    <!-- Proyecto 01: Principal -->
+                    <a href="#" class="atelier-item item-hero">
+                        <img src="https://images.unsplash.com/photo-1556910103-1c02745a8728?auto=format&fit=crop&w=1200&q=80" class="atelier-img" alt="Cocina minimal">
+                        <div class="atelier-label">
+                            <span class="technical-data" style="color: var(--color-brass);">REF: COCINA_SB</span>
+                            <h3>Bloque de Cuarzo y Luz</h3>
+                            <p class="technical-data" style="margin-top: 10px; font-size: 0.6rem;">Santa Bárbara, Bogotá</p>
+                        </div>
+                    </a>
+
+                    <!-- Proyecto 02: Top -->
+                    <a href="#" class="atelier-item item-top">
+                        <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80" class="atelier-img" alt="Dormitorio">
+                        <div class="atelier-label">
+                            <span class="technical-data">REF: DORMITORIO_COTA</span>
+                            <h3 style="font-size: 1.2rem;">Luz Cicadiana</h3>
+                            <p class="technical-data" style="font-size: 0.6rem;">Cota, Cundinamarca</p>
+                        </div>
+                    </a>
+
+                    <!-- Proyecto 03: Bot -->
+                    <a href="#" class="atelier-item item-bot">
+                        <img src="https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?auto=format&fit=crop&w=800&q=80" class="atelier-img" alt="Barra">
+                        <div class="atelier-label">
+                            <span class="technical-data">REF: SOCIAL_CHICO</span>
+                            <h3 style="font-size: 1.2rem;">Volumen en Nogal</h3>
+                            <p class="technical-data" style="font-size: 0.6rem;">El Chicó, Bogotá</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div style="text-align: right; margin-top: var(--gap-phi-3);">
+                    <a href="#" class="btn-joinery"><i></i> Explorar Archivo Completo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER / CONTACTO -->
+        <footer id="agendar" style="background-color: var(--color-ink); color: var(--color-canvas); padding: var(--gap-phi-6) 0;">
+            <div class="container" style="text-align: center;">
+                <h2 style="font-size: 4rem; margin-bottom: var(--gap-phi-2); color: white;">Habitar el Bienestar.</h2>
+                <p style="opacity: 0.7; margin-bottom: var(--gap-phi-4);">Agenda una visita técnica sin costo en tu espacio.</p>
+                <div style="display: flex; justify-content: center; gap: var(--gap-phi-3);">
+                    <a href="https://wa.link/rmgga6" class="btn-joinery" style="color: var(--color-brass);"><i></i> WhatsApp</a>
+                    <a href="mailto:hgaciasas@gmail.com" class="btn-joinery" style="color: white;"><i></i> Email</a>
+                </div>
+                <div style="margin-top: var(--gap-phi-5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--gap-phi-3);">
+                    <p class="technical-data">Cra 72a 71a 57 - Bogotá | © Veta de Oro</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+</body>
+</html>

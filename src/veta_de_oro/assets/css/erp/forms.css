@@ -1,0 +1,97 @@
+/**
+ * INDRA AXIOMATIC UI - Forms
+ * Insumos de datos técnicos y robustos.
+ */
+
+.axiom-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.axiom-label {
+    font-family: var(--font-technical);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-faint);
+}
+
+.axiom-input, .axiom-select, .axiom-textarea {
+    width: 100%;
+    background: var(--color-surface-soft);
+    border: none;
+    border-bottom: 1px solid var(--color-boundary);
+    padding: var(--gap-phi-2) 0;
+    font-family: var(--font-rational);
+    font-size: 1rem;
+    color: var(--color-ink);
+    outline: none;
+    transition: var(--transition-fast);
+}
+
+.axiom-input:focus, .axiom-textarea:focus {
+    border-bottom-color: var(--color-brass);
+    background: transparent;
+}
+
+/* Multimedia Ingestion Lego */
+.axiom-dropzone {
+    border: 1px dashed var(--color-boundary);
+    padding: var(--gap-phi-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-phi-2);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition-autor);
+}
+
+.axiom-dropzone:hover {
+    border-color: var(--color-brass);
+    background: var(--color-surface-soft);
+}
+
+/* Audio Recorder Lego */
+.axiom-audio-viz {
+    width: 100%;
+    height: 60px;
+    background: var(--color-ink);
+    border-radius: var(--radius-arch);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.axiom-audio-viz::after {
+    content: 'SIGNAL_READY';
+    font-family: var(--font-technical);
+    font-size: 0.5rem;
+    color: var(--color-brass);
+    opacity: 0.5;
+}
+
+/* Model 3D Placeholder Lego */
+.axiom-3d-canvas {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #111;
+    border-radius: var(--radius-arch);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.axiom-3d-canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}

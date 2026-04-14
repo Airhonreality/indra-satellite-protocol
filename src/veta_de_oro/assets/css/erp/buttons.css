@@ -1,0 +1,98 @@
+/**
+ * INDRA AXIOMATIC v3 - Arquetipo Botón
+ * Minimalismo, Elegancia y Aire Técnico.
+ */
+
+.axiom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    /* Aire y Proporción Líquida */
+    padding: 0.8em 1.6em;
+    border-radius: var(--btn-radius);
+    
+    /* Tipografía Minimalista */
+    font-family: var(--font-rational);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--btn-letter-spacing);
+    
+    /* Estética Base */
+    background: #FFF;
+    border: 1px solid #E0E0E0;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: var(--btn-transition);
+    
+    /* Previene colapsos */
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    outline: none;
+}
+
+.axiom-btn:hover {
+    border-color: var(--color-ink);
+    box-shadow: var(--shadow-depth);
+    transform: translateY(-1px);
+}
+
+.axiom-btn-primary {
+    background: var(--color-ink);
+    color: #FFF;
+    border-color: var(--color-ink);
+}
+
+.axiom-btn-primary:hover {
+    background: #000;
+    border-color: #000;
+}
+
+.axiom-btn-brass {
+    background: var(--color-brass);
+    color: #FFF;
+    border-color: var(--color-brass);
+}
+
+.axiom-btn-brass:hover {
+    background: #b2936a;
+    border-color: #b2936a;
+}
+
+.axiom-btn-ghost {
+    background: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+}
+
+.axiom-btn-ghost:hover {
+    background: #F8F8F8;
+    border-color: #EEE;
+    box-shadow: var(--shadow-soft);
+}
+
+/* Selección Estilo Mockup */
+.axiom-btn-selected {
+    border: 1px solid var(--color-ink);
+    background: #FAFAFA;
+}
+
+/* Iconos Lucide Integrados */
+.axiom-btn i, .axiom-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2px;
+}
+
+/* Tamaños */
+.axiom-btn-sm { 
+    padding: 8px 16px; 
+    font-size: 0.65rem; 
+}
+
+.axiom-btn-lg { 
+    padding: 16px 32px; 
+    font-size: 0.85rem; 
+}

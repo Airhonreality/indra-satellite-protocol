@@ -27,16 +27,16 @@ class SystemNavigation {
          * Si el rol del usuario no está en la lista, el link no se renderiza.
          */
         this.config = [
-            { id: 'erp', label: 'Dashboard', icon: 'layout', url: '/02-admin-erp/index.html', roles: ['admin', 'manager', 'operador'] },
-            { id: 'proyecto', label: 'Proyectos', icon: 'briefcase', url: '/02-admin-erp/tools/proyectos/index.html', roles: ['admin', 'manager'] },
-            { id: 'directorio', label: 'Entidades', icon: 'users', url: '/02-admin-erp/tools/entidades/index.html', roles: ['admin', 'manager'] },
-            { id: 'catalogo', label: 'Catálogo', icon: 'package', url: '/02-admin-erp/tools/catalogo/index.html', roles: ['admin', 'manager'] },
-            { id: 'produccion', label: 'Producción', icon: 'hammer', url: '/02-admin-erp/tools/produccion/index.html', roles: ['admin', 'manager'] },
-            { id: 'desarrollo', label: 'Desarrollo', icon: 'wrench', url: '/02-admin-erp/tools/desarrollo/index.html', roles: ['admin', 'manager'] },
-            { id: 'logs', label: 'Logs & Tareas', icon: 'list-todo', url: '/02-admin-erp/tools/logs/index.html', roles: ['admin', 'manager', 'operador'] },
-            { id: 'kpis', label: 'KPIs', icon: 'bar-chart-3', url: '/02-admin-erp/tools/kpis/index.html', roles: ['admin'] },
-            { id: 'financiero', label: 'Finanzas', icon: 'banknote', url: '/02-admin-erp/tools/financiero/index.html', roles: ['admin'] },
-            { id: 'bridge', label: 'Indra Bridge', icon: 'zap', url: '/02-admin-erp/tools/bridge/index.html', roles: ['admin'] }
+            { id: 'erp', label: 'Dashboard', icon: 'layout', url: '/src/veta_de_oro/admin-erp/index.html', roles: ['admin', 'manager', 'operador'] },
+            { id: 'proyecto', label: 'Proyectos', icon: 'briefcase', url: '/src/veta_de_oro/admin-erp/tools/proyectos/index.html', roles: ['admin', 'manager'] },
+            { id: 'directorio', label: 'Entidades', icon: 'users', url: '/src/veta_de_oro/admin-erp/tools/entidades/index.html', roles: ['admin', 'manager'] },
+            { id: 'catalogo', label: 'Catálogo', icon: 'package', url: '/src/veta_de_oro/admin-erp/tools/catalogo/index.html', roles: ['admin', 'manager'] },
+            { id: 'produccion', label: 'Producción', icon: 'hammer', url: '/src/veta_de_oro/admin-erp/tools/produccion/index.html', roles: ['admin', 'manager'] },
+            { id: 'desarrollo', label: 'Desarrollo', icon: 'wrench', url: '/src/veta_de_oro/admin-erp/tools/desarrollo/index.html', roles: ['admin', 'manager'] },
+            { id: 'logs', label: 'Logs & Tareas', icon: 'list-todo', url: '/src/veta_de_oro/admin-erp/tools/logs/index.html', roles: ['admin', 'manager', 'operador'] },
+            { id: 'kpis', label: 'KPIs', icon: 'bar-chart-3', url: '/src/veta_de_oro/admin-erp/tools/kpis/index.html', roles: ['admin'] },
+            { id: 'financiero', label: 'Finanzas', icon: 'banknote', url: '/src/veta_de_oro/admin-erp/tools/financiero/index.html', roles: ['admin'] },
+            { id: 'bridge', label: 'Indra Bridge', icon: 'zap', url: '/src/veta_de_oro/admin-erp/tools/bridge/index.html', roles: ['admin'] }
         ];
 
         this.baseUrl = this.calculateBase();

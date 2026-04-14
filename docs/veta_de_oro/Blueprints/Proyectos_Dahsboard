@@ -1,0 +1,26 @@
+Dharma: Ser el peunte entre el satelite y el core, permite configurar el espacio de trabajo.
+
+-HEader:
+1. identificacion del core, correo
+3. Nombre del satelite, propietario {metadata minima}
+5. Usuario activo: (google)
+4. boton de inicio de sesión gogole
+--
+-card 1 configuracion del puente:
+-- Configuracion del work space designado default; "crear" "seleccionar" (texto: pudes usar le mismo nombre de tu satelite")
+
+-card 2 panel de shcemas (en vista de arbol, cada scehma es una card desplegable que revela su metadata)
+    -- schemas descubiertos, total. 
+    -- Sub card desplegable Schema;
+    ---Sub header metadata: Nombre del schema ubicación html (nombre de la pagina y nombre del form o contenedor), botones relacionados (botones de forms o acciones que lo relacionan), (Work flows / automatizacion aqui si no se si es posible hacer que una automatizacion se vea como un work flow de indra (json) y si se puedan importar o mostrar las automatizaciones: C:\Users\javir\Documents\DEVs\INDRA FRONT END\system_core\client\src\components\macro_engines\WorkflowDesigner y C:\Users\javir\Documents\DEVs\INDRA FRONT END\system_core\core).
+    ---Cuerpo lista de propeidades por cards: 
+    ----Sub header: nombre + tipo.
+    ....Cuerpo de la card (acciones posibles de la propeidad): Silos asociados (si se asocia a una columna de sheet, notion db, sql db, etc).
+    Asociar o vincular a "silo" (columna de sheet, notion db, sql db, etc).
+--
+-card 3 POsible panel de diseñador de/ descubridor de work flows Ancho total pantalla:
+panel lateral lista de automaticaciones (work flows)
+
+
+NOTA:
+Revisar el disñeo de un modulo que conjunte las funciones del:C:\Users\javir\Documents\DEVs\INDRA FRONT END\system_core\client\src\components\macro_engines\BridgeDesigner y el C:\Users\javir\Documents\DEVs\INDRA FRONT END\system_core\client\src\components\macro_engines\WorkflowDesigner en un solo panel de diseño de work flows y puentesЕnico (card 3) que permita diseñar y hacer logica de automatizaciones y puentes, ojo esto puede ser rebatido por la idea de programar las automatizaciones y puentes desde el schema, o desde codigo puro, pues la idea es que el flujo de diseño de autoamtizaciones i sea mediado por antigravity y texto y es mas rapido y eficiente seguir escribiendo autoamtizaicon desde texto lo que no se es como o donde se alojan me reocmeindas mas darle a antigravity permiso a mi carpeta de G drive donde indra aloja las automatizaciones para que tu las puedas escribir? o las podemos escribir en local para que indra las consuma? de hecho me aprece mas eficiente la idea de escribrilas en local, la limitacion actual es que indra lee solo los json dentro de su propia carpeta de instalacion, siguiendo la configuraicon propia de indra, pero indra es tan poderoso que desde satelite podemos hacer lo que queramos, podemos decirle a indra que en este work space tambien puede consumir las automatizaciones que se encuentren en la carpeta de satelite, o en cualquier carpeta que le indiquemos. aduita esta idea.

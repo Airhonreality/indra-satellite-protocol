@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Dashboard | Indra Axiomatic UI</title>
+    
+    <!-- FUENTES TÉCNICAS -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Cormorant+Garamond:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <!-- CORE CSS -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    
+    <!-- MODULAR ERP SYSTEM (Indra Axiomatic) -->
+    <link rel="stylesheet" href="../css/erp/layout.css">
+    <link rel="stylesheet" href="../css/erp/buttons.css">
+    <link rel="stylesheet" href="../css/erp/forms.css">
+    <link rel="stylesheet" href="../css/erp/themes.css">
+    
+    <link rel="stylesheet" href="../css/system-navigation.css">
+    <script src="../03-system-infra/core/engines/SystemNavigation.js"></script>
+</head>
+<body class="erp-veta axiom-dashboard" data-theme="light">
+
+    <!-- La navegación global se inyecta automáticamente via SystemNavigation.js -->
+
+    <!-- CUERPO DEL DASHBOARD (Layout Áureo: 61.8% / 38.2%) -->
+    <div class="axiom-grid-aureo">
+        
+        <!-- COLUMNA PRINCIPAL -->
+        <section class="axiom-flex-column">
+            <article class="axiom-panel">
+                <span class="axiom-label">MAIN_VIEWPORT</span>
+                <h2>Área de Trabajo Principal</h2>
+                <p>Aquí va el contenido core del dashboard.</p>
+                
+                <div class="axiom-3d-canvas">
+                    <span class="axiom-label" style="opacity: 0.3;">3D_RENDER_ENGINE_IDLE</span>
+                </div>
+            </article>
+        </section>
+
+        <!-- COLUMNA LATERAL (Sidebar) -->
+        <aside class="axiom-flex-column">
+            <article class="axiom-panel">
+                <span class="axiom-label">CONTROL_UNIT</span>
+                <h3>Acciones Rápidas</h3>
+                
+                <div class="axiom-flex-column" style="margin-top: var(--gap-phi-2);">
+                    <div class="axiom-form-group">
+                        <label class="axiom-label">Entry_ID</label>
+                        <input type="text" class="axiom-input" placeholder="00-X-ALPHA">
+                    </div>
+                    
+                    <button class="axiom-btn axiom-btn-primary">EJECUTAR PROCESO ↗</button>
+                    <button class="axiom-btn axiom-btn-ghost">Descargar Reporte</button>
+                </div>
+            </article>
+
+            <article class="axiom-panel">
+                <span class="axiom-label">AUDIO_LOG</span>
+                <div class="axiom-audio-viz"></div>
+                <button class="axiom-btn axiom-btn-sm" style="width: 100%;">RECORD_SESSION</button>
+            </article>
+        </aside>
+
+    </div>
+
+    <!-- FOOTER TÉCNICO -->
+    <footer class="axiom-flex-row axiom-space-between technical-data" style="margin-top: auto; opacity: 0.4; padding-top: var(--gap-phi-3);">
+        <span>AXIOM_UI_BUILD: 2026.4.11</span>
+        <span>SYSTEM_HOMEOTASIS: 100%</span>
+    </footer>
+
+</body>
+</html>

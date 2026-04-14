@@ -50,7 +50,6 @@ async function ignite() {
             }
         };
     }
-}
 
     // 6. Escuchar Intento de Login
     window.addEventListener('indra-login', () => {
@@ -59,3 +58,8 @@ async function ignite() {
         alert("Sincronizando con Google Identity Services v3...");
     });
 }
+
+// Iniciar el Proceso
+ignite().catch(err => {
+    console.error("❌ ERROR CRÍTICO EN IGNICIÓN:", err);
+});

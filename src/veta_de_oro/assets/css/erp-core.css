@@ -1,0 +1,96 @@
+/**
+ * ERP CORE — Veta de Oro
+ * Estética Canónica para herramientas internas (Cotizador, CRM, Admin).
+ * DHARMA: Aislado bajo el Namespace .erp-veta para evitar fugas a la web pública.
+ */
+
+:root {
+    --erp-transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    --erp-border: 1px solid rgba(212, 175, 55, 0.3);
+    --erp-bg-soft: rgba(212, 175, 55, 0.05);
+}
+
+/* El Namespace protege a la web pública de cambios accidentales */
+.erp-veta {
+    font-family: var(--font-rational);
+    color: var(--color-ink);
+}
+
+.erp-veta .title-display {
+    font-family: var(--font-signature);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.1;
+    margin-bottom: var(--gap-phi-3);
+}
+
+/* Card Axiomática ERP */
+.erp-veta .option-card {
+    background: transparent;
+    border: var(--border-hairline);
+    padding: var(--gap-phi-3);
+    cursor: pointer;
+    transition: var(--erp-transition);
+    position: relative;
+}
+
+.erp-veta .option-card:hover {
+    border-color: var(--color-brass);
+    background: var(--erp-bg-soft);
+}
+
+.erp-veta .option-card.selected {
+    border-color: var(--color-brass);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Botonera Canon Veta */
+.erp-veta .btn-veta {
+    font-family: var(--font-rational);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 15px 40px;
+    border: var(--border-hairline);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: var(--erp-transition);
+}
+
+.erp-veta .btn-veta:hover:not(:disabled) {
+    background: var(--color-ink);
+    color: var(--color-canvas);
+}
+
+.erp-veta .btn-veta-primary {
+    border-color: var(--color-brass);
+}
+
+/* Inputs y Formularios Técnicos */
+.erp-veta .form-group input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: var(--border-hairline);
+    padding: 12px 0;
+    font-size: 1.1rem;
+    outline: none;
+    transition: var(--erp-transition);
+}
+
+.erp-veta .form-group input:focus {
+    border-bottom-color: var(--color-brass);
+}
+
+/* Cajas de Resultado y Proyección */
+.erp-veta .summary-box {
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    padding: var(--gap-phi-4);
+    text-align: center;
+}
+
+.erp-veta .projection-value {
+    font-family: var(--font-technical);
+    font-size: 2.5rem;
+    color: var(--color-brass);
+}
