@@ -26,7 +26,7 @@ async function ignite() {
     console.log(`🔗 Resonancia establecida con el Core v${coreMeta.core_version}`);
 
     // 3. Cargar la Realidad Local (Contrato)
-    const reader = await ContractReader.loadLocal('../_INDRA_PROTOCOL_/indra_contract.json');
+    const reader = await ContractReader.loadLocal('./_INDRA_PROTOCOL_/indra_contract.json');
     console.log(`📦 Capacidades asimiladas: ${reader.contract.capabilities.protocols.length} protocolos.`);
 
     // 4. Proyectar en la Estación de Control (HUD)
