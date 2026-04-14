@@ -1,9 +1,9 @@
 /**
  * =============================================================================
- * MAIN SATELLITE ENTRY POINT
+ * MAIN SATELLITE ENTRY POINT (Decoupled Edition)
  * =============================================================================
- * Este es el archivo donde el usuario inicia su lógica de negocio.
- * Importamos todo desde la jurisdicción protegida _INDRA_PROTOCOL_.
+ * Este es el archivo donde el ERP gestiona su lógica y sus usuarios.
+ * El Satélite es el único responsable de obtener el TOKEN de acceso.
  * =============================================================================
  */
 
@@ -13,50 +13,50 @@ import ContractReader from '../_INDRA_PROTOCOL_/core/ContractReader.js';
 import '../_INDRA_PROTOCOL_/ui/IndraBridgeHUD.js';
 
 async function ignite() {
-    console.log("🚀 Ignición del Satélite...");
+    console.log("🚀 Ignición del Satélite Soberano...");
 
-    // 1. Inicializar el Sistema Nervioso
+    // 1. Inicializar el Sistema Nervioso (Sin dependencia de UI para Auth)
     const bridge = new IndraBridge({
         coreUrl: 'https://script.google.com/macros/s/AKfycbyhEucpkr6GtpMqQ0LnenhP4SIUXOUJ2M4ycFIVGLBmUuxWYL6hXRTUOBESiC6LlpfA/exec',
         satelliteToken: 'indra_satellite_omega'
     });
 
-    // 2. Handshake con el Core
+    // 2. Handshake con el Core (Infraestructura)
     const coreMeta = await bridge.init();
     console.log(`🔗 Resonancia establecida con el Core v${coreMeta.core_version}`);
 
-    // 3. Cargar la Realidad Local (Contrato)
+    // 3. Cargar la Realidad Local (Contrato mediado por Git)
     const reader = await ContractReader.loadLocal('./_INDRA_PROTOCOL_/indra_contract.json');
-    console.log(`📦 Capacidades asimiladas: ${reader.contract.capabilities.protocols.length} protocolos.`);
-
-    // 4. Obtener Entornos (Workspaces) reales
+    
+    // 4. Carga de Workspaces (Acceso de Infraestructura)
     let workspaces = [];
     try {
         workspaces = await bridge.listWorkspaces();
     } catch (e) {
-        console.warn("⚠️ No se pudieron cargar los workspaces (¿Sesión activa?).");
+        console.warn("⚠️ Workspaces restringidos. Identidad requerida.");
     }
 
-    // 5. Proyectar en la Estación de Control (HUD)
+    // 5. Proyectar en la Estación de Control (HUD Pasivo)
     const hud = document.getElementById('main-hud');
     if (hud) {
+        // El HUD solo recibe datos. No inicia procesos.
         hud.config = {
             contract: reader.contract,
             workspaces: workspaces,
             core: {
-                id: coreMeta.core_id, 
-                sat_name: 'VETA DE ORO ERP',
-                status: 'RESONANDO'
-            }
+                sat_name: 'VETA DE ORO ERP'
+            },
+            // user: { email: 'admin@vetadeoro.com' } // <--- Ejemplo de inyección de identidad
         };
     }
 
-    // 6. Escuchar Intento de Login
-    window.addEventListener('indra-login', () => {
-        console.log("🔑 Iniciando flujo de Google Identity Services...");
-        // Aquí iría el cliente de GSI: google.accounts.id.prompt();
-        alert("Sincronizando con Google Identity Services v3...");
-    });
+    /**
+     * NOTA ARQUITECTÓNICA:
+     * El login debe manejarse aquí, en la lógica del ERP.
+     * Al obtener el token, se inyectaría al bridge: 
+     * bridge.setAuth(googleToken);
+     * hud.config = { ...hud.config, user: { email: '...' } };
+     */
 }
 
 // Iniciar el Proceso
