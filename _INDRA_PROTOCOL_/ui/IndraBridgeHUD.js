@@ -1,10 +1,10 @@
 /**
  * =============================================================================
- * INDRA BRIDGE HUD (Soberanía Veta de Oro - LIGHT EDITION)
+ * INDRA BRIDGE HUD (Blueprint Standard v2.0)
  * =============================================================================
- * Responsabilidad: Orquestador visual del Satélite.
- * Tematización: Premium Light Mode.
- * Identidad: Google Identity Integrated.
+ * Responsabilidad: Interfaz de control estricta y profesional.
+ * Nomenclatura: Basada 100% en el Blueprint de Veta de Oro.
+ * Estética: Minimalista, sin elementos superfluos (emojis).
  * =============================================================================
  */
 
@@ -13,32 +13,29 @@ const TEMPLATE = `
     :host {
         display: block;
         font-family: var(--indra-font, 'Inter', system-ui, sans-serif);
-        --accent: var(--indra-accent, #1A73E8);
-        --bg: var(--indra-bg, #FFFFFF);
-        --surface: var(--indra-surface, #F8F9FA);
-        --text: var(--indra-text, #3C4043);
-        --border: var(--indra-border, #DADCE0);
-        --card-bg: #FFFFFF;
+        --accent: #1A73E8;
+        --bg: #FFFFFF;
+        --surface: #F8F9FA;
+        --text: #3C4043;
+        --border: #DADCE0;
         color: var(--text);
     }
 
     .hud-container {
         display: flex;
         flex-direction: column;
-        gap: 20px;
         background: var(--bg);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 0;
+        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* --- HEADER --- */
+    /* --- HEADER: IDENTIDAD Y ACCESO --- */
     .hud-header {
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        padding: 15px 25px;
+        background: #FFFFFF;
+        border-bottom: 2px solid var(--surface);
+        padding: 20px 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -51,136 +48,109 @@ const TEMPLATE = `
 
     .core-id {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        color: var(--accent);
-        font-weight: 600;
-        opacity: 0.8;
+        font-size: 11px;
+        color: #70757a;
+        margin-top: 4px;
     }
 
     .sat-label {
-        font-weight: 800;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-weight: 700;
+        font-size: 13px;
         color: #202124;
+        letter-spacing: 0.2px;
     }
 
-    /* --- GOOGLE LOGIN BUTTON --- */
     .btn-google {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         background: #FFFFFF;
         color: #3C4043;
         border: 1px solid var(--border);
-        padding: 8px 16px;
+        padding: 10px 18px;
         border-radius: 4px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 1px 2px rgba(60,64,67, 0.3), 0 1px 3px 1px rgba(60,64,67, 0.15);
+        transition: background 0.2s;
     }
 
-    .btn-google:hover {
-        background: #F7F8F8;
-        box-shadow: 0 1px 2px rgba(60,64,67, 0.3), 0 2px 6px 2px rgba(60,64,67, 0.15);
-    }
-
-    .btn-google:active {
-        background: #E8EAED;
-        box-shadow: 0 1px 2px rgba(60,64,67, 0.3);
-    }
-
-    .btn-google svg {
-        width: 18px;
-        height: 18px;
-    }
+    .btn-google:hover { background: #f8f9fa; border-color: #bcc1c8; }
+    .btn-google svg { width: 18px; height: 18px; }
 
     /* --- GRID DE CARDS --- */
     .hud-body {
         display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 20px;
-        padding: 25px;
-        background: var(--surface);
+        grid-template-columns: 340px 1fr;
+        gap: 1px;
+        background: var(--border);
     }
 
     .card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        background: #FFFFFF;
+        padding: 25px;
     }
 
     .card-title {
         font-size: 11px;
-        color: #70757a;
+        color: #5f6368;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-         font-weight: 700;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        letter-spacing: 0.8px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--surface);
+        padding-bottom: 8px;
     }
 
-    /* --- CARD 1: WORKSPACE --- */
+    /* --- CARD 1: CONFIGURACIÓN DEL WORKSPACE --- */
     .workspace-selector {
-        background: #FFFFFF;
+        background: var(--surface);
         border: 1px solid var(--border);
-        color: var(--text);
+        padding: 12px;
         width: 100%;
-        padding: 10px;
         border-radius: 4px;
-        margin-bottom: 12px;
+        margin-bottom: 15px;
         font-size: 13px;
-        outline: none;
     }
-
-    .workspace-selector:focus { border-color: var(--accent); }
 
     .btn-action {
         width: 100%;
-        background: transparent;
-        border: 1px solid var(--accent);
-        color: var(--accent);
-        padding: 8px;
+        background: #F1F3F4;
+        border: none;
+        color: #3C4043;
+        padding: 10px;
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
         border-radius: 4px;
-        transition: background 0.2s;
     }
 
-    .btn-action:hover { background: rgba(26, 115, 232, 0.04); }
+    .btn-action:hover { background: #E8EAED; }
 
-    /* --- CARD 2: RESONANCIA (Árbol) --- */
+    /* --- CARD 2: PANEL DE ESQUEMAS --- */
     .resonance-tree {
         font-family: 'JetBrains Mono', monospace;
         font-size: 12px;
     }
 
     .tree-node {
-        padding: 8px 0;
-        border-bottom: 1px solid #f1f3f4;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--surface);
     }
 
-    .node-label { display: flex; justify-content: space-between; font-weight: 600; color: #202124; }
-    .node-meta { font-size: 10px; color: #70757a; margin-top: 2px; }
+    .node-label { font-weight: 700; color: #202124; }
+    .node-meta { font-size: 10px; color: #70757a; margin-top: 4px; text-transform: uppercase; }
 
-    /* --- CARD 3: WORKFLOW --- */
+    /* --- CARD 3: WORKFLOW & AUTOMATION DESIGNER --- */
     .workflow-panel {
         display: grid;
-        grid-template-columns: 240px 1fr;
-        gap: 20px;
-        min-height: 400px;
+        grid-template-columns: 260px 1fr;
+        gap: 30px;
+        min-height: 450px;
     }
 
     .flow-list {
-        border-right: 1px solid #f1f3f4;
-        padding-right: 15px;
+        border-right: 1px solid var(--surface);
     }
 
     .flow-item {
@@ -188,20 +158,17 @@ const TEMPLATE = `
         font-size: 13px;
         color: #5f6368;
         cursor: pointer;
-        border-radius: 6px;
-        margin-bottom: 4px;
-        transition: all 0.2s;
+        border-radius: 4px;
     }
 
-    .flow-item:hover { background: #f1f3f4; }
-    .flow-item.active { background: #E8F0FE; color: var(--accent); font-weight: 600; }
+    .flow-item.active { background: #E8F0FE; color: var(--accent); font-weight: 700; }
 
-    .flow-editor-empty {
+    .empty-designer {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #dadce0;
+        color: #BDC1C6;
         text-align: center;
     }
 </style>
@@ -209,8 +176,8 @@ const TEMPLATE = `
 <div class="hud-container">
     <header class="hud-header">
         <div class="core-identity">
-            <span class="sat-label" id="sat-name">CARGANDO SATÉLITE...</span>
-            <span class="core-id" id="core-id">Sincronizando Core...</span>
+            <span class="sat-label" id="sat-name">IDENTIFICACIÓN: DESCONOCIDO</span>
+            <span class="core-id" id="core-id">GOOGLE_CORE: PENDIENTE DE SESIÓN</span>
         </div>
         <div class="user-auth">
             <button class="btn-google" id="login-trigger">
@@ -226,33 +193,35 @@ const TEMPLATE = `
     </header>
 
     <div class="hud-body">
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; flex-direction: column; background: var(--border); gap: 1px;">
+            <!-- CARD I -->
             <section class="card">
-                <h3 class="card-title">🌐 Espacio de Trabajo</h3>
+                <h3 class="card-title">CONFIGURACIÓN DEL WORKSPACE</h3>
                 <select class="workspace-selector" id="ws-select">
-                    <option>Cargando entornos...</option>
+                    <option value="">SIN ENTORNOS</option>
                 </select>
-                <button class="btn-action" id="create-ws">+ NUEVO ENTORNO</button>
+                <button class="btn-action">CREAR NUEVO WORKSPACE</button>
             </section>
 
+            <!-- CARD II -->
             <section class="card">
-                <h3 class="card-title">🧬 Árbol de Resonancia</h3>
+                <h3 class="card-title">PANEL DE ESQUEMAS</h3>
                 <div class="resonance-tree" id="res-tree">
-                    <div style="opacity: 0.3; font-size: 11px;">Mapeando realidad local...</div>
+                    <div style="opacity: 0.3; font-size: 11px;">ESPERANDO HANDSHAKE...</div>
                 </div>
             </section>
         </div>
 
-        <section class="card">
-            <h3 class="card-title">🎼 Orquestador de Flujos</h3>
+        <!-- CARD III -->
+        <section class="card" style="border-left: 1px solid var(--border);">
+            <h3 class="card-title">WORKFLOW & AUTOMATION DESIGNER</h3>
             <div class="workflow-panel">
                 <div class="flow-list" id="flow-list">
-                    <div class="flow-item active">Nuevo Flujo de Negocio</div>
+                    <div class="flow-item active">Nuevo Flujo Local...</div>
                 </div>
-                <div class="flow-editor-empty" id="flow-content">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🎼</div>
-                    <div style="font-weight: 600; color: #5f6368;">Diseñador de Flujos v2.2</div>
-                    <div style="font-size: 13px; color: #9aa0a6; margin-top: 10px;">Selecciona una partitura para editar la lógica.</div>
+                <div class="empty-designer" id="flow-content">
+                    <div style="color: #dadce0; font-size: 32px; font-weight: 300;">PROYECTOR LÓGICO</div>
+                    <div style="font-size: 12px; margin-top: 15px;">Seleccione un esquema para iniciar el diseño de flujo.</div>
                 </div>
             </div>
         </section>
@@ -269,9 +238,7 @@ class IndraBridgeHUD extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        if (this._config) {
-            this.applyConfig(this._config);
-        }
+        if (this._config) this.applyConfig(this._config);
     }
 
     set config(data) {
@@ -283,31 +250,33 @@ class IndraBridgeHUD extends HTMLElement {
 
     applyConfig(data) {
         if (data.contract) this.updateResonanceTree(data.contract);
+        if (data.workspaces) this.updateWorkspaces(data.workspaces);
         if (data.core) {
             const coreIdEl = this.shadowRoot.getElementById('core-id');
             const satNameEl = this.shadowRoot.getElementById('sat-name');
-            if (coreIdEl) coreIdEl.innerText = `CORE ID: ${data.core.id}`;
-            if (satNameEl) satNameEl.innerText = data.core.sat_name || 'INDRA SATELLITE';
+            if (coreIdEl) coreIdEl.innerText = `STATUS: ${data.core.status || 'CONECTADO'} | ID: ${data.core.id}`;
+            if (satNameEl) satNameEl.innerText = `INSTANCIA: ${data.core.sat_name || 'INDRA'}`;
         }
+    }
+
+    updateWorkspaces(workspaces) {
+        const select = this.shadowRoot.getElementById('ws-select');
+        if (!select || workspaces.length === 0) return;
+        select.innerHTML = workspaces.map(ws => `<option value="${ws.id}">${ws.name}</option>`).join('');
     }
 
     updateResonanceTree(contract) {
         const tree = this.shadowRoot.getElementById('res-tree');
         if (!contract) return;
-
         const schemas = contract.schemas || (contract.raw?.metadata?.items?.filter(i => i.class === 'SCHEMA')) || [];
-
         if (schemas.length === 0) {
-            tree.innerHTML = '<div style="opacity:0.3; font-size:11px;">No hay esquemas resonando.</div>';
+            tree.innerHTML = '<div style="opacity:0.3; font-size:11px;">SIN ESQUEMAS DISPONIBLES</div>';
             return;
         }
-
         tree.innerHTML = schemas.map(schema => `
             <div class="tree-node">
-                <div class="node-label">
-                    <span>${schema.handle?.alias || schema.id}</span>
-                </div>
-                <div class="node-meta">${schema.protocols?.join(' • ') || 'Silo Sincronizado'}</div>
+                <div class="node-label">${schema.handle?.alias || schema.id}</div>
+                <div class="node-meta">RESONANCIA: ${schema.protocols?.[0] || 'SISTEMA'}</div>
             </div>
         `).join('');
     }
@@ -315,7 +284,8 @@ class IndraBridgeHUD extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = TEMPLATE;
         this.shadowRoot.getElementById('login-trigger').onclick = () => {
-            this.dispatchEvent(new CustomEvent('indra-login', { bubbles: true, composed: true }));
+             alert("Redirigiendo a Google Auth...");
+             this.dispatchEvent(new CustomEvent('indra-login', { bubbles: true, composed: true }));
         };
     }
 }

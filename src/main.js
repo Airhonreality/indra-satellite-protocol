@@ -29,14 +29,24 @@ async function ignite() {
     const reader = await ContractReader.loadLocal('./_INDRA_PROTOCOL_/indra_contract.json');
     console.log(`📦 Capacidades asimiladas: ${reader.contract.capabilities.protocols.length} protocolos.`);
 
-    // 4. Proyectar en la Estación de Control (HUD)
+    // 4. Obtener Entornos (Workspaces) reales
+    let workspaces = [];
+    try {
+        workspaces = await bridge.listWorkspaces();
+    } catch (e) {
+        console.warn("⚠️ No se pudieron cargar los workspaces (¿Sesión activa?).");
+    }
+
+    // 5. Proyectar en la Estación de Control (HUD)
     const hud = document.getElementById('main-hud');
     if (hud) {
         hud.config = {
             contract: reader.contract,
+            workspaces: workspaces,
             core: {
-                id: coreMeta.core_id,
-                sat_name: 'VETA DE ORO ERP'
+                id: coreMeta.core_id, 
+                sat_name: 'VETA DE ORO ERP',
+                status: 'RESONANDO'
             }
         };
     }
