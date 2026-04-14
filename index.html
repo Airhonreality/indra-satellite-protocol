@@ -8,35 +8,45 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --indra-bg: #FFFFFF;
+            --indra-accent: #1A73E8; /* Azul Google Central */
+            --indra-surface: #F8F9FA;
+            --indra-text: #3C4043;
+            --indra-border: #DADCE0;
+        }
+
         body {
-            background-color: #050608;
-            color: #e0e0e0;
+            background-color: var(--indra-surface);
+            color: var(--indra-text);
             margin: 0;
             padding: 40px;
             font-family: 'Inter', sans-serif;
+            transition: background 0.3s ease;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         h1 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 30px;
-            color: #00f2ff;
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            color: var(--indra-accent);
             text-transform: uppercase;
+            letter-spacing: -0.5px;
+            font-weight: 700;
         }
 
         #log-layer {
             margin-top: 40px;
-            border-top: 1px solid rgba(0, 242, 255, 0.1);
+            border-top: 1px solid var(--indra-border);
             padding-top: 20px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            opacity: 0.5;
+            opacity: 0.6;
         }
     </style>
 </head>
