@@ -1,4 +1,24 @@
-# Indra Satellite Protocol (ISP) v1.8 — Smart Jurisdiction
+# Indra Satellite Protocol (ISP) v2.1 — MCEP Standards
+> **NIVEL DE PROTOCOLO: Modular Capabilities Exchange (MCEP)**
+
+
+## 🏛️ El Dharma del Desarrollo (Anti-Entropía)
+
+Este repositorio no es una librería de funciones; es un sistema de órbitas. Todo desarrollador u **Agente de IA** que opere aquí debe adherirse a los siguientes documentos de integridad:
+
+1.  **[AXIOMS_DHARMA.md](AXIOMS_DHARMA.md)**: El propósito existencial de cada capa.
+2.  **[ENTROPY_VECTORS.md](ENTROPY_VECTORS.md)**: Lo que NO debes hacer (Garantía de Sinceridad).
+3.  **[COOKBOOK.md](COOKBOOK.md)**: Patrones de solución industrial.
+
+---
+
+## 🤖 Instrucciones para Agentes (IA / LLM)
+Si eres una IA encargada de construir en este satélite, tus directivas son:
+1. **Sincronización Mandatoria**: Llama a `sync_core.js` y usa `ContractReader` antes de proponer cualquier esquema de datos.
+2. **Prohibición de Persistencia Local**: No sugerir SQL o LocalStorage para datos de negocio. Usa `bridge.uploadFile()`.
+3. **Orquestación sobre Lógica**: Si el requerimiento involucra cálculos, propón una Estación en el `WorkflowEngine` usando `patterns/LOGIC_UNIT.json`.
+
+---
 
 ## 🚀 Ignición del Satélite
 

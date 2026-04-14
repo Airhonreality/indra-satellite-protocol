@@ -50,11 +50,37 @@ class IndraBridge {
     }
 
     /**
-     * Sube un archivo al Core (ej: Drive) de forma canónica.
-     * @param {string} fileName - Nombre del archivo con extensión.
-     * @param {string} base64Data - Contenido en Base64 (sin el prefijo data:...)
-     * @param {string} folderId - ID del contenedor (opcional).
-     * @param {string} provider - El silo de destino (default: drive).
+     * @dharma Inicializar el sistema nervioso.
+     * @restriction NUNCA permite operar sin un contrato sincronizado recientemente.
+     */
+    async init() {
+        console.log("[IndraBridge] Handshake iniciado...");
+        
+        // Validación de Salud del Contrato (MCEP Enforcement)
+        try {
+            const contractRes = await fetch('./core/indra_contract.json');
+            const contract = await contractRes.json();
+            const syncedAt = new Date(contract.synced_at);
+            const now = new Date();
+            const hoursDiff = (now - syncedAt) / (1000 * 60 * 60);
+
+            if (hoursDiff > 24) {
+                console.warn("⚠️ [IndraBridge] DHARMA_WARN: El contrato local tiene >24h. Riesgo de Entropía Semántica. Se recomienda correr sync_core.js.");
+            }
+        } catch (e) {
+            console.error("❌ [IndraBridge] ERROR_AXIOMATICO: indra_contract.json no encontrado. El satélite está ciego.");
+        }
+
+        return this.execute({
+            protocol: 'GETMCEPMANIFEST',
+            provider: 'system',
+            data: { mode: 'RAW_MAP' }
+        }).then(res => res.metadata);
+    }
+
+    /**
+     * @dharma Cargar y persistir archivos en silos de datos.
+     * @restriction Solo admite transporte en Base64.
      */
     async uploadFile(fileName, base64Data, folderId = null, provider = 'drive') {
         return this.execute({
@@ -134,26 +160,10 @@ class IndraBridge {
         }
     }
 
-    async init(config = {}) {
-        this.coreUrl = config.coreUrl || this.coreUrl;
-        this.satelliteToken = config.satelliteToken || this.satelliteToken;
-        if (!this.coreUrl || !this.satelliteToken) return false;
-
-        try {
-            const handshake = await this.execute({ protocol: 'SYSTEM_INSTALL_HANDSHAKE' });
-            this.coreVersion = handshake.metadata?.core_version || '4.0';
-            const manifest = await this.execute({ protocol: 'SYSTEM_MANIFEST' });
-            this.capabilities.providers = manifest.items.map(p => p.handle?.alias || p.id);
-            return true;
-        } catch (err) {
-            this.logger.error("[IndraBridge] Fallo en Handshake:", err);
-            return false;
-        }
-    }
-
     /**
-     * EJECUCIÓN SOBERANA (UQO)
-     * Auto-inyecta 'system' como provider si se omite para evitar bloqueos ADR-001.
+     * EJECUCIÓN SOBERANA
+     * @dharma Puente de comunicación universal.
+     * @restriction NUNCA debe modificar los datos del UQO.
      */
     async execute(uqo, options = {}) {
         // --- 🛡️ PARCHE DE JURISDICCIÓN (v1.8) ---
