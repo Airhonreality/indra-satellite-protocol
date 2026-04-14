@@ -17,8 +17,8 @@ async function ignite() {
 
     // 1. Inicializar el Sistema Nervioso (Sin dependencia de UI para Auth)
     const bridge = new IndraBridge({
-        coreUrl: 'https://script.google.com/macros/s/AKfycbyhEucpkr6GtpMqQ0LnenhP4SIUXOUJ2M4ycFIVGLBmUuxWYL6hXRTUOBESiC6LlpfA/exec',
-        satelliteToken: 'indra_satellite_omega'
+        coreUrl: 'https://TU_CORE_URL_AQUI',
+        satelliteToken: 'SATELLITE_TOKEN_AQUI'
     });
 
     // 2. Handshake con el Core (Infraestructura)
@@ -44,9 +44,9 @@ async function ignite() {
             contract: reader.contract,
             workspaces: workspaces,
             core: {
-                sat_name: 'VETA DE ORO ERP'
+                sat_name: 'SATELLITE_ALPHA'
             },
-            // user: { email: 'admin@vetadeoro.com' } // <--- Ejemplo de inyección de identidad
+            // user: { email: 'admin@satellite.ai' } // <--- Ejemplo de inyección de identidad
         };
     }
 

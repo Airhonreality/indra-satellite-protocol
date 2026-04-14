@@ -2,7 +2,7 @@
 > **NIVEL DE PROTOCOLO: Modular Capabilities Exchange (MCEP)**
 
 ## 📍 RUTA DE COLONIZACIÓN
-Para desplegar este protocolo en un nuevo Satélite o ERP (Veta de Oro), usa una de las siguientes rutas:
+Para desplegar este protocolo en un nuevo Satélite o ERP, usa una de las siguientes rutas:
 
 ### A. Proyecto Nuevo (Clonación Completa)
 ```bash
