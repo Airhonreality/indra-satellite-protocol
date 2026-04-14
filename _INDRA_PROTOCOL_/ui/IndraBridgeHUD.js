@@ -290,9 +290,9 @@ const TEMPLATE = `
 <div class="hud-container">
     <header class="hud-header">
         <div class="core-identity">
-            <span class="sat-label" id="sat-name">CONECTANDO...</span>
+            <span class="sat-label" id="sat-name">LOCALIZANDO...</span>
             <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
-                 <span class="core-id" id="core-id" style="opacity:0.6; font-size:9px;">IDENTIFICANDO PROTOCOLO...</span>
+                 <span id="core-status" style="font-size:9px; color:#188038; font-weight:700;">NÚCLEO SINCORNIZADO</span>
                  <span id="auth-status" style="font-size:9px; background:#f1f3f4; color:#5f6368; padding:2px 6px; border-radius:4px; font-weight:700;">ACCESO SOBERANO REQUERIDO</span>
             </div>
         </div>
@@ -385,9 +385,7 @@ class IndraBridgeHUD extends HTMLElement {
         }
 
         if (data.core) {
-            const coreIdEl = this.shadowRoot.getElementById('core-id');
             const satNameEl = this.shadowRoot.getElementById('sat-name');
-            if (coreIdEl) coreIdEl.innerText = `NÚCLEO SOBERANO: ${data.core.id}`;
             if (satNameEl) satNameEl.innerText = data.core.sat_name || 'INDRA SATELLITE';
         }
     }
