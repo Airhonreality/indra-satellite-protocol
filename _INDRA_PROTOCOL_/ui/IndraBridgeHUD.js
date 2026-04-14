@@ -189,16 +189,17 @@ const TEMPLATE = `
 
     .prop-silo { color: #188038; font-weight: 600; font-size: 9px; }
 
-    /* --- CARD 3: WORKFLOW & AUTOMATION DESIGNER --- */
     .workflow-panel {
         display: grid;
-        grid-template-columns: 260px 1fr;
-        gap: 30px;
-        min-height: 450px;
+        grid-template-columns: 280px 1fr;
+        gap: 0;
+        min-height: 500px;
     }
 
     .flow-list {
-        border-right: 1px solid var(--surface);
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 15px;
     }
 
     .flow-item {
@@ -207,18 +208,83 @@ const TEMPLATE = `
         color: #5f6368;
         cursor: pointer;
         border-radius: 4px;
+        margin-bottom: 5px;
+        border: 1px solid transparent;
     }
 
-    .flow-item.active { background: #E8F0FE; color: var(--accent); font-weight: 700; }
+    .flow-item:hover { background: #fff; border-color: var(--border); }
+    .flow-item.active { background: #fff; border-color: var(--accent); color: var(--accent); font-weight: 700; }
 
-    .empty-designer {
+    .designer-stage {
+        padding: 30px;
+        background: #fff;
+    }
+
+    .step-node {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .step-node::after {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        width: 2px;
+        height: 20px;
+        background: var(--border);
+    }
+
+    .step-node:last-child::after { display: none; }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        display: flex;
         align-items: center;
         justify-content: center;
-        color: #BDC1C6;
-        text-align: center;
+        font-weight: 800;
+        font-size: 10px;
+        color: var(--accent);
     }
+
+    .step-info {
+        flex: 1;
+        background: var(--surface);
+        padding: 12px 18px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+    }
+
+    .step-type { font-size: 10px; text-transform: uppercase; color: #70757a; font-weight: 700; }
+    .step-name { font-size: 13px; font-weight: 700; color: #202124; margin-bottom: 4px; }
+
+    .designer-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 15px 30px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .btn-soapy {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-soapy:hover { background: #f1f3f4; }
 </style>
 
 <div class="hud-container">
@@ -261,15 +327,21 @@ const TEMPLATE = `
         </div>
 
         <!-- CARD III -->
-        <section class="card" style="border-left: 1px solid var(--border);">
-            <h3 class="card-title">WORKFLOW & AUTOMATION DESIGNER</h3>
+        <section class="card" style="padding:0;">
+            <div class="designer-toolbar">
+                <button class="btn-soapy">IMPORTAR JSON</button>
+                <button class="btn-soapy" style="color:var(--accent)">EXPORTAR SOBERANÍA</button>
+            </div>
             <div class="workflow-panel">
                 <div class="flow-list" id="flow-list">
-                    <div class="flow-item active">Nuevo Flujo Local...</div>
+                    <h3 class="card-title" style="padding:0; border:none; margin-bottom:10px;">AUTOMATIZACIONES</h3>
+                    <div class="flow-item active">Nuevo Flujo Maestro</div>
                 </div>
-                <div class="empty-designer" id="flow-content">
-                    <div style="color: #dadce0; font-size: 32px; font-weight: 300;">PROYECTOR LÓGICO</div>
-                    <div style="font-size: 12px; margin-top: 15px;">Seleccione un esquema para iniciar el diseño de flujo.</div>
+                <div class="designer-stage" id="flow-content">
+                    <h3 class="card-title">DISEÑO DE FLUJO</h3>
+                    <div id="steps-container">
+                         <div style="opacity: 0.3; font-size: 11px; text-align:center; padding-top:100px;">SELECCIONE UNA AUTOMATIZACIÓN PARA VISUALIZAR SU LÓGICA</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -299,6 +371,7 @@ class IndraBridgeHUD extends HTMLElement {
     applyConfig(data) {
         if (data.contract) this.updateResonanceTree(data.contract);
         if (data.workspaces) this.updateWorkspaces(data.workspaces);
+        if (data.activeWorkflow) this.updateWorkflowDesigner(data.activeWorkflow);
         if (data.core) {
             const coreIdEl = this.shadowRoot.getElementById('core-id');
             const satNameEl = this.shadowRoot.getElementById('sat-name');
@@ -342,6 +415,28 @@ class IndraBridgeHUD extends HTMLElement {
                             </div>
                         `).join('') || '<div style="opacity:0.5">Sin propiedades definidas</div>'}
                     </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateWorkflowDesigner(workflow) {
+        const container = this.shadowRoot.getElementById('steps-container');
+        if (!container) return;
+        const stations = workflow.payload?.stations || [];
+
+        if (stations.length === 0) {
+            container.innerHTML = '<div style="opacity: 0.3; font-size: 11px; text-align:center; padding-top:100px;">ESTE FLUJO NO TIENE ESTACIONES DEFINIDAS</div>';
+            return;
+        }
+
+        container.innerHTML = stations.map((step, index) => `
+            <div class="step-node">
+                <div class="step-icon">${index + 1}</div>
+                <div class="step-info">
+                    <div class="step-type">${step.type}</div>
+                    <div class="step-name">${step.label || step.id}</div>
+                    <div style="font-size:10px; opacity:0.6;">PROVIDER: ${step.provider || 'system'}</div>
                 </div>
             </div>
         `).join('');
