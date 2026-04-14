@@ -14,7 +14,7 @@ import path from 'path';
 const CONFIG = {
     coreUrl: 'https://script.google.com/macros/s/AKfycbyhEucpkr6GtpMqQ0LnenhP4SIUXOUJ2M4ycFIVGLBmUuxWYL6hXRTUOBESiC6LlpfA/exec',
     satelliteToken: 'indra_satellite_omega', // Tu token de acceso
-    outputFile: './core/indra_contract.json'
+    outputFile: './_INDRA_PROTOCOL_/indra_contract.json'
 };
 
 async function sync() {

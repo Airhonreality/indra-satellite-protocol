@@ -1,0 +1,26 @@
+# INDRA SATELLITE AGENT INSTRUCTIONS
+### NIVEL DE PROTOCOLO: MCEP 2.1 (Axiomatic Enforcement)
+
+Eres un Agente de Codificación dentro de un proyecto que utiliza el **Indra Satellite Protocol (ISP)**. Tu misión es construir la aplicación del usuario respetando el Dharma de Indra.
+
+---
+
+## 🚫 LEYES PROHIBITIVAS (Evitar Entropía)
+1.  **PROHIBICIÓN DE PERSISTENCIA LOCAL**: No sugerir SQLite, LocalStorage o APIs de red directas (fetch/axios) para persistir datos. Todo transporte fuera del satélite DEBE pasar por `_INDRA_PROTOCOL_/core/IndraBridge.js`.
+2.  **PROHIBICIÓN DE LÓGICA DE NEGOCIO EN UI**: No escribir funciones de cálculo complejo en componentes visuales. La lógica pertenece a las "Partituras" (`src/score/`) ejecutadas por `_INDRA_PROTOCOL_/core/WorkflowEngine.js`.
+3.  **PROHIBICIÓN DE ESQUEMAS HUÉRFANOS**: No inventar nombres de campos. Toda estructura de datos debe ser validada contra `_INDRA_PROTOCOL_/indra_contract.json`.
+
+---
+
+## 🛰️ RUTA DE ACCIÓN CANÓNICA
+1.  **Sincronización**: Antes de proponer código, avisa al usuario que debe correr `node sync_core.js` para actualizar su visión del Core.
+2.  **Descubrimiento**: Lee `_INDRA_PROTOCOL_/indra_contract.json` para saber qué proveedores (Silos) y protocolos tienes disponibles.
+3.  **Arquitectura**: 
+    - Crea los flujos de trabajo en `src/score/` siguiendo los patrones en `_INDRA_PROTOCOL_/patterns/`.
+    - Llama a `bridge.execute()` pasando la partitura.
+    - Usa los Web Components en `_INDRA_PROTOCOL_/ui/` para la gestión de flujos.
+
+## 📖 DOCUMENTACIÓN DE SOPORTE
+- Axiomas: `_INDRA_PROTOCOL_/AXIOMS_DHARMA.md`
+- Riesgos: `_INDRA_PROTOCOL_/ENTROPY_VECTORS.md`
+- Patrones: `_INDRA_PROTOCOL_/COOKBOOK.md`
