@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin ERP | Veta de Oro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <script src="../03-system-infra/core/engines/SystemNavigation.js"></script>
+    
+    <!-- INDRA AXIOMATIC UI (Modular System) -->
+    <link rel="stylesheet" href="../css/erp/layout.css">
+    <link rel="stylesheet" href="../css/erp/buttons.css">
+    <link rel="stylesheet" href="../css/erp/forms.css">
+    <link rel="stylesheet" href="../css/erp/themes.css">
+    
+    <link rel="stylesheet" href="../css/system-navigation.css">
+</head>
+<body class="erp-veta axiom-dashboard">
+
+    <!-- La navegación global se inyecta automáticamente via SystemNavigation.js -->
+
+    <!-- SISTEMA DE BLOQUES (LEGO) -->
+    <div class="axiom-grid-3col">
+        
+        <!-- BLOQUE: COTIZADOR -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label" style="color: var(--color-brass);">MODULAR_READY</span>
+                <h3 class="axiom-title-sm">Cotizador de Autor</h3>
+                <p class="axiom-text-muted">Captura industrial de solicitudes y cálculo de deltas de inversión técnica.</p>
+            </div>
+            <button class="axiom-btn axiom-btn-primary" onclick="location.href='../01-public-site/tools/cotizador/index.html'">
+                ACCEDER AL MÓDULO ↗
+            </button>
+        </article>
+
+        <!-- BLOQUE: PRODUCCIÓN / FLOW -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label" style="color: var(--color-ink);">PRODUCTION_PIPELINE</span>
+                <h3 class="axiom-title-sm">Mesa de Producción</h3>
+                <p class="axiom-text-muted">Seguimiento de proyectos activos: Manufactura, Instalación y Garantías.</p>
+            </div>
+            <button class="axiom-btn" onclick="location.href='tools/produccion/index.html'">
+                ABRIR PIPELINE ↗
+            </button>
+        </article>
+
+        <!-- BLOQUE: DESARROLLO (NUEVO) -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label" style="color: var(--color-brass);">INGENIERÍA</span>
+                <h3 class="axiom-title-sm">Desarrollo Técnico</h3>
+                <p class="axiom-text-muted">Herramientas de fabricación, recetas estándar y manuales de ensamble.</p>
+            </div>
+            <button class="axiom-btn" onclick="location.href='tools/desarrollo/index.html'">
+                ABRIR DESARROLLO ↗
+            </button>
+        </article>
+
+        <!-- BLOQUE: MODULADOR -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label" style="color: var(--color-success);">DESIGN_TÉCNICO</span>
+                <h3 class="axiom-title-sm">Modulador de Autor</h3>
+                <p class="axiom-text-muted">Desarrollo visual de recetas, despieces y assets 3D para fabricación.</p>
+            </div>
+            <button class="axiom-btn" onclick="location.href='tools/modulador-interno/index.html'">
+                ABRIR MODULADOR ↗
+            </button>
+        </article>
+
+        <!-- BLOQUE: CATÁLOGO -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label">ASSET_MANAGER</span>
+                <h3 class="axiom-title-sm">Catálogo de Ensambles</h3>
+                <p class="axiom-text-muted">Administración de módulos compuestos y gestión de assets multimedia.</p>
+            </div>
+            <button class="axiom-btn" onclick="location.href='tools/catalogo-modular/index.html'">
+                ABRIR CATÁLOGO ↗
+            </button>
+        </article>
+
+        <!-- BLOQUE: PROPUESTAS -->
+        <article class="axiom-panel">
+            <div class="axiom-flex-column">
+                <span class="axiom-label">GENERATOR_CORE</span>
+                <h3 class="axiom-title-sm">Generador Axiomático</h3>
+                <p class="axiom-text-muted">Sistema técnico para la creación de propuestas con variantes por espacios.</p>
+            </div>
+            <button class="axiom-btn" onclick="location.href='tools/propuestas/index.html'">
+                ABRIR GENERADOR ↗
+            </button>
+        </article>
+
+    </div>
+
+    <footer class="axiom-flex-row axiom-space-between technical-data v-safe-zone" style="margin-top: auto; opacity: 0.4; flex-wrap: wrap;">
+        <span>PROYECIÓN_MES: $ 240.000.000</span>
+        <span>LEADS_ACTIVOS: 18</span>
+        <span>SERVER_TIME: 12:08:22</span>
+    </footer>
+</body>
+</html>

@@ -52,4 +52,10 @@ async function ignite() {
     }
 }
 
-ignite().catch(err => console.error("❌ Fallo en la ignición:", err));
+    // 6. Escuchar Intento de Login
+    window.addEventListener('indra-login', () => {
+        console.log("🔑 Iniciando flujo de Google Identity Services...");
+        // Aquí iría el cliente de GSI: google.accounts.id.prompt();
+        alert("Sincronizando con Google Identity Services v3...");
+    });
+}

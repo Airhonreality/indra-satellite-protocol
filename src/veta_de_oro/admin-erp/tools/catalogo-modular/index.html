@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Modular | Veta de Oro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/erp-core.css">
+    <link rel="stylesheet" href="../../../css/system-navigation.css">
+    <link rel="stylesheet" href="../../../css/catalogo-modular.css">
+    <script src="../../../03-system-infra/core/engines/SystemNavigation.js"></script>
+</head>
+<body class="erp-veta cm-layout">
+
+    <!-- PANEL 1: SIDEBAR / STATS -->
+    <aside class="cm-stats-panel">
+        <!-- La navegación global sustituye al logo local -->
+        
+        <h4 class="technical-data" style="color: var(--color-brass); margin-bottom: 15px;">ESTADÍSTICAS</h4>
+        <div class="metric" style="margin-bottom: 20px;">
+            <label style="font-size: 0.6rem; text-transform: uppercase;">Módulos Activos</label>
+            <span id="stat-count" style="font-family: var(--font-technical); font-size: 1.5rem;">0</span>
+        </div>
+
+        <nav style="margin-top: 20px; display: flex; flex-direction: column; gap: 20px;">
+            <button class="cm-asset-btn" onclick="exportar()">Exportar JSON</button>
+        </nav>
+    </aside>
+
+    <!-- PANEL 2: LISTADO -->
+    <section class="cm-list-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 style="font-family: var(--font-signature); font-size: 2rem; margin: 0;">Ensambles</h2>
+            <button class="btn-veta btn-veta-primary" style="padding: 10px 20px; font-size: 0.75rem;" onclick="nuevoModulo()">+ NUEVO</button>
+        </div>
+        <input type="text" placeholder="Buscar módulo..." class="v-input-clean" style="margin-bottom: 20px; width: 100%;" oninput="filtrar(this.value)">
+        <div id="list-container"></div>
+    </section>
+
+    <!-- PANEL 3: INSPECTOR -->
+    <main class="cm-inspector" id="inspector">
+        <div style="opacity: 0.3; text-align: center; margin-top: 20vh;">
+            <h1 class="technical-data">SELECCIONA UN MÓDULO <br> PARA VER DETALLES</h1>
+        </div>
+    </main>
+
+    <!-- CORE SCRIPTS -->
+    <script src="../../../03-system-infra/core/connectors/database-connector.js"></script>
+    <script src="../../../03-system-infra/core/engines/QuotationEngine.js"></script>
+    <script src="../../../03-system-infra/core/engines/mocks.js"></script>
+    <script src="../../../03-system-infra/core/engines/CatalogoModular.js"></script>
+    <script src="../../../03-system-infra/core/engines/AgnosticPortalPicker.js"></script>
+
+    <script>
+        let cm, activeSku = null;
+
+        window.onload = () => {
+            cm = new CatalogoModular(MOCK_CATALOGO);
+            renderList();
+        };
+
+        function renderList(query = '') {
+            const container = document.getElementById('list-container');
+            const items = cm.getEnsambles().filter(e => e.descripcion.toLowerCase().includes(query.toLowerCase()) || e.sku.toLowerCase().includes(query.toLowerCase()));
+            
+            document.getElementById('stat-count').innerText = items.length;
+            container.innerHTML = items.map(e => `
+                <div class="cm-card ${e.sku === activeSku ? 'active' : ''}" onclick="select('${e.sku}')">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span class="technical-data" style="font-size:0.7rem;">${e.sku}</span>
+                        <span class="technical-data" style="color:var(--color-brass); font-size:0.75rem;">$ ${Math.round(cm.getPrecioEfectivo(e.sku)).toLocaleString()}</span>
+                    </div>
+                    <div style="font-weight:500;">${e.descripcion}</div>
+                </div>
+            `).join('');
+        }
+
+        async function select(sku) {
+            activeSku = sku;
+            renderList();
+            const e = MOCK_CATALOGO.find(p => p.sku === sku);
+            const inspector = document.getElementById('inspector');
+            
+            // Resolver assets
+            const img = await DBConnector.resolveAsset(e.asset_imagen_id);
+            const model = await DBConnector.resolveAsset(e.asset_modelo3d_id);
+
+            inspector.innerHTML = `
+                <div class="cm-asset-zone">
+                    ${img ? `<img src="${img.url}">` : '<div class="cm-asset-placeholder">Sin imagen — Workflow pendiente</div>'}
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-bottom:30px;">
+                    <button class="cm-asset-btn" onclick="document.getElementById('up-img').click()">Subir Imagen</button>
+                    <button class="cm-asset-btn" onclick="document.getElementById('up-3d').click()">Subir Modelo 3D</button>
+                    <input type="file" id="up-img" style="display:none" onchange="uploadAsset('${sku}', 'RENDER_IMAGE', this.files[0])">
+                    <input type="file" id="up-3d" style="display:none" onchange="uploadAsset('${sku}', 'MODEL_3D', this.files[0])">
+                </div>
+
+                <div class="form-group" style="margin-bottom:30px;">
+                    <label class="technical-data" style="font-size:0.7rem; color:var(--color-brass);">NOMBRE DEL MÓDULO</label>
+                    <input type="text" value="${e.descripcion}" onchange="update('${sku}', 'descripcion', this.value)">
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px; margin-bottom:30px;">
+                    <div class="form-group">
+                        <label class="technical-data" style="font-size:0.6rem;">ANCHO (CM)</label>
+                        <input type="number" value="${e.medidas_json.ancho}" onchange="updateMedida('${sku}', 'ancho', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label class="technical-data" style="font-size:0.6rem;">ALTO (CM)</label>
+                        <input type="number" value="${e.medidas_json.alto}" onchange="updateMedida('${sku}', 'alto', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label class="technical-data" style="font-size:0.6rem;">FONDO (CM)</label>
+                        <input type="number" value="${e.medidas_json.fondo}" onchange="updateMedida('${sku}', 'fondo', this.value)">
+                    </div>
+                </div>
+
+                <h4 class="technical-data" style="color:var(--color-brass); margin: 40px 0 10px 0;">COMPOSICIÓN TÉCNICA</h4>
+                <div class="cm-composicion-header">
+                    <span>ÍTEM</span><span>CANT</span><span>MÉTRICA</span><span>SUBTOTAL</span><span></span>
+                </div>
+                <div id="composition-list"></div>
+                <button class="btn-veta" style="width:100%; border: 1px dashed var(--color-brass); margin-top:15px; padding:10px;" onclick="addLinea('${sku}')">+ AGREGAR LÍNEA</button>
+
+                <div class="cm-precio-efectivo">
+                    <small style="display:block; font-size:0.7rem; color:var(--color-ink); letter-spacing:1px;">TOTAL CALCULADO</small>
+                    $ ${Math.round(cm.getPrecioEfectivo(sku)).toLocaleString()} COP
+                </div>
+
+                <div style="margin-top:40px; display:flex; gap:20px;">
+                    <button class="btn-veta btn-veta-primary" onclick="alert('Guardado en local. Sincroniza con Indra desde System Infra.')">Sincronizar Cambios</button>
+                    <button class="btn-veta" style="color:red; border-color:red;" onclick="archivar('${sku}')">Archivar</button>
+                </div>
+            `;
+
+            renderComposition(sku);
+        }
+
+        function renderComposition(sku) {
+            const list = document.getElementById('composition-list');
+            const lines = cm.getDesglose(sku);
+            list.innerHTML = lines.map((l, idx) => `
+                <div class="cm-composicion-row">
+                    <div style="font-weight:500;">${l.descripcion_hijo}</div>
+                    <input type="number" value="${l.cantidad}" step="0.01" style="width:100%" onchange="updateLine('${sku}', ${idx}, {cantidad:this.value})">
+                    <select onchange="updateLine('${sku}', ${idx}, {tipo_metrica:this.value})">
+                        <option value="unidad" ${l.tipo_metrica==='unidad'?'selected':''}>Unidad</option>
+                        <option value="porcentaje" ${l.tipo_metrica==='porcentaje'?'selected':''}>%</option>
+                    </select>
+                    <span class="technical-data">$ ${Math.round(l.subtotal_linea).toLocaleString()}</span>
+                    <button style="background:none; border:none; color:red; cursor:pointer;" onclick="deleteLine('${sku}', ${idx})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // Acciones
+        window.nuevoModulo = () => { const e = cm.createEnsamble({descripcion: 'Nuevo Ensamble'}); select(e.sku); };
+        window.filtrar = (v) => renderList(v);
+        window.update = (sku, k, v) => { cm.updateEnsamble(sku, {[k]: v}); renderList(); };
+        window.updateMedida = (sku, k, v) => { 
+            const e = MOCK_CATALOGO.find(p => p.sku === sku);
+            e.medidas_json[k] = parseFloat(v);
+            cm._commit();
+            select(sku);
+        };
+        window.updateLine = (sku, idx, patch) => { cm.updateLineaComposicion(sku, idx, patch); select(sku); };
+        window.deleteLine = (sku, idx) => { cm.updateLineaComposicion(sku, idx, null); select(sku); };
+        window.addLinea = (sku) => {
+            // Demo: agrega el primer átomo del catálogo por defecto
+            const item = cm.getAtomos()[0];
+            cm.addLineaComposicion(sku, { sku: item.sku, cantidad: 1, tipo_metrica: 'unidad' });
+            select(sku);
+        };
+        window.archivar = (sku) => { if(confirm("¿Archivar este módulo?")) { cm.archivarEnsamble(sku); activeSku = null; renderList(); document.getElementById('inspector').innerHTML = ''; } };
+        window.exportar = () => { console.log(cm.exportarJSON()); alert("JSON exportado a consola"); };
+
+        window.uploadAsset = async (sku, type, file) => {
+            if(!file) return;
+            try {
+                const res = await DBConnector.uploadAsset(file, type, { sku_modulo: sku });
+                if(res.metadata.status === 'OK') {
+                    cm.registrarAsset(sku, type === 'RENDER_IMAGE' ? 'imagen' : 'modelo3d', res.data.id || res.metadata.id);
+                    alert("Asset subido con éxito");
+                    select(sku);
+                }
+            } catch(e) { alert("Error subiendo asset: " + e.message); }
+        };
+    </script>
+</body>
+</html>

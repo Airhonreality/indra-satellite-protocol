@@ -1,0 +1,70 @@
+<!-- MÓDULO: COTIZADOR AGNÓSTICO (CANÓNICO) -->
+<div class="axiom-grid-aureo" style="gap: var(--gap-phi-3);">
+    
+    <!-- PANEL A: ESTRUCTURA (Espacios y Versiones) -->
+    <aside class="axiom-panel" style="background: var(--color-surface-soft);">
+        <span class="axiom-label">ESPACIOS_Y_RAMAS</span>
+        <div style="margin-top: var(--gap-phi-3); display: flex; flex-direction: column; gap: var(--gap-phi-1);">
+            <div data-indra-loop="spaces_list">
+                <!-- Template de Slot -->
+                <div class="indra-ghost-slot" style="width: 100%; cursor: pointer;">[ESPACIO_ITERADOR]</div>
+            </div>
+            <button class="axiom-btn" style="width: 100%; border-style: dashed; margin-top: var(--gap-phi-2);">+ AÑADIR_ESPACIO</button>
+        </div>
+
+        <hr class="axiom-divider" style="margin: var(--gap-phi-4) 0;">
+        
+        <span class="axiom-label">BRANCH_CONTROL</span>
+        <div data-indra-loop="versions_list" style="margin-top: var(--gap-phi-2);">
+            <span class="indra-ghost-slot">[VERSIÓN_ACTIVA]</span>
+        </div>
+    </aside>
+
+    <!-- PANEL B: WORKSPACE (Items y Notas) -->
+    <main class="axiom-panel">
+        <header class="axiom-flex-row axiom-space-between" style="margin-bottom: var(--gap-phi-3);">
+            <h3 class="axiom-title" data-indra-slot="active_space_name">[ESPACIO_ACTUAL]</h3>
+            <span class="technical-data" data-indra-slot="space_subtotal">$ 0.00</span>
+        </header>
+
+        <!-- LISTA DE ÍTEMS AXIOMÁTICA (En lugar de <table>) -->
+        <div class="axiom-flex-column" style="margin-top: var(--gap-phi-3);">
+            
+            <!-- Cabecera de Lista (Desktop Only) -->
+            <div class="axiom-flex-row axiom-space-between v-safe-zone" style="border-bottom: 2px solid var(--color-ink); padding: 5px 0;">
+                <span class="axiom-label" style="flex: 2;">ÍTEM_IDENTIDAD</span>
+                <span class="axiom-label" style="flex: 1; text-align: center;">NATURALEZA</span>
+                <span class="axiom-label" style="flex: 1; text-align: right;">ESTADO_LOG</span>
+            </div>
+
+            <!-- Contenedor de Iteración (Indra Loop) -->
+            <div data-indra-loop="space_items" class="axiom-flex-column" style="gap: 1px;">
+                <!-- TEMPLATE DE FILA / CARD -->
+                <div class="axiom-flex-row axiom-space-between v-safe-zone axiom-panel" style="padding: var(--gap-phi-2); flex-wrap: wrap; margin-bottom: 0;">
+                    <div style="flex: 2; min-width: 200px;">
+                        <span class="indra-ghost-slot" style="display: block;">[NOMBRE_DEL_ITEM]</span>
+                    </div>
+                    <div style="flex: 1; text-align: center; min-width: 100px;">
+                        <span class="technical-data">[CATEGORÍA]</span>
+                    </div>
+                    <div style="flex: 1; text-align: right; min-width: 100px;">
+                        <span class="axiom-btn-sm" style="font-size: 0.6rem;">[ESTADO]</span>
+                    </div>
+                </div>
+
+                <!-- Estado Vacío -->
+                <div style="padding: var(--gap-phi-5); text-align: center; border: var(--border-hairline); border-style: dashed; opacity: 0.5;">
+                    <span class="technical-data">[ SIN_ITEMS_EN_ESTE_ESPACIO ]</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Notas del Espacio -->
+        <div style="margin-top: var(--gap-phi-4);">
+            <span class="axiom-label">NOTAS_DE_LEVANTAMIENTO</span>
+            <textarea class="axiom-input" style="width: 100%; min-height: 80px; margin-top: var(--gap-phi-1); background: transparent;" placeholder="Desplomes, puntos hidráulicos, acuerdos..."></textarea>
+        </div>
+    </main>
+
+</div>

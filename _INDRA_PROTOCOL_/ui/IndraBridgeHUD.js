@@ -290,8 +290,11 @@ const TEMPLATE = `
 <div class="hud-container">
     <header class="hud-header">
         <div class="core-identity">
-            <span class="sat-label" id="sat-name">IDENTIFICACIÓN: DESCONOCIDO</span>
-            <span class="core-id" id="core-id">GOOGLE_CORE: PENDIENTE DE SESIÓN</span>
+            <span class="sat-label" id="sat-name">CONECTANDO...</span>
+            <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+                 <span class="core-id" id="core-id" style="opacity:0.5">ESPERANDO CORE...</span>
+                 <span id="auth-status" style="font-size:9px; background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px; font-weight:700;">SIN SESIÓN ACTIVA</span>
+            </div>
         </div>
         <div class="user-auth">
             <button class="btn-google" id="login-trigger">
@@ -372,11 +375,20 @@ class IndraBridgeHUD extends HTMLElement {
         if (data.contract) this.updateResonanceTree(data.contract);
         if (data.workspaces) this.updateWorkspaces(data.workspaces);
         if (data.activeWorkflow) this.updateWorkflowDesigner(data.activeWorkflow);
+        
+        if (data.user) {
+            const authStatus = this.shadowRoot.getElementById('auth-status');
+            authStatus.innerText = "SESIÓN: " + data.user.email;
+            authStatus.style.background = "#e6f4ea";
+            authStatus.style.color = "#137333";
+            this.shadowRoot.getElementById('login-trigger').style.display = 'none';
+        }
+
         if (data.core) {
             const coreIdEl = this.shadowRoot.getElementById('core-id');
             const satNameEl = this.shadowRoot.getElementById('sat-name');
-            if (coreIdEl) coreIdEl.innerText = `STATUS: ${data.core.status || 'CONECTADO'} | ID: ${data.core.id}`;
-            if (satNameEl) satNameEl.innerText = `INSTANCIA: ${data.core.sat_name || 'INDRA'}`;
+            if (coreIdEl) coreIdEl.innerText = `BRIDGE INTERFACE | CORE: ${data.core.id}`;
+            if (satNameEl) satNameEl.innerText = data.core.sat_name || 'INDRA SATELLITE';
         }
     }
 

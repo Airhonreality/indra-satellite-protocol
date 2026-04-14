@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulador Interno | Veta de Oro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <!-- INFRAESTRUCTURA GLOBAL -->
+    <link rel="stylesheet" href="../../../css/system-navigation.css">
+    <script src="../../../03-system-infra/core/engines/SystemNavigation.js"></script>
+    
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/erp/layout.css">
+    <link rel="stylesheet" href="../../../css/erp/buttons.css">
+
+    <style>
+        .blueprint-canvas {
+            padding: var(--gap-phi-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-phi-3);
+        }
+    </style>
+</head>
+<body class="erp-veta axiom-dashboard">
+
+    <div class="blueprint-canvas">
+        
+        <header class="axiom-flex-row axiom-space-between v-safe-zone">
+            <div>
+                <h1 class="axiom-title-lg">Modulador de Autor</h1>
+                <p class="axiom-label" style="opacity: 0.5;">DEFINICIÓN TÉCNICA DE COMPONENTES Y RECETAS</p>
+            </div>
+            <div class="v-hud-strip">
+                <span class="v-hud-label">SISTEMA_RECETAS:</span>
+                <span class="v-hud-value" style="color: var(--color-brass);">V2.1_AUTOR</span>
+            </div>
+        </header>
+
+        <section class="axiom-grid-aureo">
+            
+            <!-- EL GESTOR DE RECETAS (SOL) -->
+            <main class="axiom-panel">
+                <div class="axiom-flex-row axiom-space-between">
+                    <span class="axiom-label" style="color: var(--color-brass);">CONFIGURADOR_DE_RECETAS</span>
+                    <button class="axiom-btn axiom-btn-ghost">+ NUEVA RECETA</button>
+                </div>
+                
+                <div style="margin-top: 30px; border: 1px solid var(--color-boundary); height: 500px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--color-surface-soft);">
+                    <span class="indra-ghost-slot" style="font-size: 1.2rem;">[EDITOR_VISUAL_DE_COMPONENTES]</span>
+                    
+                    <!-- HUD FLOTANTE DE LA RECETA -->
+                    <div class="v-hud-strip" style="position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(0,0,0,0.8); border:none;">
+                        <span class="v-hud-label" style="color: white; opacity: 0.8;">PIEZAS:</span> <span class="indra-ghost-slot" style="background: transparent; color: white;">[NUM]</span>
+                        <div class="v-hud-divider" style="background: rgba(255,255,255,0.2);"></div>
+                        <span class="v-hud-label" style="color: white; opacity: 0.8;">COSTO_ESTIMADO:</span> <span class="indra-ghost-slot" style="background: transparent; color: var(--color-brass);">$ [VALOR]</span>
+                    </div>
+                </div>
+            </main>
+
+            <!-- ASSET MANAGER (3D & NOMENCLATURA) -->
+            <aside class="axiom-panel">
+                <span class="axiom-label">VISUAL_ASSETS_3D</span>
+                <div style="margin-top: 15px; background: var(--color-canvas); border: var(--border-hairline); height: 250px; display: flex; align-items: center; justify-content: center;">
+                    <span class="indra-ghost-slot">[VISUALIZADOR_OBJ_GLB]</span>
+                </div>
+
+                <hr class="axiom-divider">
+
+                <span class="axiom-label">NOMENCLATURA_Y_PARTES</span>
+                <div style="margin-top: 15px;">
+                    <div class="indra-ghost-slot" style="width: 100%; height: 150px;">[TABLA_ESQUEMA_PIEZAS]</div>
+                </div>
+            </aside>
+
+        </section>
+
+    </div>
+
+</body>
+</html>

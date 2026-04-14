@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Definidor de Proyectos | Veta de Oro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+    
+    <!-- INFRAESTRUCTURA GLOBAL -->
+    <link rel="stylesheet" href="../../../css/system-navigation.css">
+    <script src="../../../03-system-infra/core/engines/SystemNavigation.js"></script>
+    
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/erp/layout.css">
+    <link rel="stylesheet" href="../../../css/erp/buttons.css">
+
+    <style>
+        .blueprint-canvas {
+            padding: var(--gap-phi-1);
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-phi-2);
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        @media (min-width: 768px) {
+            .blueprint-canvas { padding: var(--gap-phi-3); }
+        }
+    </style>
+</head>
+<body class="erp-veta axiom-dashboard">
+
+    <!-- EL LIENZO MAESTRO -->
+    <div class="blueprint-canvas">
+        
+        <!-- SLOT 1: IDENTIDAD (Metadata) -->
+        <section id="module-header"></section>
+
+        <!-- SLOT 2: COTIZADOR (Espacios e Items) -->
+        <section id="module-quotation"></section>
+
+        <!-- SLOT 3: ACCIONES (Grabación y Contrato) -->
+        <section id="module-remote"></section>
+
+    </div>
+
+    <!-- INFRAESTRUCTURA DE DATOS (Indra Satellite Protocol) -->
+    <script type="module">
+        import IndraBridge from '../../js/core/IndraBridge.js';
+        window.indra = new IndraBridge();
+    </script>
+
+    <!-- CARGA DEL ORQUESTADOR Y SONDA DE SATÉLITE -->
+    <script src="js/ProjectOrchestrator.js"></script>
+    
+    <!-- SONDA INDRA (ADR_033): Handshake & Forge Engine -->
+    <!-- <script src="https://indra.io/satellite/v1/hud.js"></script> -->
+    <script>
+        console.log('[VetaOS] Sonda de Satélite lista para conexión con la Forja.');
+    </script>
+
+    <!-- INYECTOR DE MÓDULOS (Modularidad Pura) -->
+
+    <script>
+        async function injectModule(id, path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) throw new Error(`NO_SE_PUDO_CARGAR: ${path}`);
+                const html = await response.text();
+                document.getElementById(id).innerHTML = html;
+                console.log(`[VetaOS] Módulo cargado: ${path}`);
+            } catch (err) {
+                document.getElementById(id).innerHTML = `<div class="indra-ghost-slot">ERROR_LOAD: ${path}</div>`;
+            }
+        }
+
+        // Carga secuencial de los "Cascarones"
+        window.addEventListener('DOMContentLoaded', () => {
+            injectModule('module-header', 'modules/project-header.html');
+            
+            // ANIDACIÓN AXIOMÁTICA: Usamos un iframe agnóstico para aislar el motor de cotización
+            // El flag embed=true suprime la navegación interna del módulo.
+            const frame = document.createElement('iframe');
+            frame.src = '../propuestas/index.html?embed=true';
+            frame.style.width = '100%';
+            frame.style.height = '85vh';
+            frame.style.border = 'none';
+            frame.style.borderRadius = '8px';
+            frame.style.boxShadow = '0 0 0 1px rgba(0,0,0,0.05), var(--shadow-lg)';
+            document.getElementById('module-quotation').appendChild(frame);
+
+            injectModule('module-remote', 'modules/remote-functions.html');
+        });
+    </script>
+
+</body>
+</html>

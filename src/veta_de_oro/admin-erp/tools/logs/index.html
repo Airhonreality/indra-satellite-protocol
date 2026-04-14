@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Master | Veta de Oro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <!-- INFRAESTRUCTURA GLOBAL -->
+    <link rel="stylesheet" href="../../../css/system-navigation.css">
+    <script src="../../../03-system-infra/core/engines/SystemNavigation.js"></script>
+    
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/erp/layout.css">
+    <link rel="stylesheet" href="../../../css/erp/buttons.css">
+
+    <style>
+        .blueprint-canvas {
+            padding: var(--gap-phi-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-phi-3);
+        }
+        .indra-ghost-slot {
+            border: 1px dashed var(--color-brass);
+            padding: 2px 6px;
+            font-family: var(--font-technical);
+            font-size: 0.7rem;
+            color: var(--color-brass);
+            background: rgba(191, 163, 126, 0.05);
+        }
+    </style>
+</head>
+<body class="erp-veta axiom-dashboard">
+
+    <div class="blueprint-canvas">
+        
+        <header class="axiom-flex-row axiom-space-between">
+            <h1 class="axiom-title-lg">Log Master & Gestor de Tareas</h1>
+            <div class="v-hud-strip">
+                <span class="v-hud-label">SISTEMA_ASINCRONO:</span>
+                <span class="v-hud-value" style="color: var(--color-success);">LISTENING</span>
+            </div>
+        </header>
+
+        <div class="axiom-grid-aureo">
+            
+            <!-- SECCIÓN DE LOGS CRONOLÓGICOS -->
+            <main class="axiom-panel">
+                <span class="axiom-label">HISTORIAL_DE_ACCIONES_ (SYSTEM_LOG)</span>
+                <div style="margin-top: 20px; font-family: var(--font-technical); font-size: 0.8rem; line-height: 1.6;">
+                    <div class="indra-ghost-slot" style="width: 100%; height: 500px; display: block; overflow-y: auto; padding: 20px;">
+                        [ITERADOR_DE_LOGS_CRONOLOGICOS]
+                        <br><br>
+                        <ctrl94> [2026-04-12 20:30] PROYECTO_001: ITEM_COCINA_A_FABRICACION
+                        <br>
+                        >> [2026-04-12 20:31] LOG_MASTER: GENERANDO_TAREAS_AUTO...
+                    </div>
+                </div>
+            </main>
+
+            <!-- SECCIÓN DE TAREAS PENDIENTES -->
+            <aside class="axiom-panel">
+                <span class="axiom-label">TAREAS_DERIVADAS_POR_ITEM</span>
+                <div style="margin-top: 20px;">
+                    <span class="indra-ghost-slot" style="width: 100%; height: 300px; display: flex; align-items: center; justify-content: center;">
+                        [TABLA_DE_TAREAS_ESTADO]
+                    </span>
+                </div>
+                
+                <hr class="axiom-divider">
+                
+                <div class="metrics-mini">
+                    <span class="axiom-label">EFICIENCIA_DE_CIERRE</span>
+                    <div class="indra-ghost-slot" style="width: 100%;">[KPI_COMPLETITUD_TAREAS]</div>
+                </div>
+            </aside>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
