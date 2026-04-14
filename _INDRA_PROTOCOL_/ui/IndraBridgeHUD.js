@@ -129,17 +129,65 @@ const TEMPLATE = `
 
     /* --- CARD 2: PANEL DE ESQUEMAS --- */
     .resonance-tree {
-        font-family: 'JetBrains Mono', monospace;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .schema-node {
+        border: 1px solid #f1f3f4;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .schema-header {
+        background: var(--surface);
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .schema-title { font-weight: 700; font-size: 13px; color: #202124; }
+    .status-badge { 
+        font-size: 9px; 
+        padding: 2px 6px; 
+        border-radius: 10px; 
+        font-weight: 700;
+        background: #e8f0fe;
+        color: var(--accent);
+    }
+
+    .schema-body {
+        padding: 15px;
         font-size: 12px;
     }
 
-    .tree-node {
-        padding: 10px 0;
-        border-bottom: 1px solid var(--surface);
+    .meta-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 12px;
+        color: #70757a;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
     }
 
-    .node-label { font-weight: 700; color: #202124; }
-    .node-meta { font-size: 10px; color: #70757a; margin-top: 4px; text-transform: uppercase; }
+    .property-list {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 8px;
+    }
+
+    .prop-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .prop-silo { color: #188038; font-weight: 600; font-size: 9px; }
 
     /* --- CARD 3: WORKFLOW & AUTOMATION DESIGNER --- */
     .workflow-panel {
@@ -269,14 +317,32 @@ class IndraBridgeHUD extends HTMLElement {
         const tree = this.shadowRoot.getElementById('res-tree');
         if (!contract) return;
         const schemas = contract.schemas || (contract.raw?.metadata?.items?.filter(i => i.class === 'SCHEMA')) || [];
+        
         if (schemas.length === 0) {
             tree.innerHTML = '<div style="opacity:0.3; font-size:11px;">SIN ESQUEMAS DISPONIBLES</div>';
             return;
         }
+
         tree.innerHTML = schemas.map(schema => `
-            <div class="tree-node">
-                <div class="node-label">${schema.handle?.alias || schema.id}</div>
-                <div class="node-meta">RESONANCIA: ${schema.protocols?.[0] || 'SISTEMA'}</div>
+            <div class="schema-node">
+                <div class="schema-header">
+                    <span class="schema-title">${schema.handle?.alias || schema.id}</span>
+                    <span class="status-badge">RESONANDO</span>
+                </div>
+                <div class="schema-body">
+                    <div class="meta-row">
+                        <span>UBICACIÓN: ${schema.handle?.location || 'src/components/Form.js'}</span>
+                        <span>SELECTOR: ${schema.handle?.selector || '#' + schema.id}</span>
+                    </div>
+                    <div class="property-list">
+                        ${(schema.properties || []).map(prop => `
+                            <div class="prop-item">
+                                <span>${prop.name} <small style="opacity:0.5">${prop.type}</small></span>
+                                <span class="prop-silo">VÍNCULO: ${prop.silo_mapping || 'GOOGLE_SHEETS'}</span>
+                            </div>
+                        `).join('') || '<div style="opacity:0.5">Sin propiedades definidas</div>'}
+                    </div>
+                </div>
             </div>
         `).join('');
     }
