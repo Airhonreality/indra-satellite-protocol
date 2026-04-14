@@ -16,7 +16,23 @@ git submodule add https://github.com/Airhonreality/indra-satellite-protocol.git 
 ```
 
 
-## 🏛️ El Dharma del Desarrollo (Anti-Entropía)
+## 🏛️ El Dharma de la Arquitectura (v2.3)
+
+Este sistema opera bajo un modelo de **Soberanía Desacoplada**. No es una librería, es un ecosistema de órbitas:
+
+```mermaid
+graph TD
+    A[Satélite ERP / App] -- "Inyecta Token" --> B[Indra Bridge]
+    B -- "Handshake ADN" --> C[indra_contract.json]
+    B -- "Observador Reactivo" --> D[Indra Bridge HUD]
+    B -- "Protocolos MCEP" --> E[Indra Core / GAS]
+    E -- "Silo Mapping" --> F[Notion / Sheets / SQL]
+```
+
+1.  **Satélite (Soberanía de Negocio)**: Dueño de la UI y la sesión de usuario.
+2.  **Bridge (Motor de Jurisdicción)**: El único canal que habla con el mundo exterior.
+3.  **HUD (Monitor de Resonancia)**: Interfaz pasiva que refleja el estado del Bridge.
+4.  **Contrato (DNA del Sistema)**: Define esquemas y capacidades permitidas.
 
 Este repositorio no es una librería de funciones; es un sistema de órbitas. Todo desarrollador u **Agente de IA** que opere aquí debe adherirse a los siguientes documentos de integridad:
 
