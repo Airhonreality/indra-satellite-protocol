@@ -27,10 +27,11 @@ Este repositorio no es una librería de funciones; es un sistema de órbitas. To
 ---
 
 ## 🤖 Instrucciones para Agentes (IA / LLM)
-Si eres una IA encargada de construir en este satélite, tus directivas son:
-1. **Sincronización Mandatoria**: Llama a `sync_core.js` y usa `ContractReader` antes de proponer cualquier esquema de datos.
-2. **Prohibición de Persistencia Local**: No sugerir SQL o LocalStorage para datos de negocio. Usa `bridge.uploadFile()`.
-3. **Orquestación sobre Lógica**: Si el requerimiento involucra cálculos, propón una Estación en el `WorkflowEngine` usando `patterns/LOGIC_UNIT.json`.
+Si eres una IA encargada de construir en este satélite, tus directivas obligatorias son:
+1. **Validación HUD-First**: Antes de proponer código de UI, verifica que el esquema esté proyectado en el `IndraBridgeHUD`. 
+2. **Auditoría Técnica**: Usa siempre `bridge.audit()` para confirmar la integridad del handshake local.
+3. **MCEP Design**: Todo nuevo componente debe nacer de una propiedad definida en `indra_contract.json`. No alucines campos.
+4. **Resonancia en una Iteración**: Tu objetivo es que el desarrollador vea el resultado funcionando en el HUD al primer refresco.
 
 ---
 
