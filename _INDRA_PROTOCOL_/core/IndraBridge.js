@@ -1,9 +1,9 @@
 /**
  * =============================================================================
- * INDRA SATELLITE BRIDGE (v1.8) - SMART JURISDICTION EDITION
+ * INDRA SATELLITE BRIDGE (v2.3) - SOVEREIGN ARCH NODE
  * =============================================================================
  * Responsabilidad: Gestión soberana, orquestada y resiliente.
- * Mejora: Inteligencia de Jurisdicción (Auto-Provider).
+ * Consolidación: Ahora incluye la lógica del ContractReader de forma nativa.
  * =============================================================================
  */
 
@@ -20,8 +20,6 @@ const ADR_ERROR_MAP = {
 };
 
 const RETRIABLE_CODES = ['LOCK_TIMEOUT', 'GATEWAY_TIMEOUT', 'NETWORK_ERROR'];
-const MIN_CORE_VERSION = '4.1';
-const MANIFEST_FILENAME = 'INDRA_MANIFEST.json';
 
 class IndraBridge {
     constructor(config = {}) {
@@ -30,167 +28,104 @@ class IndraBridge {
         this.shareTicket = config.shareTicket || null;
         this.coreVersion = null;
         this.logger = config.logger || console;
-        this.capabilities = { providers: [], core_version: '0.0' };
+        
+        // El Contrato es el ADN cargado localmente
+        this.contract = { capabilities: { protocols: [], providers: [] }, schemas: [] };
+        // Las capacidades son las dinámicas del Core
+        this.capabilities = { protocols: [], providers: [], core_version: '0.0' };
 
         this.MAX_CONCURRENT = config.maxConcurrent || 5;
         this.activeRequests = 0;
         this.requestQueue = [];
         
-        // MOTOR DE FLUJOS (Blueprint v2.0)
-        this.workflow = null; // Se inicializará bajo demanda
+        this.workflowEngine = null;
+        this.onStateChange = config.onStateChange || null;
     }
 
     /**
-     * AXIOMA DE NOMBRAMIENTO (Card I del Blueprint)
-     * Sugiere un nombre de workspace basado en la identidad del satélite.
+     * @dharma Carga el contrato local (ADN del Satélite).
      */
-    suggestWorkspaceName(satelliteName = "Satellite") {
-        const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-        return `WS_${satelliteName.toUpperCase().replace(/\s/g, '_')}_${date}`;
+    async loadContract(path = './_INDRA_PROTOCOL_/indra_contract.json') {
+        try {
+            const response = await fetch(path);
+            this.contract = await response.json();
+            this._notify();
+            return this.contract;
+        } catch (e) {
+            this.logger.error('[IndraBridge] Error cargando contrato local:', e);
+            return null;
+        }
     }
 
     /**
-     * @dharma Inicializar el sistema nervioso.
-     * @restriction NUNCA permite operar sin un contrato sincronizado recientemente.
+     * @dharma Inicializar el sistema nervioso completo.
      */
     async init() {
         console.log("[IndraBridge] Handshake iniciado...");
         
-        // Validación de Salud del Contrato (MCEP Enforcement)
-        try {
-            const contractRes = await fetch('./_INDRA_PROTOCOL_/indra_contract.json');
-            const contract = await contractRes.json();
-            const syncedAt = new Date(contract.synced_at);
-            const now = new Date();
-            const hoursDiff = (now - syncedAt) / (1000 * 60 * 60);
+        // 1. Carga automática del contrato local como base
+        await this.loadContract();
 
-            if (hoursDiff > 24) {
-                console.warn("⚠️ [IndraBridge] DHARMA_WARN: El contrato local tiene >24h. Riesgo de Entropía Semántica. Se recomienda correr sync_core.js.");
+        // 2. Handshake dinámico con el Core (si hay URL)
+        if (this.coreUrl) {
+            try {
+                const manifest = await this.execute({
+                    protocol: 'GETMCEPMANIFEST',
+                    provider: 'system',
+                    data: { mode: 'RAW_MAP' }
+                });
+                this.capabilities = manifest.metadata;
+                this.coreVersion = this.capabilities.core_version;
+            } catch (e) {
+                this.logger.warn("⚠️ Handshake dinámico fallido. Operando con Contrato Local.");
             }
-        } catch (e) {
-            console.error("❌ [IndraBridge] ERROR_AXIOMATICO: indra_contract.json no encontrado. El satélite está ciego.");
         }
 
-        return this.execute({
-            protocol: 'GETMCEPMANIFEST',
-            provider: 'system',
-            data: { mode: 'RAW_MAP' }
-        }).then(res => res.metadata);
+        this._notify();
+        return { 
+            core: this.capabilities, 
+            contract: this.contract 
+        };
+    }
+
+    _notify() {
+        if (this.onStateChange) this.onStateChange(this);
     }
 
     /**
-     * @dharma Gestión de Espacios de Trabajo.
-     * @param {string} name - Nombre del nuevo entorno.
+     * @dharma Auditoría técnica para el IDE/Terminal.
      */
-    async createWorkspace(name) {
-        return this.execute({
-            protocol: 'SYSTEM_WORKSPACE_CREATE',
-            provider: 'system',
-            data: { name: name }
-        });
+    audit() {
+        const report = {
+            id: this.contract.core_id || 'ANONYMOUS',
+            status: this.coreUrl ? 'CONNECTED' : 'LOCAL_ONLY',
+            protocols: this.contract.capabilities.protocols.length,
+            schemas: this.contract.schemas.length,
+            auth: this.satelliteToken ? 'PRESENT' : 'MISSING',
+            resonance: this.capabilities.core_version !== '0.0'
+        };
+        console.table(report);
+        return report;
     }
 
-    /**
-     * @dharma Sincronizar el listado de entornos disponibles.
-     */
-    async listWorkspaces() {
-        return this.execute({
-            protocol: 'SYSTEM_MANIFEST',
-            provider: 'system'
-        }).then(res => res.items.filter(i => i.class === 'WORKSPACE'));
+    // --- MÉTODOS HEREDADOS DEL CONTRACT READER ---
+
+    supports(protocol) {
+        return this.contract.capabilities.protocols.includes(protocol.toUpperCase());
     }
 
-    /**
-     * @dharma Cargar y persistir archivos en silos de datos.
-     * @restriction Solo admite transporte en Base64.
-     */
-    async uploadFile(fileName, base64Data, folderId = null, provider = 'drive') {
-        return this.execute({
-            protocol: 'ATOM_CREATE',
-            provider: provider,
-            context_id: folderId,
-            data: {
-                name: fileName,
-                file_base64: base64Data,
-                mime_type: this._inferMimeType(fileName)
-            }
-        });
+    getSilos() {
+        return this.contract.capabilities.providers || [];
     }
 
-    _inferMimeType(name) {
-        const ext = name.split('.').pop().toLowerCase();
-        const map = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', json: 'application/json' };
-        return map[ext] || 'application/octet-stream';
+    getSchemas() {
+        return this.contract.schemas || [];
     }
 
-    /**
-     * ORQUESTACIÓN DE FLUJOS (Roadmap Punto 1)
-     * Ejecuta una partitura JSON usando el WorkflowEngine interno.
-     */
-    async runWorkflow(workflowJson, triggerData = {}) {
-        if (!this.workflowEngine) {
-            const WorkflowEngine = (await import('./WorkflowEngine.js')).default;
-            this.workflowEngine = new WorkflowEngine(this);
-        }
-        return await this.workflowEngine.run(workflowJson, triggerData);
-    }
+    // --- SISTEMA DE EJECUCIÓN ---
 
-    /**
-     * ESCUCHA DE RESONANCIA
-     */
-    listenFromShell(allowedOrigin = "*") {
-        this.logger.info("[IndraBridge] Escuchando resonancia desde la Shell Madre...");
-        window.addEventListener("message", async (event) => {
-            if (allowedOrigin !== "*" && event.origin !== allowedOrigin) return;
-            const { type, payload } = event.data;
-            if (type === "INDRA_RESONANCE_GRANT") {
-                this.logger.info("[IndraBridge] Resonancia recibida. Ignitando motor...");
-                this.coreUrl = payload.core_url;
-                this.satelliteToken = payload.satellite_key;
-                if (payload.google_token || payload.core_url) await this.init();
-                window.dispatchEvent(new CustomEvent("indra-ready", { detail: this.capabilities }));
-            }
-        });
-    }
-
-    /**
-     * PROTOCOLO DISCOVERY
-     */
-    async discover(googleAccessToken) {
-        if (!googleAccessToken) throw new Error("DISCOVERY_REQUIRES_GOOGLE_TOKEN");
-        try {
-            const q = encodeURIComponent(`name = '${MANIFEST_FILENAME}' and trashed = false`);
-            const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
-                headers: { 'Authorization': `Bearer ${googleAccessToken}` }
-            });
-            const searchData = await searchRes.json();
-            if (!searchData.files || searchData.files.length === 0) throw new Error("INDRA_MANIFEST_NOT_FOUND");
-            
-            const manifestFileId = searchData.files[0].id;
-            const downloadRes = await fetch(`https://www.googleapis.com/drive/v3/files/${manifestFileId}?alt=media`, {
-                headers: { 'Authorization': `Bearer ${googleAccessToken}` }
-            });
-            const manifest = await downloadRes.json();
-
-            this.coreUrl = manifest.core_url;
-            this.satelliteToken = manifest.satellite_key;
-            await this.init(); 
-            return { ok: true, coreUrl: this.coreUrl };
-        } catch (error) {
-            this.logger.error("[IndraBridge] Fallo en Discovery:", error.message);
-            throw error;
-        }
-    }
-
-    /**
-     * EJECUCIÓN SOBERANA
-     * @dharma Puente de comunicación universal.
-     * @restriction NUNCA debe modificar los datos del UQO.
-     */
     async execute(uqo, options = {}) {
-        // --- 🛡️ PARCHE DE JURISDICCIÓN (v1.8) ---
-        if (!uqo.provider && uqo.protocol !== 'SYSTEM_INSTALL_HANDSHAKE' && uqo.protocol !== 'SYSTEM_MANIFEST') {
-            this.logger.warn(`[IndraBridge] Aviso: Protocolo ${uqo.protocol} invocado sin 'provider'. Usando 'system' por defecto.`);
+        if (!uqo.provider && uqo.protocol !== 'SYSTEM_MANIFEST') {
             uqo.provider = 'system';
         }
 
@@ -227,39 +162,29 @@ class IndraBridge {
         const envelope = { satellite_token: this.satelliteToken, ...uqo };
         if (this.shareTicket) envelope.share_ticket = this.shareTicket;
 
-        let rawText = '';
-        try {
-            const response = await fetch(this.coreUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(envelope)
-            });
+        const response = await fetch(this.coreUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(envelope)
+        });
 
-            rawText = await response.text();
-            const result = JSON.parse(rawText);
+        const rawText = await response.text();
+        const result = JSON.parse(rawText);
 
-            if (result.metadata?.status === 'ERROR') {
-                const error = new Error(this._mapError(result.metadata.error));
-                error.code = result.metadata.error;
-                throw error;
-            }
-            return result;
-        } catch (e) {
-            if (e instanceof SyntaxError) {
-                this.logger.error("[IndraBridge] Error de Parseo. El servidor no devolvió JSON.");
-                this.logger.debug("Raw Response Content:", rawText.slice(0, 500));
-                
-                if (rawText.includes("<!DOCTYPE html>") || rawText.includes("<html")) {
-                    throw new Error("ERROR_SERVIDOR: Google devolvió una página de error (posible 403 o sesión expirada).");
-                }
-            }
-            if (!e.code) e.code = 'NETWORK_ERROR';
-            throw e;
+        if (result.metadata?.status === 'ERROR') {
+            const error = new Error(ADR_ERROR_MAP[result.metadata.error] || result.metadata.error);
+            error.code = result.metadata.error;
+            throw error;
         }
+        return result;
     }
 
-    _mapError(coreCode) {
-        return ADR_ERROR_MAP[coreCode] || `Error desconocido: ${coreCode}`;
+    async runWorkflow(workflowJson, triggerData = {}) {
+        if (!this.workflowEngine) {
+            const Engine = (await import('./WorkflowEngine.js')).default;
+            this.workflowEngine = new Engine(this);
+        }
+        return await this.workflowEngine.run(workflowJson, triggerData);
     }
 }
 
