@@ -58,7 +58,7 @@ class IndraBridge {
         
         // Validación de Salud del Contrato (MCEP Enforcement)
         try {
-            const contractRes = await fetch('./core/indra_contract.json');
+            const contractRes = await fetch('../indra_contract.json');
             const contract = await contractRes.json();
             const syncedAt = new Date(contract.synced_at);
             const now = new Date();
@@ -129,8 +129,8 @@ class IndraBridge {
      */
     async runWorkflow(workflowJson, triggerData = {}) {
         if (!this.workflowEngine) {
-            const { IndraWorkflowEngine } = await import('./WorkflowEngine.js');
-            this.workflowEngine = new IndraWorkflowEngine(this);
+            const WorkflowEngine = (await import('./WorkflowEngine.js')).default;
+            this.workflowEngine = new WorkflowEngine(this);
         }
         return await this.workflowEngine.run(workflowJson, triggerData);
     }

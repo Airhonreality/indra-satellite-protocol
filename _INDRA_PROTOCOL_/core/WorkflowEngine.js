@@ -12,7 +12,7 @@
  * =============================================================================
  */
 
-export class IndraWorkflowEngine {
+export default class WorkflowEngine {
     /**
      * @param {Object} bridge - Instancia de IndraBridge (o mock para tests)
      */

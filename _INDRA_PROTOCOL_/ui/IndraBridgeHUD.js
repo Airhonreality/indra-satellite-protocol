@@ -225,26 +225,47 @@ class IndraBridgeHUD extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        // Si ya nos inyectaron configuración antes de nacer, la aplicamos ahora.
+        if (this._config) {
+            this.applyConfig(this._config);
+        }
     }
 
     set config(data) {
+        this._config = data;
+        if (this.shadowRoot && this.shadowRoot.getElementById('core-id')) {
+            this.applyConfig(data);
+        }
+    }
+
+    applyConfig(data) {
         if (data.contract) this.updateResonanceTree(data.contract);
         if (data.core) {
-            this.shadowRoot.getElementById('core-id').innerText = `CORE: ${data.core.id}`;
-            this.shadowRoot.getElementById('sat-name').innerText = data.core.sat_name || 'INDRA SAT';
+            const coreIdEl = this.shadowRoot.getElementById('core-id');
+            const satNameEl = this.shadowRoot.getElementById('sat-name');
+            if (coreIdEl) coreIdEl.innerText = `CORE: ${data.core.id}`;
+            if (satNameEl) satNameEl.innerText = data.core.sat_name || 'INDRA SAT';
         }
     }
 
     updateResonanceTree(contract) {
         const tree = this.shadowRoot.getElementById('res-tree');
-        if (!contract || !contract.schemas) return;
+        if (!contract) return;
 
-        tree.innerHTML = contract.schemas.map(schema => `
+        // Intentar obtener esquemas de diferentes rutas posibles en el contrato
+        const schemas = contract.schemas || (contract.raw?.metadata?.items?.filter(i => i.class === 'SCHEMA')) || [];
+
+        if (schemas.length === 0) {
+            tree.innerHTML = '<div style="opacity:0.3; font-size:10px;">No se detectaron esquemas activos en este Core.</div>';
+            return;
+        }
+
+        tree.innerHTML = schemas.map(schema => `
             <div class="tree-node">
                 <div class="node-label">
-                    <span>${schema.handle?.label || schema.id}</span>
+                    <span>${schema.handle?.alias || schema.id}</span>
                 </div>
-                <div class="node-meta">ID: ${schema.id} | ${schema.protocols?.join(', ')}</div>
+                <div class="node-meta">ID: ${schema.id.substring(0,8)}... | ${schema.protocols?.join(', ') || 'Protocolo Nativo'}</div>
             </div>
         `).join('');
     }
