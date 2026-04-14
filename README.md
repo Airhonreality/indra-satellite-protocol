@@ -1,6 +1,20 @@
 # Indra Satellite Protocol (ISP) v2.1 — MCEP Standards
 > **NIVEL DE PROTOCOLO: Modular Capabilities Exchange (MCEP)**
 
+## 📍 RUTA DE COLONIZACIÓN
+Para desplegar este protocolo en un nuevo Satélite o ERP (Veta de Oro), usa una de las siguientes rutas:
+
+### A. Proyecto Nuevo (Clonación Completa)
+```bash
+git clone https://github.com/Airhonreality/indra-satellite-protocol.git
+```
+
+### B. Satélite Existente (Inyección Axial)
+Se recomienda inyectar el protocolo como **submódulo** para mantener la soberanía de tu código `src/`:
+```bash
+git submodule add https://github.com/Airhonreality/indra-satellite-protocol.git _INDRA_PROTOCOL_
+```
+
 
 ## 🏛️ El Dharma del Desarrollo (Anti-Entropía)
 
