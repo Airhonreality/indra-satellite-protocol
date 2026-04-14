@@ -49,4 +49,21 @@ const result = await engine.execute({
 
 ---
 
-*Añade aquí nuevos patrones conforme los satélites colonicen nuevas funcionalidades.*
+## 3. Mímesis Visual (Tematización)
+**Problema:** El componente UI de Indra no encaja con la paleta de colores de mi Satélite (ej: Veta de Oro).
+
+### El Patrón Canónico
+Los componentes de Indra usan variables CSS inyectables con prefijo `--indra-`.
+
+#### Implementación:
+En el CSS global de tu satélite, define los colores de marca:
+```css
+:root {
+  --indra-accent: #D4AF37; /* Oro para Veta de Oro */
+  --indra-bg: #000000;
+  --indra-font: 'Outfit', sans-serif;
+}
+```
+
+El componente se adaptará automáticamente respetando el aislamiento de su estructura interna.
+

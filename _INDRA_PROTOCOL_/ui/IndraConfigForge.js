@@ -11,11 +11,15 @@ const TEMPLATE = `
 <style>
     :host {
         display: block;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        --accent: #00f2ff;
-        --bg: rgba(10, 12, 18, 0.95);
-        --border: rgba(0, 242, 255, 0.2);
-        color: #fff;
+        font-family: var(--indra-font, 'Inter', system-ui, sans-serif);
+        
+        /* VARIABLES CON FALLBACK (Personalizables desde el satélite) */
+        --accent: var(--indra-accent, #00f2ff);
+        --bg: var(--indra-bg, rgba(10, 12, 18, 0.95));
+        --border: var(--indra-border, rgba(0, 242, 255, 0.2));
+        --text: var(--indra-text, #fff);
+        
+        color: var(--text);
     }
 
     .forge-container {
