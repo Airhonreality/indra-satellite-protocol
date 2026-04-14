@@ -9,6 +9,7 @@ Este documento define el **Dharma** (deber esencial) y los **Axiomas** (leyes in
 **Misión:** Interpretar los deseos del negocio y proyectarlos al Core.
 - **Axioma de la Ceguera**: El Satélite NUNCA asume el estado del Core. Siempre consulta el `indra_contract.json`. Inventar un nombre de campo o protocolo es el pecado original.
 - **Axioma de la Proyección**: La Interfaz de Usuario (UI) es un lienzo pasivo. No se permite lógica de cálculo pesado ni de persistencia dentro de componentes visuales (ej: React, WebComponents).
+- **Axioma de la Palabra (Origen)**: El documento `0_VOICE.md` es la única fuente de verdad inmutable para el propósito del negocio. Ninguna optimización técnica puede contradecir lo expresado literalmente por el usuario en este archivo.
 
 ## 🌉 2. El Dharma del Bridge (Capa de Transporte)
 **Misión:** Garantizar el flujo de información seguro y agnóstico.

@@ -5,6 +5,14 @@ Eres un Agente de Codificación dentro de un proyecto que utiliza el **Indra Sat
 
 ---
 
+## 🔥 EL RITUAL DE IGNICIÓN (PASO 0 - OBLIGATORIO)
+Antes de proponer cualquier código o estructura en `src/`, el Agente DEBE completar el ritual de escucha en la carpeta `_IGNITION_/`:
+
+1.  **CAPTURAR LA VOZ (`0_VOICE.md`)**: El Agente debe realizar las 4 preguntas de base (Necesidades, Pantallas, Datos Clave, Estética) de forma individual. La respuesta del usuario debe ser transcrita LITERALMENTE en `0_VOICE.md`. Este archivo es la "Palabra Sagrada" y el Agente NO puede editarlo una vez cerrado por el usuario.
+2.  **DESARROLLO CONCEPTUAL (`1_CONCEPT.md`)**: Basado en `0_VOICE.md`, el Agente presentará una propuesta técnica detallada (Distribución Axiomática, Flujos MCEP sugeridos, Axiomas de Cumplimiento). Solo cuando el usuario apruebe este documento, se guarda en `1_CONCEPT.md` y se considera la "Línea Base" del desarrollo.
+
+---
+
 ## 🚫 LEYES PROHIBITIVAS (Evitar Entropía)
 1.  **PROHIBICIÓN DE PERSISTENCIA LOCAL**: No sugerir SQLite, LocalStorage o APIs de red directas (fetch/axios) para persistir datos. Todo transporte fuera del satélite DEBE pasar por `_INDRA_PROTOCOL_/core/IndraBridge.js`.
 2.  **PROHIBICIÓN DE LÓGICA DE NEGOCIO EN UI**: No escribir funciones de cálculo complejo en componentes visuales. La lógica pertenece a las "Partituras" (`src/score/`) ejecutadas por `_INDRA_PROTOCOL_/core/WorkflowEngine.js`.
