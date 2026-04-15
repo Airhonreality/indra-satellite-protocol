@@ -132,6 +132,10 @@ export default class WorkflowEngine {
             for (let i = 0; i < stations.length; i++) {
                 const station = stations[i];
                 this._currentStepId = station.id;
+                // 0. Respetar Retardo de Estación (Axioma de Peristaltismo)
+                const delayMs = station.config?.step_delay || 0;
+                if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+
                 this._emit('step_start', { step_id: station.id, index: i, type: station.type });
 
                 let stepOutput = null;
@@ -160,8 +164,11 @@ export default class WorkflowEngine {
                         query: resolvedConfig.query
                     };
 
-                    const response = await this.bridge.execute(req);
-                    stepOutput = response; // { items, metadata }
+                    // ADR-036: Reintentos en la capa de transporte (Axioma de Resiliencia)
+                    const maxRetries = station.config?.maxRetries ?? 2;
+                    stepOutput = await this.bridge.execute(req, { maxRetries });
+                    
+                    // { items, metadata }
                 } else {
                     throw new Error(`Unknown station type: ${station.type}`);
                 }

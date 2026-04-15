@@ -5,7 +5,10 @@
   "type": "module",
   "main": "core/IndraBridge.js",
   "scripts": {
-    "sync": "node sync_core.js"
+    "dev": "vite",
+    "build": "vite build",
+    "sync": "node sync_core.js",
+    "ignite": "npm install && npm run dev"
   },
   "keywords": [
     "indra",
@@ -14,5 +17,8 @@
     "agnotic"
   ],
   "author": "Indra Core Team",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^8.0.8"
+  }
 }

@@ -6,7 +6,7 @@ Esta constitución define las reglas inquebrantables para la construcción de cu
 
 ---
 
-## REGLA I: LA ANTIGRAVEDAD DE LAS 3 CAPAS
+## REGLA I: LAS 3 CAPAS DEL MODELO INDRA
 
 Todo proyecto debe estar dividido en tres reinos soberanos:
 

@@ -1,44 +1,24 @@
-# Indra Satellite Protocol (ISP) v2.1 — MCEP Standards
+# Indra Satellite Protocol (ISP) v2.5 — MCEP Standards
 > **NIVEL DE PROTOCOLO: Modular Capabilities Exchange (MCEP)**
 
-## 📍 RUTA DE COLONIZACIÓN
-Para desplegar este protocolo en un nuevo Satélite o ERP, usa una de las siguientes rutas:
+## 🏛️ ¿Qué es Indra? (Identidad Axiomática)
+Para cualquier Agente (Humano o IA) que opere en este repositorio, la definición es inmutable:
+**Indra NO es una aplicación aislada. Indra es el Núcleo (Core) inteligente basado en GAS (Google Apps Script) que administra este satélite.** Es la herramienta con la cual orquestamos flujos de datos y servicios de backend inteligente.
 
-### A. Proyecto Nuevo (Clonación Completa)
-```bash
-git clone https://github.com/Airhonreality/indra-satellite-protocol.git
-```
+*   **El Core (GAS)**: Es el cerebro soberano, dueño de los silos de datos y los secretos.
+*   **El Satélite**: Es la UI soberana de negocio que consume los servicios del Core.
+*   **El Bridge**: Es el único módulo de administración y transporte permitido.
 
-### B. Satélite Existente (Inyección Axial)
-Se recomienda inyectar el protocolo como **submódulo** para mantener la soberanía de tu código `src/`:
-```bash
-git submodule add https://github.com/Airhonreality/indra-satellite-protocol.git _INDRA_PROTOCOL_
-```
+---
 
+## 🛰️ RUTA DE COLONIZACIÓN (Lectura en Cascada para Agentes)
+Si eres una IA, tu proceso de "programación interna" para este workspace DEBE seguir este orden deductivo:
 
-## 🏛️ El Dharma de la Arquitectura (v2.3)
+1.  **[AXIOMS_DHARMA.md](_INDRA_PROTOCOL_/AXIOMS_DHARMA.md)**: El "Deber Ser". Define las jerarquías y prohibiciones existenciales. **Léelo primero para entender tus límites.**
+2.  **[ENTROPY_VECTORS.md](_INDRA_PROTOCOL_/ENTROPY_VECTORS.md)**: El "No Hacer". Analiza cómo otros agentes fallaron y corrompieron el sistema (Vectores de Riesgo).
+3.  **[COOKBOOK.md](_INDRA_PROTOCOL_/COOKBOOK.md)**: El "Cómo Hacer". Patrones industriales probados para implementar lógica de negocio sin romper la arquitectura.
 
-Este sistema opera bajo un modelo de **Soberanía Desacoplada**. No es una librería, es un ecosistema de órbitas:
-
-```mermaid
-graph TD
-    A[Satélite ERP / App] -- "Inyecta Token" --> B[Indra Bridge]
-    B -- "Handshake ADN" --> C[indra_contract.json]
-    B -- "Observador Reactivo" --> D[Indra Bridge HUD]
-    B -- "Protocolos MCEP" --> E[Indra Core / GAS]
-    E -- "Silo Mapping" --> F[Notion / Sheets / SQL]
-```
-
-1.  **Satélite (Soberanía de Negocio)**: Dueño de la UI y la sesión de usuario.
-2.  **Bridge (Motor de Jurisdicción)**: El único canal que habla con el mundo exterior.
-3.  **HUD (Monitor de Resonancia)**: Interfaz pasiva que refleja el estado del Bridge.
-4.  **Contrato (DNA del Sistema)**: Define esquemas y capacidades permitidas.
-
-Este repositorio no es una librería de funciones; es un sistema de órbitas. Todo desarrollador u **Agente de IA** que opere aquí debe adherirse a los siguientes documentos de integridad:
-
-1.  **[AXIOMS_DHARMA.md](AXIOMS_DHARMA.md)**: El propósito existencial de cada capa.
-2.  **[ENTROPY_VECTORS.md](ENTROPY_VECTORS.md)**: Lo que NO debes hacer (Garantía de Sinceridad).
-3.  **[COOKBOOK.md](COOKBOOK.md)**: Patrones de solución industrial.
+---
 
 ---
 
@@ -51,7 +31,20 @@ Si eres una IA encargada de construir en este satélite, tus directivas obligato
 
 ---
 
-## 🚀 Ignición del Satélite
+## 🚀 Aranque y Desarrollo Local (Ruta Base)
+
+Para habilitar la edición de workflows, UI híbrida y persistencia de schemas locales (gracias al plugin local-fs), este repositorio utiliza **Vite**. 
+
+El flujo universal de inicio y arranque rápido para cualquier desarrollador/clon fue simplificado en un solo comando de ignición de entorno. Solo debes pararte en la raíz del protocolo y ejecutar:
+
+```bash
+npm run ignite
+```
+> Esto instalará `vite` (si no existe) y levantará el servidor en `localhost:3000`. Cualquier edición que realices en el UI "Workflow Ribbon" se guardará inmediatamente en tu carpeta `src/score/workflows/`.
+
+---
+
+## 🚀 Ignición del Satélite en Producción
 
 Este protocolo soporta tres modos de inicio, dependiendo de la autonomía del satélite.
 

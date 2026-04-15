@@ -39,6 +39,8 @@ class IndraBridge {
         this.requestQueue = [];
         
         this.workflowEngine = null;
+        this.resonanceWarnings = []; 
+        this.environment = config.environment || 'PRODUCTION'; // PRODUCTION | SANDBOX
         this.onStateChange = config.onStateChange || null;
     }
 
@@ -66,18 +68,29 @@ class IndraBridge {
         // 1. Carga automática del contrato local como base
         await this.loadContract();
 
-        // 2. Handshake dinámico con el Core (si hay URL)
+        // 2. Handshake dinámico y Resonancia de ADN (Crystallization)
         if (this.coreUrl) {
             try {
-                const manifest = await this.execute({
-                    protocol: 'GETMCEPMANIFEST',
+                // ADR-Resonancia: Empujamos el ADN local para cristalizarlo en el Core
+                const response = await this.execute({
+                    protocol: 'SYSTEM_RESONANCE_CRYSTALLIZE',
                     provider: 'system',
-                    data: { mode: 'RAW_MAP' }
+                    data: { contract: this.contract }
                 });
-                this.capabilities = manifest.metadata;
+                
+                this.capabilities = response.metadata || {};
                 this.coreVersion = this.capabilities.core_version;
+                
+                // Almacenar advertencias de integridad (Ej: Schemas Ghosted)
+                this.resonanceWarnings = response.metadata?.integrity_warnings || [];
+                
+                if (this.resonanceWarnings.length > 0) {
+                    this.logger.warn("⚠️ Advertencias de Resonancia detectadas:", this.resonanceWarnings);
+                }
+
+                console.log("[IndraBridge] Resonancia establecida con el Core.");
             } catch (e) {
-                this.logger.warn("⚠️ Handshake dinámico fallido. Operando con Contrato Local.");
+                this.logger.warn("⚠️ Fallo en cristalización. Operando en modo Local/Desconectado.");
             }
         }
 
@@ -159,7 +172,11 @@ class IndraBridge {
 
     async _rawFetch(uqo) {
         if (!this.coreUrl) throw new Error("CORE_NOT_INITIALIZED");
-        const envelope = { satellite_token: this.satelliteToken, ...uqo };
+        const envelope = { 
+            satellite_token: this.satelliteToken, 
+            environment: this.environment,
+            ...uqo 
+        };
         if (this.shareTicket) envelope.share_ticket = this.shareTicket;
 
         const response = await fetch(this.coreUrl, {

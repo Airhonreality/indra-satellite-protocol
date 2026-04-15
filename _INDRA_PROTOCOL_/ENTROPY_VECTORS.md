@@ -22,5 +22,9 @@ La entropía es el desorden natural que degrada los sistemas. En Indra, la entro
 
 ## 🚩 Vector 4: La UI Rígida (Entropía de Presentación)
 **Síntoma:** El Agente crea un botón para cada acción posible, llenando la pantalla de código visual ad-hoc.
-**Impacto:** Interfaz inflada y difícil de mantener.
 **Antídoto:** Usar el `SYSTEM_MANIFEST` para renderizar dinámicamente capacidades basadas en lo que el Silo realmente soporta hoy.
+
+## 🚩 Vector 5: La Corrupción de Infraestructura (Entropía Orgánica)
+**Síntoma:** El Agente intenta "arreglar" un problema de negocio (ej. añadir un botón de Cotización) modificando archivos dentro de `_INDRA_PROTOCOL_` o `system_core/client/src/satellite/`.
+**Impacto:** Destrucción del desacoplamiento. El satélite deja de ser portátil. El Bridge se vuelve un espagueti de lógica de negocio que el Core no puede procesar.
+**Antídoto:** Mantener una frontera absoluta. La lógica de negocio vive en `src/`. La infraestructura es intocable. Si necesitas una nueva funcionalidad, pídele al Core un nuevo protocolo, no parches el Bridge.
