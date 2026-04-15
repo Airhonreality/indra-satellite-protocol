@@ -19,6 +19,7 @@ Si eres una IA, tu proceso de "programación interna" para este workspace DEBE s
 3.  **[COOKBOOK.md](_INDRA_PROTOCOL_/COOKBOOK.md)**: El "Cómo Hacer". Patrones industriales probados para implementar lógica de negocio sin romper la arquitectura.
 4.  **[.ia-agente/discovery_protocol.md](.ia-agente/discovery_protocol.md)**: El "Hacer". **Punto de ignición.** Una vez asimilada la ley, activa este protocolo para mapear el negocio del usuario y comenzar la construcción por rebanadas.
 5.  **[HYBRID_ARCH_GUIDE.md](_INDRA_PROTOCOL_/HYBRID_ARCH_GUIDE.md)**: El "Poder". Guía para usar el Arsenal de Indra (Indra Tools) e invocar módulos React desde el satélite.
+6.  **[SATELLITE_MULTITENANCY.md](_INDRA_PROTOCOL_/SATELLITE_MULTITENANCY.md)**: La "Soberanía". Protocolo de permisos multi-usuario, aislamiento de contexto y Ley de Jurisdicción.
 
 ---
 

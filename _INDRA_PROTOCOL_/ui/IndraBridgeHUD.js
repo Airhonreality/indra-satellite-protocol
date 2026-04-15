@@ -134,14 +134,16 @@ class IndraBridgeHUD extends HTMLElement {
 
         // --- FILTRADO DE DHARMA: Separar Negocio de Sistema ---
         const filteredSchemas = (contract.schemas || []).filter(s => {
-            // Filtro de Seguridad: Escondemos solo ruidos obvios de sistema
-            const isSystem = s.id?.startsWith('INDRA_') || 
-                             s.id?.toLowerCase().includes('config') || 
-                             s.id === 'notion' || 
-                             s.id === 'intelligences';
-            
-            // Si es local (no tiene metadata de core aún) o es explícitamente DATA_SCHEMA, se muestra
-            return !isSystem;
+            // REGLA AXIOMÁTICA: Si es un esquema de configuración, es de la Shell, no del Satélite
+            if (s.class === 'CONFIG_SCHEMA' || s.class === 'SYSTEM_SCHEMA') return false;
+
+            // Filtro de Seguridad por ID (Aduana)
+            const isSystemId = s.id?.startsWith('INDRA_') || 
+                               s.handle?.alias?.startsWith('config_') ||
+                               s.id === 'notion' || 
+                               s.id === 'intelligence';
+
+            return !isSystemId;
         });
 
         // Proyectar a los Widgets

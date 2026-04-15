@@ -59,6 +59,12 @@ class IndraWorkflowRibbon extends HTMLElement {
         <nav class="tabs-nav">
             <button class="tab-btn ${activeCategory === 'CLIENTE' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('CLIENTE')">🛰️ CLIENTE SATÉLITE</button>
             <button class="tab-btn ${activeCategory === 'SYSTEM' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('SYSTEM')">🛠️ INDRA TOOLS</button>
+            ${activeCategory === 'SYSTEM' ? `
+                <button class="btn btn-play" style="margin-left: auto; background: var(--color-warm, #ffaa00); color: black;" 
+                        onclick="this.getRootNode().host._invokeServiceManager()">
+                    GESTIONAR SERVICIOS (CORE)
+                </button>
+            ` : ''}
         </nav>
 
         <div class="ribbon-container">
@@ -114,6 +120,20 @@ class IndraWorkflowRibbon extends HTMLElement {
             else alert(`❌ ERROR: ${result.message}`);
         } catch (e) {
             alert(`Fallo Crítico: ${e.message}`);
+        }
+    }
+
+    async _invokeServiceManager() {
+        const hud = document.querySelector('indra-bridge-hud');
+        if (!hud || !hud._bridge) return alert("INDRA_BRIDGE_NOT_FOUND");
+
+        try {
+            await hud._bridge.execute({
+                protocol: 'UI_INVOKE',
+                module: 'SERVICE_MANAGER'
+            });
+        } catch (e) {
+            console.error(e);
         }
     }
 
