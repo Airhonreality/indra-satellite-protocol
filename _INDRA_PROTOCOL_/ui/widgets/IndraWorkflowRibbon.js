@@ -7,7 +7,7 @@
  * =============================================================================
  */
 
-import { SYSTEM_TOOLS } from '../core/SystemToolsRegistry.js';
+import { SYSTEM_TOOLS } from '../../core/SystemToolsRegistry.js';
 
 class IndraWorkflowRibbon extends HTMLElement {
     constructor() {
