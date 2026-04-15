@@ -8,7 +8,21 @@ Un mismo código de satélite (ej: `erp-panaderia`) puede atender a N clientes d
 *   **Acceso**: El Core genera un Token de Resonancia único para cada combinación de `Usuario + Workspace`.
 *   **Aislamiento**: Cuando el Satélite recibe este token vía `INDRA_RESONANCE_GRANT`, el Bridge bloquea la sesión a ese **ID de Contexto** único.
 
-## 🛡️ Ley deJurisdicción (Seguridad en el Gateway)
+## 🗺️ El Axioma de la Geografía de Datos (Vórtices)
+Para evitar la entropía en Google Drive, cada satélite debe reclamar un **Vórtice Soberano** (Carpeta Raíz) durante su ignición.
+
+### 1. El Protocolo de Anclaje
+Cuando un satélite ejecuta el flujo `GÉNESIS_EXPRESS`, el proceso sigue este flujo:
+1.  **Declaración**: El usuario define el `target_folder` en el `IndraParamModal`.
+2.  **Resolución**: El Core (API Gateway) busca la carpeta en el root del Drive.
+3.  **Anclaje**: Si no existe, la crea. El ID resultante se devuelve al satélite.
+4.  **Herencia**: Todos los artefactos materiales (Sheets, Docs) creados por este satélite usarán ese ID como `parentId` obligatorio.
+
+### 2. Ubicación de la Verdad
+*   **Meta-Data**: El ID de la carpeta raíz se almacena en el `indra_contract.json` bajo la propiedad `storage_root`.
+*   **Seguridad**: El Satélite solo tiene visibilidad de lo que ocurre dentro de su propio Vórtice, manteniendo la soberanía de datos entre diferentes proyectos o clientes.
+
+## 🛡️ Ley de Jurisdicción (Seguridad en el Gateway)
 Para evitar la **Entropía de Datos** (ver `ENTROPY_VECTORS.md`), el sistema sigue la **Ley del Gateway**:
 
 1.  **Paquetes Estériles**: La Shell Core (Madre) filtra el contrato antes de enviarlo al Satélite. 

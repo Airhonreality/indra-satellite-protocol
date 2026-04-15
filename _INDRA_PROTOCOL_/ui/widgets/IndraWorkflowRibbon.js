@@ -15,6 +15,8 @@ class IndraWorkflowRibbon extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this._workflows = [];
         this._activeCategory = 'CLIENTE';
+        
+        window.addEventListener('indra-resonance-sync', () => this._updateResonanceStatus());
     }
 
     set workflows(data) {
@@ -30,6 +32,27 @@ class IndraWorkflowRibbon extends HTMLElement {
     _setCategory(cat) {
         this._activeCategory = cat;
         this.render();
+        this._updateResonanceStatus();
+    }
+
+    _updateResonanceStatus() {
+        if (this._activeCategory !== 'SYSTEM') return;
+        
+        const hud = document.querySelector('indra-bridge-hud');
+        if (!hud || !hud._bridge) return;
+
+        const monitor = this.shadowRoot.getElementById('dna-monitor');
+        if (!monitor) return;
+
+        const isResonating = (this.resonanceWarnings || []).length === 0 && hud._bridge.coreUrl;
+        
+        if (isResonating) {
+            monitor.style.color = 'var(--accent)';
+            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 5px var(--accent);"></div> ADN_EN_RESONANCIA`;
+        } else {
+            monitor.style.color = '#ef4444';
+            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 5px #ef4444;"></div> DIVERGENCIA_ADN`;
+        }
     }
 
     render() {
@@ -51,6 +74,9 @@ class IndraWorkflowRibbon extends HTMLElement {
             .wf-actions { display: flex; gap: 8px; }
             .btn { font-size: 9px; font-weight: 700; padding: 5px 10px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; }
             .btn-play { background: #E6F4EA; color: #137333; }
+            .btn-ghost { background: transparent; color: #666; border-color: #DADCE0; }
+            .btn-ghost:hover { background: #F1F3F4; color: #000; }
+            .engineering-actions .btn { white-space: nowrap; }
             .station-list { display: flex; flex-direction: column; padding: 10px; gap: 5px; background: #F8F9FA;}
             .station-item { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 10px; align-items: center; padding: 6px; background: #FFF; border: 1px solid #DADCE0; border-radius: 4px; font-size: 10px; }
             .station-num { font-weight: bold; color: var(--accent); }
@@ -59,11 +85,17 @@ class IndraWorkflowRibbon extends HTMLElement {
         <nav class="tabs-nav">
             <button class="tab-btn ${activeCategory === 'CLIENTE' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('CLIENTE')">🛰️ CLIENTE SATÉLITE</button>
             <button class="tab-btn ${activeCategory === 'SYSTEM' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('SYSTEM')">🛠️ INDRA TOOLS</button>
+            
             ${activeCategory === 'SYSTEM' ? `
-                <button class="btn btn-play" style="margin-left: auto; background: var(--color-warm, #ffaa00); color: black;" 
-                        onclick="this.getRootNode().host._invokeServiceManager()">
-                    GESTIONAR SERVICIOS (CORE)
-                </button>
+                <div class="engineering-actions" style="margin-left: auto; display: flex; gap: 8px; align-items: center; padding-right: 10px;">
+                    <div id="dna-monitor" class="dna-status" style="font-size: 8px; font-family: monospace; color: var(--accent); margin-right: 15px; display: flex; align-items: center; gap: 5px; opacity: 0.8;">
+                        <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 5px var(--accent);"></div>
+                        ADN_SINCRONIZADO
+                    </div>
+                    <button class="btn btn-ghost" style="font-size: 8px; border: 1px solid #CCC;" onclick="this.getRootNode().host._invokeUI('SCHEMA_DESIGNER')">📐 ESQUEMAS</button>
+                    <button class="btn btn-ghost" style="font-size: 8px; border: 1px solid #CCC;" onclick="this.getRootNode().host._invokeUI('WORKFLOW_DESIGNER')">⛓️ FLUJOS</button>
+                    <button class="btn btn-play" style="background: #f59e0b; color: white;" onclick="this.getRootNode().host._invokeServiceManager()">SERVICIOS</button>
+                </div>
             ` : ''}
         </nav>
 
@@ -104,22 +136,40 @@ class IndraWorkflowRibbon extends HTMLElement {
         const wf = this._workflows.find(w => w.id === id);
         if (!wf) return;
 
-        // Búsqueda del Bridge (vía HUD)
+        // Búsqueda del Portal de Parámetros (vía HUD)
         const hud = document.querySelector('indra-bridge-hud');
         if (!hud || !hud._bridge) return alert("INDRA_BRIDGE_NOT_FOUND");
-
-        // UI de parámetros simple para el MVP (Camino del Dev)
-        const paramsStr = prompt(`Ejecutar: ${wf.label}\n\nIntroduce parámetros en JSON (opcional):`, '{"target_schema": "veta_de_oro"}');
-        let params = {};
-        try { if(paramsStr) params = JSON.parse(paramsStr); } catch(e) { return alert("JSON_INVALIDO"); }
+        
+        const portal = hud.shadowRoot.getElementById('param-portal');
+        if (!portal) return alert("INDRA_PARAM_PORTAL_NOT_FOUND");
 
         try {
+            // Invocación del Formulario de Ignición
+            const params = await portal.prompt(wf);
+            
             console.log(`[Ribbon] Ejecutando flujo ${id}...`, params);
             const result = await hud._bridge.runWorkflow(wf, params);
+            
             if (result.status === 'SUCCESS') alert("✅ FLUJO COMPLETADO");
             else alert(`❌ ERROR: ${result.message}`);
         } catch (e) {
+            if (e.message === 'USER_CANCELLED') return; // Silencio si el usuario canceló
             alert(`Fallo Crítico: ${e.message}`);
+        }
+    }
+
+    async _invokeUI(moduleName) {
+        const hud = document.querySelector('indra-bridge-hud');
+        if (!hud || !hud._bridge) return alert("INDRA_BRIDGE_NOT_FOUND");
+
+        try {
+            await hud._bridge.execute({
+                protocol: 'UI_INVOKE',
+                module: moduleName
+            });
+        } catch (e) {
+            console.error(`[Ribbon] Fallo al invocar ${moduleName}:`, e);
+            alert(`Error de Portal: ${e.message}`);
         }
     }
 

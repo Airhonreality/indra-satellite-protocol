@@ -10,6 +10,7 @@
 import './widgets/IndraSchemaProjector.js';
 import './widgets/IndraUniversalPicker.js';
 import './widgets/IndraWorkflowRibbon.js';
+import './widgets/IndraParamModal.js';
 
 const TEMPLATE = `
 <style>
@@ -107,6 +108,7 @@ const TEMPLATE = `
             </section>
         </div>
     </div>
+    <indra-param-modal id="param-portal"></indra-param-modal>
 </div>
 `;
 

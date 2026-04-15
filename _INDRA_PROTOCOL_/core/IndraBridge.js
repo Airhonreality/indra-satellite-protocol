@@ -138,9 +138,11 @@ class IndraBridge {
                     });
                     this.capabilities = crystalResponse.metadata || {};
                     this.resonanceWarnings = crystalResponse.metadata?.integrity_warnings || [];
+                    window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'CRYSTALLIZED' } }));
                 } else {
                     console.log("[IndraBridge] Resonancia perfecta. No se requiere cristalización.");
                     this.capabilities = statusPulse.metadata || {};
+                    window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
                 }
                 
                 this.coreVersion = this.capabilities.core_version;
