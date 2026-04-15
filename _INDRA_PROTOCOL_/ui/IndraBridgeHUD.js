@@ -133,11 +133,20 @@ class IndraBridgeHUD extends HTMLElement {
         const { contract } = this._bridge;
 
         // --- FILTRADO DE DHARMA: Separar Negocio de Sistema ---
-        const businessSchemas = (contract.schemas || []).filter(s => s.class === 'DATA_SCHEMA');
+        const filteredSchemas = (contract.schemas || []).filter(s => {
+            // Filtro de Seguridad: Escondemos solo ruidos obvios de sistema
+            const isSystem = s.id?.startsWith('INDRA_') || 
+                             s.id?.toLowerCase().includes('config') || 
+                             s.id === 'notion' || 
+                             s.id === 'intelligences';
+            
+            // Si es local (no tiene metadata de core aún) o es explícitamente DATA_SCHEMA, se muestra
+            return !isSystem;
+        });
 
         // Proyectar a los Widgets
         const projector = this.shadowRoot.getElementById('schema-projector');
-        if (projector) projector.schemas = businessSchemas;
+        if (projector) projector.schemas = filteredSchemas;
 
         const picker = this.shadowRoot.getElementById('universal-picker');
         if (picker) picker.providers = contract.capabilities?.providers || [];
