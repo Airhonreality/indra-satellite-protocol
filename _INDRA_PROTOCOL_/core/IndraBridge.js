@@ -34,7 +34,7 @@ class IndraBridge {
         // Las capacidades son las dinámicas del Core
         this.capabilities = { protocols: [], providers: [], core_version: '0.0' };
 
-        this.MAX_CONCURRENT = config.maxConcurrent || 5;
+        this.MAX_CONCURRENT = config.maxConcurrent || 1; // Axioma Peristáltico: 1 a la vez por defecto
         this.activeRequests = 0;
         this.requestQueue = [];
         
@@ -42,6 +42,20 @@ class IndraBridge {
         this.resonanceWarnings = []; 
         this.environment = config.environment || 'PRODUCTION'; // PRODUCTION | SANDBOX
         this.onStateChange = config.onStateChange || null;
+    }
+
+    /**
+     * @dharma Genera un Checksum ligero del ADN local para validar la sinceridad.
+     */
+    _generateChecksum(schemas) {
+        const str = JSON.stringify(schemas || []);
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convertir a 32bit int
+        }
+        return `chk_${Math.abs(hash).toString(36)}`;
     }
 
     /**
@@ -68,21 +82,35 @@ class IndraBridge {
         // 1. Carga automática del contrato local como base
         await this.loadContract();
 
-        // 2. Handshake dinámico y Resonancia de ADN (Crystallization)
+        // 2. Handshake y Checksum de Sinceridad
         if (this.coreUrl) {
             try {
-                // ADR-Resonancia: Empujamos el ADN local para cristalizarlo en el Core
-                const response = await this.execute({
-                    protocol: 'SYSTEM_RESONANCE_CRYSTALLIZE',
-                    provider: 'system',
-                    data: { contract: this.contract }
+                const localChecksum = this._generateChecksum(this.contract.schemas);
+                
+                // Primero intentamos un pulso ligero para verificar el estado
+                const statusPulse = await this.execute({
+                    protocol: 'SYSTEM_MANIFEST',
+                    provider: 'system'
                 });
                 
-                this.capabilities = response.metadata || {};
-                this.coreVersion = this.capabilities.core_version;
+                const coreChecksum = statusPulse.metadata?.schema_checksum;
                 
-                // Almacenar advertencias de integridad (Ej: Schemas Ghosted)
-                this.resonanceWarnings = response.metadata?.integrity_warnings || [];
+                if (localChecksum !== coreChecksum) {
+                    this.logger.warn(`[IndraBridge] Divergencia de ADN detectada (Local: ${localChecksum} vs Core: ${coreChecksum}). Forzando Cristalización...`);
+                    // ADR-Resonancia: Empujamos el ADN local para cristalizarlo en el Core
+                    const crystalResponse = await this.execute({
+                        protocol: 'SYSTEM_RESONANCE_CRYSTALLIZE',
+                        provider: 'system',
+                        data: { contract: this.contract, checksum: localChecksum }
+                    });
+                    this.capabilities = crystalResponse.metadata || {};
+                    this.resonanceWarnings = crystalResponse.metadata?.integrity_warnings || [];
+                } else {
+                    console.log("[IndraBridge] Resonancia perfecta. No se requiere cristalización.");
+                    this.capabilities = statusPulse.metadata || {};
+                }
+                
+                this.coreVersion = this.capabilities.core_version;
                 
                 if (this.resonanceWarnings.length > 0) {
                     this.logger.warn("⚠️ Advertencias de Resonancia detectadas:", this.resonanceWarnings);
@@ -90,7 +118,7 @@ class IndraBridge {
 
                 console.log("[IndraBridge] Resonancia establecida con el Core.");
             } catch (e) {
-                this.logger.warn("⚠️ Fallo en cristalización. Operando en modo Local/Desconectado.");
+                this.logger.warn("⚠️ Fallo en Handshake/Cristalización. Operando en modo Local/Desconectado.", e);
             }
         }
 
@@ -143,17 +171,20 @@ class IndraBridge {
         }
 
         const maxRetries = options.maxRetries ?? 3;
+        
+        // COLUMNA PERISTÁLTICA: Encolado ordenado para evitar asfixiar al Core
         if (this.activeRequests >= this.MAX_CONCURRENT) {
             await new Promise(resolve => this.requestQueue.push(resolve));
         }
         this.activeRequests++;
+        
         try {
             return await this._executeWithRetry(uqo, maxRetries);
         } finally {
             this.activeRequests--;
             if (this.requestQueue.length > 0) {
                 const next = this.requestQueue.shift();
-                next();
+                next(); // Libera el siguiente pulso en la cola
             }
         }
     }

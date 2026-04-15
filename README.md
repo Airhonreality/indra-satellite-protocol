@@ -17,6 +17,7 @@ Si eres una IA, tu proceso de "programación interna" para este workspace DEBE s
 1.  **[AXIOMS_DHARMA.md](_INDRA_PROTOCOL_/AXIOMS_DHARMA.md)**: El "Deber Ser". Define las jerarquías y prohibiciones existenciales. **Léelo primero para entender tus límites.**
 2.  **[ENTROPY_VECTORS.md](_INDRA_PROTOCOL_/ENTROPY_VECTORS.md)**: El "No Hacer". Analiza cómo otros agentes fallaron y corrompieron el sistema (Vectores de Riesgo).
 3.  **[COOKBOOK.md](_INDRA_PROTOCOL_/COOKBOOK.md)**: El "Cómo Hacer". Patrones industriales probados para implementar lógica de negocio sin romper la arquitectura.
+4.  **[.ia-agente/discovery_protocol.md](.ia-agente/discovery_protocol.md)**: El "Hacer". **Punto de ignición.** Una vez asimilada la ley, activa este protocolo para mapear el negocio del usuario y comenzar la construcción por rebanadas.
 
 ---
 
