@@ -42,6 +42,39 @@ class IndraBridge {
         this.resonanceWarnings = []; 
         this.environment = config.environment || 'PRODUCTION'; // PRODUCTION | SANDBOX
         this.onStateChange = config.onStateChange || null;
+
+        this.pendingUIRequests = new Map(); // Para rastrear llamadas a la UI del Core
+    }
+
+    /**
+     * @dharma Escucha resonancia desde una Shell Madre (Iframe Host).
+     */
+    listenFromShell() {
+        window.addEventListener("message", (event) => {
+            const { type, payload, request_id } = event.data || {};
+
+            // 1. Handshake de Resonancia
+            if (type === "INDRA_RESONANCE_GRANT") {
+                this.coreUrl = payload.core_url;
+                this.satelliteToken = payload.google_token;
+                this.environment = payload.environment || 'PRODUCTION';
+                console.log("[IndraBridge] Resonancia concedida por la Shell Madre.");
+                
+                // Dispara evento nativo para que el satélite sepa que puede empezar
+                window.dispatchEvent(new CustomEvent("indra-ready", { detail: payload }));
+                this.init(); // Auto-ignición
+            }
+
+            // 2. Respuesta de una invocación de UI
+            if (type === "INDRA_UI_RESPONSE" && request_id) {
+                const pending = this.pendingUIRequests.get(request_id);
+                if (pending) {
+                    if (payload.status === 'SUCCESS') pending.resolve(payload.data);
+                    else pending.reject(new Error(payload.error || "UI_INVOKE_FAILED"));
+                    this.pendingUIRequests.delete(request_id);
+                }
+            }
+        });
     }
 
     /**
@@ -168,6 +201,20 @@ class IndraBridge {
     async execute(uqo, options = {}) {
         if (!uqo.provider && uqo.protocol !== 'SYSTEM_MANIFEST') {
             uqo.provider = 'system';
+        }
+
+        // --- INTERCEPCIÓN DE PROTOCOLO DE INTERFAZ (SHELL MADRE) ---
+        if (uqo.protocol === 'UI_INVOKE') {
+            return new Promise((resolve, reject) => {
+                const requestId = `ui_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                this.pendingUIRequests.set(requestId, { resolve, reject });
+
+                window.parent.postMessage({
+                    type: 'INDRA_UI_INVOKE',
+                    request_id: requestId,
+                    payload: uqo
+                }, "*");
+            });
         }
 
         const maxRetries = options.maxRetries ?? 3;

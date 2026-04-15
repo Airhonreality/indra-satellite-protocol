@@ -7,62 +7,108 @@
  * =============================================================================
  */
 
+import { SYSTEM_TOOLS } from '../core/SystemToolsRegistry.js';
+
 class IndraWorkflowRibbon extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._workflows = [];
+        this._activeCategory = 'CLIENTE';
     }
 
     set workflows(data) {
-        this._workflows = data;
+        // Inyectamos las herramientas nativas del sistema desde el Registro Central
+        this._workflows = [...this.systemTools, ...data];
+        this.render();
+    }
+
+    get systemTools() {
+        return SYSTEM_TOOLS;
+    }
+
+    _setCategory(cat) {
+        this._activeCategory = cat;
         this.render();
     }
 
     render() {
+        const activeCategory = this._activeCategory;
+        const filteredWorkflows = this._workflows.filter(wf => (wf.metadata?.category || 'CLIENTE') === activeCategory);
+
         this.shadowRoot.innerHTML = `
         <style>
-            :host { display: block; }
+            :host { display: block; --accent: ${activeCategory === 'SYSTEM' ? '#f59e0b' : '#8B5CF6'}; }
+            
+            .tabs-nav { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid #DADCE0; background: #EEE; padding: 4px 4px 0 4px; border-radius: 4px; }
+            .tab-btn { padding: 6px 12px; font-size: 10px; font-weight: 700; cursor: pointer; border: none; background: transparent; color: #666; border-bottom: 2px solid transparent; text-transform: uppercase; }
+            .tab-btn.active { color: #000; border-bottom-color: var(--accent); background: #FFF; border-radius: 4px 4px 0 0; }
+
             .ribbon-container { display: flex; flex-direction: column; gap: 15px; }
-            .workflow-item { background: #FFFFFF; border: 1px solid #DADCE0; border-left: 4px solid #8B5CF6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+            .workflow-item { background: #FFFFFF; border: 1px solid #DADCE0; border-left: 4px solid var(--accent); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
             .wf-header { padding: 12px 15px; border-bottom: 1px solid #F1F3F4; display: flex; justify-content: space-between; align-items: center; }
-            .wf-label { font-size: 13px; font-weight: 700; color: #1A1F36; margin: 0; padding: 0; border: none; outline: none; width: 100%; }
+            .wf-label { font-size: 12px; font-weight: 700; color: #1A1F36; border: none; background: transparent; }
             .wf-actions { display: flex; gap: 8px; }
-            .btn { font-size: 10px; font-weight: 700; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; background: #F1F3F4; color: #3C4043; }
-            .btn-test { background: #E6F4EA; color: #137333; }
-            .btn-save { background: #1A73E8; color: #FFFFFF; }
+            .btn { font-size: 9px; font-weight: 700; padding: 5px 10px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; }
+            .btn-play { background: #E6F4EA; color: #137333; }
             .station-list { display: flex; flex-direction: column; padding: 10px; gap: 5px; background: #F8F9FA;}
-            .station-item { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 10px; align-items: center; padding: 8px; background: #FFF; border: 1px solid #DADCE0; border-radius: 4px; }
-            .station-num { font-size: 10px; font-weight: bold; color: #8B5CF6; }
-            select { font-size: 11px; padding: 4px; border: 1px solid #DADCE0; border-radius: 3px; outline: none; }
+            .station-item { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 10px; align-items: center; padding: 6px; background: #FFF; border: 1px solid #DADCE0; border-radius: 4px; font-size: 10px; }
+            .station-num { font-weight: bold; color: var(--accent); }
         </style>
+
+        <nav class="tabs-nav">
+            <button class="tab-btn ${activeCategory === 'CLIENTE' ? 'active' : ''}" onclick="this.closest('indra-workflow-ribbon')._setCategory('CLIENTE')">🛰️ CLIENTE SATÉLITE</button>
+            <button class="tab-btn ${activeCategory === 'SYSTEM' ? 'active' : ''}" onclick="this.closest('indra-workflow-ribbon')._setCategory('SYSTEM')">🛠️ INDRA TOOLS</button>
+        </nav>
+
         <div class="ribbon-container">
-            ${this._workflows.map(wf => `
+            ${filteredWorkflows.map(wf => `
                 <div class="workflow-item">
                     <div class="wf-header">
-                        <input type="text" class="wf-label" value="${wf.label || wf.id}" disabled />
+                        <div class="wf-label">${wf.payload?.label || wf.label || wf.id}</div>
                         <div class="wf-actions">
-                            <button class="btn btn-test" onclick="try{ document.querySelector('indra-bridge-hud')._bridge.execute({protocol:'TEST'},{maxRetries:0}).then(()=>alert('TEST EXITOSO')).catch(e=>alert('TEST FALLIDO: '+e)) }catch(e){}">TEST</button>
-                            <button class="btn btn-save" onclick="fetch('http://localhost:3000/api/save-score',{method:'POST',body:JSON.stringify(${JSON.stringify(wf).replace(/"/g, '&quot;')})}).then(r=>r.json()).then(r=>alert(r.status==='ok'?'GUARDADO':'ERROR'))">GUARDAR</button>
+                            <button class="btn btn-play" onclick="this.closest('indra-workflow-ribbon')._run('${wf.id}')">EJECUTAR</button>
                         </div>
                     </div>
                     <div class="station-list">
-                        ${(wf.stations || []).map((st, i) => `
+                        ${(wf.payload?.stations || wf.stations || []).map((st, i) => `
                             <div class="station-item">
                                 <span class="station-num">${(i + 1).toString().padStart(2, '0')}</span>
-                                <select disabled title="PROVEEDOR">
-                                    <option>${st.provider?.toUpperCase() || 'SISTEMA'}</option>
-                                </select>
-                                <select disabled title="PROTOCOLO">
-                                    <option>${st.protocol?.toUpperCase() || 'ACCIÓN_NO_DEFINIDA'}</option>
-                                </select>
+                                <span style="font-weight:600;">${st.provider?.toUpperCase() || 'SISTEMA'}</span>
+                                <span style="opacity:0.5;">${st.protocol}</span>
                             </div>
                         `).join('')}
                     </div>
                 </div>
-            `).join('') || '<div style="opacity:0.3; font-size:11px; text-align:center;">SIN FLUJOS ACTIVOS</div>'}
+            `).join('') || `<div style="opacity:0.3; font-size:11px; text-align:center; padding: 20px;">SIN FLUJOS EN ${activeCategory}</div>`}
         </div>
         `;
+    }
+    async _run(id) {
+        const wf = this._workflows.find(w => w.id === id);
+        if (!wf) return;
+
+        // Búsqueda del Bridge (vía HUD)
+        const hud = document.querySelector('indra-bridge-hud');
+        if (!hud || !hud._bridge) return alert("INDRA_BRIDGE_NOT_FOUND");
+
+        // UI de parámetros simple para el MVP (Camino del Dev)
+        const paramsStr = prompt(`Ejecutar: ${wf.label}\n\nIntroduce parámetros en JSON (opcional):`, '{"target_schema": "veta_de_oro"}');
+        let params = {};
+        try { if(paramsStr) params = JSON.parse(paramsStr); } catch(e) { return alert("JSON_INVALIDO"); }
+
+        try {
+            console.log(`[Ribbon] Ejecutando flujo ${id}...`, params);
+            const result = await hud._bridge.runWorkflow(wf, params);
+            if (result.status === 'SUCCESS') alert("✅ FLUJO COMPLETADO");
+            else alert(`❌ ERROR: ${result.message}`);
+        } catch (e) {
+            alert(`Fallo Crítico: ${e.message}`);
+        }
+    }
+
+    _save(id) {
+        alert(`Guardando configuración de ${id} (Mock)`);
     }
 }
 

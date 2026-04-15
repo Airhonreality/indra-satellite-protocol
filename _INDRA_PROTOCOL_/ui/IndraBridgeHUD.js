@@ -16,11 +16,11 @@ const TEMPLATE = `
     :host {
         display: block;
         font-family: var(--indra-font, 'Inter', system-ui, sans-serif);
-        --accent: #1A73E8;
-        --bg: #FFFFFF;
-        --surface: #F8F9FA;
-        --text: #3C4043;
-        --border: #DADCE0;
+        --accent: #2563eb;
+        --bg: #ffffff;
+        --surface: #f3f4f6;
+        --text: #1f2937;
+        --border: #e5e7eb;
     }
 
     .hud-container {
@@ -28,37 +28,51 @@ const TEMPLATE = `
         flex-direction: column;
         background: var(--bg);
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: 4px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         color: var(--text);
+        margin: 10px auto;
     }
 
     .hud-header {
-        background: #FFFFFF;
-        border-bottom: 2px solid var(--surface);
-        padding: 15px 20px;
+        background: var(--surface);
+        padding: 12px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: 1px solid var(--border);
     }
 
-    .status-group { display: flex; gap: 10px; align-items: center; }
-    .badge { font-size: 8px; padding: 3px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-    .badge-core { background: #f1f3f4; color: #5f6368; }
-    .badge-auth { background: #e6f4ea; color: #137333; }
+    .status-group { display: flex; gap: 8px; align-items: center; }
+    .badge { font-size: 8px; padding: 2px 8px; border-radius: 20px; font-weight: 700; text-transform: uppercase; border: 1px solid transparent; }
+    .badge-core { background: #fff; color: #4b5563; border-color: var(--border); }
+    .badge-auth { background: #dcfce7; color: #166534; }
 
-    .hud-body { display: grid; grid-template-columns: 320px 1fr; gap: 1px; background: var(--border); }
-    .panel { background: #FFFFFF; padding: 20px; }
+    .hud-body { 
+        display: grid; 
+        grid-template-columns: 280px 1fr; 
+        background: var(--border); 
+        gap: 1px;
+    }
+    
+    .panel { background: #ffffff; padding: 20px; }
     .panel-title { 
-        font-size: 10px; 
-        color: #5f6368; 
+        font-size: 11px; 
+        color: #6b7280; 
         text-transform: uppercase; 
-        letter-spacing: 0.8px; 
-        font-weight: 700; 
+        letter-spacing: 1px; 
+        font-weight: 600; 
         margin-bottom: 15px; 
-        border-bottom: 1px solid var(--surface); 
-        padding-bottom: 6px; 
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .panel-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--surface);
     }
 
     .main-stage { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
@@ -67,22 +81,20 @@ const TEMPLATE = `
 <div class="hud-container">
     <header class="hud-header">
         <div class="core-identity">
-            <span style="font-weight:700; font-size:12px; color:var(--accent);">INDRA SATELLITE HUD</span>
-            <div class="status-group" style="margin-top:4px;">
-                 <span class="badge badge-core" id="core-status">CORE: V2.5</span>
-                 <span class="badge badge-auth" id="auth-status">RESONANCIA ACTIVA</span>
+            <span style="font-weight:600; font-size:13px; color:var(--text); letter-spacing: -0.01em;">INDRA SATELLITE HUD</span>
+            <div class="status-group" style="margin-top:2px;">
+                 <span class="badge badge-core" id="core-status">VERSION 2.5</span>
+                 <span class="badge badge-auth" id="auth-status">SINCERIDAD_ESTABLECIDA</span>
             </div>
         </div>
     </header>
 
     <div class="hud-body">
-        { /* SIDEBAR: ESPINA DORSAL (SCHEMAS) */ }
         <div class="panel">
             <h3 class="panel-title">Espina Dorsal (Schemas)</h3>
             <indra-schema-projector id="schema-projector"></indra-schema-projector>
         </div>
 
-        { /* MAIN STAGE: PICKER & WORKFLOWS */ }
         <div class="main-stage">
             <section class="panel">
                 <h3 class="panel-title">Universal Picker</h3>
@@ -118,11 +130,14 @@ class IndraBridgeHUD extends HTMLElement {
     updateUI() {
         if (!this.shadowRoot || !this._bridge) return;
 
-        const { contract, capabilities } = this._bridge;
+        const { contract } = this._bridge;
+
+        // --- FILTRADO DE DHARMA: Separar Negocio de Sistema ---
+        const businessSchemas = (contract.schemas || []).filter(s => s.class === 'DATA_SCHEMA');
 
         // Proyectar a los Widgets
         const projector = this.shadowRoot.getElementById('schema-projector');
-        if (projector) projector.schemas = contract.schemas || [];
+        if (projector) projector.schemas = businessSchemas;
 
         const picker = this.shadowRoot.getElementById('universal-picker');
         if (picker) picker.providers = contract.capabilities?.providers || [];

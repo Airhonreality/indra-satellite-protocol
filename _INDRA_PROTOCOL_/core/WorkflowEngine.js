@@ -43,32 +43,49 @@ export default class WorkflowEngine {
         }
     }
 
-    // ─── RESOLUCIÓN DE VARIABLES (JSON PATHING) ────────────────────────────
+    // ─── RESOLUCIÓN DE VARIABLES (RECURSIÓN PROFUNDA) ───────────────────────
 
     /**
-     * Resuelve variables de la forma {stepId.outputKey} utilizando el SharedState.
+     * Resuelve variables de la forma {stepId.outputKey} recursivamente en cualquier
+     * profundidad de objeto o array.
      */
-    _resolveValue(rawValue) {
-        if (typeof rawValue !== 'string') return rawValue;
+    _resolveDeep(target) {
+        if (target === null || target === undefined) return target;
 
-        // Soporte básico para sintaxis tipo template o acceso directo: Ej "{trigger.user_id}"
+        // 1. Si es un Array, resolvemos cada elemento
+        if (Array.isArray(target)) {
+            return target.map(item => this._resolveDeep(item));
+        }
+
+        // 2. Si es un Objeto, resolvemos cada valor
+        if (typeof target === 'object') {
+            const resolved = {};
+            Object.keys(target).forEach(key => {
+                resolved[key] = this._resolveDeep(target[key]);
+            });
+            return resolved;
+        }
+
+        // 3. Si no es String, no hay nada que resolver
+        if (typeof target !== 'string') return target;
+
+        // 4. Lógica de resolución de Strings (Idéntica a la v2.0 pero centralizada)
         const regex = /\{([^}]+)\}/g;
-        
-        if (!rawValue.includes('{')) return rawValue;
+        if (!target.includes('{')) return target;
 
-        // Si la cadena exacta es solo un template, mantenemos su tipo de dato original
-        if (/^\{[^}]+\}$/.test(rawValue.trim())) {
-            const path = rawValue.replace(/[{}]/g, '').trim().split('.');
+        // Caso de reemplazo total (mantiene tipo de dato original: bool, int, obj...)
+        if (/^\{[^}]+\}$/.test(target.trim())) {
+            const path = target.replace(/[{}]/g, '').trim().split('.');
             let val = this._sharedState;
             for (let prop of path) {
                 if (val === undefined || val === null) break;
                 val = val[prop];
             }
-            return val;
+            return (val !== undefined) ? val : target;
         }
 
-        // Si hay templating de strings: "Hola {trigger.name}"
-        return rawValue.replace(regex, (match, pathStr) => {
+        // Caso de templating parcial (siempre devuelve string)
+        return target.replace(regex, (match, pathStr) => {
             const path = pathStr.trim().split('.');
             let val = this._sharedState;
             for (let prop of path) {
@@ -77,16 +94,6 @@ export default class WorkflowEngine {
             }
             return val !== undefined ? val : match;
         });
-    }
-
-    /** Mapea un objeto completo de configuración operando sobre todos sus valores */
-    _resolveConfig(config) {
-        if (!config) return {};
-        const resolved = {};
-        Object.keys(config).forEach(key => {
-            resolved[key] = this._resolveValue(config[key]);
-        });
-        return resolved;
     }
 
     // ─── OPERADORES NATIVOS (Headless Math & String) ─────────────────────────
@@ -139,7 +146,7 @@ export default class WorkflowEngine {
                 this._emit('step_start', { step_id: station.id, index: i, type: station.type });
 
                 let stepOutput = null;
-                const resolvedConfig = this._resolveConfig(station.config);
+                const resolvedConfig = this._resolveDeep(station.config);
 
                 // EJECUCIÓN SEGÚN LA NATURALEZA DE LA ESTACIÓN
                 if (station.type.startsWith('OP_')) {
