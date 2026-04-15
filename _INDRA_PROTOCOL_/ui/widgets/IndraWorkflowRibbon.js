@@ -57,30 +57,40 @@ class IndraWorkflowRibbon extends HTMLElement {
         </style>
 
         <nav class="tabs-nav">
-            <button class="tab-btn ${activeCategory === 'CLIENTE' ? 'active' : ''}" onclick="this.closest('indra-workflow-ribbon')._setCategory('CLIENTE')">🛰️ CLIENTE SATÉLITE</button>
-            <button class="tab-btn ${activeCategory === 'SYSTEM' ? 'active' : ''}" onclick="this.closest('indra-workflow-ribbon')._setCategory('SYSTEM')">🛠️ INDRA TOOLS</button>
+            <button class="tab-btn ${activeCategory === 'CLIENTE' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('CLIENTE')">🛰️ CLIENTE SATÉLITE</button>
+            <button class="tab-btn ${activeCategory === 'SYSTEM' ? 'active' : ''}" onclick="this.getRootNode().host._setCategory('SYSTEM')">🛠️ INDRA TOOLS</button>
         </nav>
 
         <div class="ribbon-container">
-            ${filteredWorkflows.map(wf => `
+            ${filteredWorkflows.map(wf => {
+                const origin = wf.metadata?.origin || 'LOCAL';
+                const icon = origin === 'CORE' ? '☁️' : '🛰️';
+                
+                return `
                 <div class="workflow-item">
                     <div class="wf-header">
-                        <div class="wf-label">${wf.payload?.label || wf.label || wf.id}</div>
+                        <div class="wf-label">
+                            <span style="opacity: 0.6; margin-right: 8px; font-size: 10px;">${icon}</span>
+                            ${wf.payload?.label || wf.label || wf.id}
+                        </div>
                         <div class="wf-actions">
-                            <button class="btn btn-play" onclick="this.closest('indra-workflow-ribbon')._run('${wf.id}')">EJECUTAR</button>
+                            <button class="btn btn-play" onclick="this.getRootNode().host._run('${wf.id}')">EJECUTAR</button>
                         </div>
                     </div>
                     <div class="station-list">
                         ${(wf.payload?.stations || wf.stations || []).map((st, i) => `
                             <div class="station-item">
                                 <span class="station-num">${(i + 1).toString().padStart(2, '0')}</span>
-                                <span style="font-weight:600;">${st.provider?.toUpperCase() || 'SISTEMA'}</span>
-                                <span style="opacity:0.5;">${st.protocol}</span>
+                                <div style="display:flex; flex-direction:column; flex:1;">
+                                    <span style="font-weight:600;">${st.label || st.id || 'PASO_SIN_NOMBRE'}</span>
+                                    <span style="font-size:7px; opacity:0.4; text-transform:uppercase; letter-spacing:0.5px;">PROVEEDOR: ${st.provider || 'SISTEMA'} // ${st.protocol}</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
                 </div>
-            `).join('') || `<div style="opacity:0.3; font-size:11px; text-align:center; padding: 20px;">SIN FLUJOS EN ${activeCategory}</div>`}
+                `;
+            }).join('') || `<div style="opacity:0.3; font-size:11px; text-align:center; padding: 20px;">SIN FLUJOS EN ${activeCategory}</div>`}
         </div>
         `;
     }
