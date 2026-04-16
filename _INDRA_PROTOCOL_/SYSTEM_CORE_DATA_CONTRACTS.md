@@ -85,6 +85,8 @@ Define la estructura de las llaves que residen en el `keychain_service.gs`.
 | `name` | `String` | Etiqueta humana del satélite (ej: "Bot_Finanzas"). |
 | `status` | `String` | `ACTIVE` \| `REVOKED`. |
 | `class` | `String` | `MASTER` (Full) \| `SCOPED` (Restringido). |
+| `parent_id` | `String` \| `null` | El token que emitió esta llave (Vínculo de Jerarquía). |
+| `can_delegate` | `Boolean` | Determina si esta llave puede emitir sub-tokens hijos. |
 | `scopes` | `Array` | Lista de `context_id` autorizados (ej: `["DRIVE_FOLDER_ID"]`). |
 | `scope_label` | `String` | Nombre del ámbito para visualización en el HUD. |
 
