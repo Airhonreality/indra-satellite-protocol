@@ -141,7 +141,34 @@ class IndraParamModal extends HTMLElement {
 
         // Eventos
         this.shadowRoot.getElementById('cancel-btn').onclick = () => this._close();
-        this.shadowRoot.getElementById('confirm-btn').onclick = () => {
+        this.shadowRoot.getElementById('confirm-btn').onclick = async () => {
+            const hud = document.querySelector('indra-bridge-hud');
+            const bridge = hud?._bridge;
+
+            if (!bridge) return alert("BRIDGE_NOT_FOUND");
+
+            // AXIOMA DE SINCERIDAD PROACTIVA
+            // Si no hay token de satélite, forzamos la resonancia antes de enviar el flujo
+            if (!bridge.satelliteToken) {
+                try {
+                    const btn = this.shadowRoot.getElementById('confirm-btn');
+                    const originalText = btn.innerText;
+                    btn.innerText = "RESONANDO...";
+                    btn.disabled = true;
+
+                    await bridge.ignite();
+                    
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                } catch (e) {
+                    alert(`Fallo de Resonancia: ${e.message}`);
+                    const btn = this.shadowRoot.getElementById('confirm-btn');
+                    btn.innerText = "REINTENTAR IGNICIÓN";
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
             const data = {};
             this.shadowRoot.querySelectorAll('input').forEach(input => {
                 data[input.id] = input.value;

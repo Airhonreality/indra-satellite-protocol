@@ -21,9 +21,11 @@ const ADR_ERROR_MAP = {
 
 const RETRIABLE_CODES = ['LOCK_TIMEOUT', 'GATEWAY_TIMEOUT', 'NETWORK_ERROR'];
 
+const INDRA_MOTHER_SHELL = "https://airhonreality.github.io/indra-os";
+
 class IndraBridge {
     constructor(config = {}) {
-        this.coreUrl = config.coreUrl || null;
+        this.coreUrl = config.coreUrl || INDRA_MOTHER_SHELL;
         this.satelliteToken = config.satelliteToken || null;
         this.shareTicket = config.shareTicket || null;
         this.coreVersion = null;
@@ -51,29 +53,71 @@ class IndraBridge {
      */
     listenFromShell() {
         window.addEventListener("message", (event) => {
-            const { type, payload, request_id } = event.data || {};
+            this._handleResonanceMessage(event);
+        });
+    }
 
-            // 1. Handshake de Resonancia
-            if (type === "INDRA_RESONANCE_GRANT") {
-                this.coreUrl = payload.core_url;
-                this.satelliteToken = payload.google_token;
-                this.environment = payload.environment || 'PRODUCTION';
-                console.log("[IndraBridge] Resonancia concedida por la Shell Madre.");
-                
-                // Dispara evento nativo para que el satélite sepa que puede empezar
-                window.dispatchEvent(new CustomEvent("indra-ready", { detail: payload }));
-                this.init(); // Auto-ignición
+    _handleResonanceMessage(event) {
+        const { type, payload, request_id } = event.data || {};
+
+        // 1. Handshake de Resonancia
+        if (type === "INDRA_RESONANCE_GRANT") {
+            this.coreUrl = payload.core_url;
+            this.satelliteToken = payload.google_token;
+            this.environment = payload.environment || 'PRODUCTION';
+            console.log("[IndraBridge] Resonancia concedida.");
+            
+            // Dispara evento nativo para que el satélite sepa que puede empezar
+            window.dispatchEvent(new CustomEvent("indra-ready", { detail: payload }));
+            window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
+            this.init(); // Auto-ignición
+        }
+
+        // 2. Respuesta de una invocación de UI
+        if (type === "INDRA_UI_RESPONSE" && request_id) {
+            const pending = this.pendingUIRequests.get(request_id);
+            if (pending) {
+                if (payload.status === 'SUCCESS') pending.resolve(payload.data);
+                else pending.reject(new Error(payload.error || "UI_INVOKE_FAILED"));
+                this.pendingUIRequests.delete(request_id);
             }
+        }
+    }
 
-            // 2. Respuesta de una invocación de UI
-            if (type === "INDRA_UI_RESPONSE" && request_id) {
-                const pending = this.pendingUIRequests.get(request_id);
-                if (pending) {
-                    if (payload.status === 'SUCCESS') pending.resolve(payload.data);
-                    else pending.reject(new Error(payload.error || "UI_INVOKE_FAILED"));
-                    this.pendingUIRequests.delete(request_id);
+    /**
+     * @dharma Invoca a la Madre Shell de forma proactiva (PopUp).
+     * Útil cuando el satélite no está dentro de un Iframe.
+     */
+    async ignite() {
+        console.log("[IndraBridge] Solicitando Ignición a la Nave Nodriza...");
+        const width = 500, height = 600;
+        const left = (window.innerWidth / 2) - (width / 2);
+        const top = (window.innerHeight / 2) - (height / 2);
+        
+        const popup = window.open(
+            `${INDRA_MOTHER_SHELL}#/resonate?origin=${encodeURIComponent(window.location.origin)}`,
+            "IndraResonance",
+            `width=${width},height=${height},top=${top},left=${left}`
+        );
+
+        if (!popup) throw new Error("POPUP_BLOCKED");
+
+        return new Promise((resolve, reject) => {
+            const listener = (event) => {
+                if (event.data?.type === "INDRA_RESONANCE_GRANT") {
+                    this._handleResonanceMessage(event);
+                    window.removeEventListener("message", listener);
+                    if (popup) popup.close();
+                    resolve(true);
                 }
-            }
+            };
+            window.addEventListener("message", listener);
+            
+            // Timeout de seguridad
+            setTimeout(() => {
+                window.removeEventListener("message", listener);
+                reject(new Error("RESONANCE_TIMEOUT"));
+            }, 60000);
         });
     }
 
@@ -96,14 +140,52 @@ class IndraBridge {
      */
     async loadContract(path = './_INDRA_PROTOCOL_/indra_contract.json') {
         try {
+            // 1. Intentamos cosechar materia local en desarrollo (Vite Mode)
+            const localAssets = await this._harvestLocalAssets();
+            
+            // 2. Cargamos el contrato base
             const response = await fetch(path);
             this.contract = await response.json();
+
+            // 3. Fusión de Sinceridad: Los archivos locales mandan sobre el JSON estático
+            if (localAssets.schemas.length > 0) {
+                console.log(`[IndraBridge] 🧬 Cosecha local exitosa: ${localAssets.schemas.length} esquemas detectados.`);
+                this.contract.schemas = [...(this.contract.schemas || []), ...localAssets.schemas];
+            }
+            if (localAssets.workflows.length > 0) {
+                this.contract.workflows = localAssets.workflows;
+            }
+
             this._notify();
             return this.contract;
         } catch (e) {
             this.logger.error('[IndraBridge] Error cargando contrato local:', e);
             return null;
         }
+    }
+
+    /**
+     * @dharma Escáner de Materia Local (Vite-Ready).
+     * Permite que el satélite se auto-sincronice con la carpeta /src/score/
+     * sin ejecutar comandos de terminal.
+     */
+    async _harvestLocalAssets() {
+        const assets = { schemas: [], workflows: [] };
+        
+        try {
+            // AXIOMA DE AUTODESCUBRIMIENTO: Usamos el poder de Vite para mapear el disco duro
+            // Nota: Estos globs son resueltos en tiempo de compilación/dev por Vite.
+            const schemaFiles = import.meta.glob('/src/score/schemas/*.json', { eager: true });
+            const workflowFiles = import.meta.glob('/src/score/workflows/*.json', { eager: true });
+
+            assets.schemas = Object.values(schemaFiles).map(m => m.default || m);
+            assets.workflows = Object.values(workflowFiles).map(m => m.default || m);
+        } catch (e) {
+            // En producción (fuera de Vite), esto fallará silenciosamente
+            console.warn("[IndraBridge] Auto-Scanner no disponible (Production Mode).");
+        }
+
+        return assets;
     }
 
     /**

@@ -44,14 +44,20 @@ class IndraWorkflowRibbon extends HTMLElement {
         const monitor = this.shadowRoot.getElementById('dna-monitor');
         if (!monitor) return;
 
-        const isResonating = (this.resonanceWarnings || []).length === 0 && hud._bridge.coreUrl;
-        
-        if (isResonating) {
-            monitor.style.color = 'var(--accent)';
-            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 5px var(--accent);"></div> ADN_EN_RESONANCIA`;
+        const bridge = hud._bridge;
+        const hasCore = !!bridge.coreUrl;
+        const hasAuth = !!bridge.satelliteToken;
+        const isStable = (bridge.resonanceWarnings || []).length === 0;
+
+        if (hasCore && hasAuth && isStable) {
+            monitor.style.color = '#10b981'; // Verde Esmeralda
+            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 5px #10b981;"></div> RESONANCIA_ACTIVA`;
+        } else if (hasCore && !hasAuth) {
+            monitor.style.color = '#f59e0b'; // Ámbar
+            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 5px #f59e0b;"></div> ESPERANDO_AUTH`;
         } else {
-            monitor.style.color = '#ef4444';
-            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 5px #ef4444;"></div> DIVERGENCIA_ADN`;
+            monitor.style.color = '#ef4444'; // Rojo
+            monitor.innerHTML = `<div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 5px #ef4444;"></div> MODO_LOCAL (OFFLINE)`;
         }
     }
 
@@ -133,13 +139,17 @@ class IndraWorkflowRibbon extends HTMLElement {
         `;
     }
     async _run(id) {
-        const wf = this._workflows.find(w => w.id === id);
-        if (!wf) return;
-
-        // Búsqueda del Portal de Parámetros (vía HUD)
         const hud = document.querySelector('indra-bridge-hud');
         if (!hud || !hud._bridge) return alert("INDRA_BRIDGE_NOT_FOUND");
         
+        // BLOQUEO AXIOMÁTICO: No podemos ejecutar flujos sin motor
+        if (!hud._bridge.coreUrl) {
+            return alert("❌ ERROR DE MOTOR: El satélite está en MODO_LOCAL.\n\nPara ejecutar Génesis o cualquier flujo, debes abrir el satélite desde la Shell de Indra o configurar una coreUrl válida.");
+        }
+
+        const wf = this._workflows.find(w => w.id === id);
+        if (!wf) return;
+
         const portal = hud.shadowRoot.getElementById('param-portal');
         if (!portal) return alert("INDRA_PARAM_PORTAL_NOT_FOUND");
 
