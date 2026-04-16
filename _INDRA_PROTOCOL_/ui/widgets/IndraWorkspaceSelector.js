@@ -35,7 +35,7 @@ class IndraWorkspaceSelector extends HTMLElement {
             this._workspaces = response.items || [];
             this.render();
         } catch (e) {
-            console.error("[WorkspaceSelector] No se pudo obtener la lista de silos:", e);
+            console.error("[WorkspaceSelector] No se pudo obtener la lista de Workspaces:", e);
         }
     }
 
@@ -96,7 +96,8 @@ class IndraWorkspaceSelector extends HTMLElement {
             <div class="selector-container">
                 <label>Contexto de Trabajo (Workspace)</label>
                 <select id="ws-select">
-                    <option value="">-- SELECCIONE SILO --</option>
+                    <option value="">-- SELECCIONE WORKSPACE --</option>
+                    ${this._workspaces.length === 0 ? '<option disabled>SIN_WORKSPACES_DETECTADOS</option>' : ''}
                     ${this._workspaces.map(ws => `
                         <option value="${ws.id}" ${ws.id === activeId ? 'selected' : ''}>
                             ${ws.handle?.label || ws.id}
