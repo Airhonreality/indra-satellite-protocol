@@ -77,9 +77,10 @@ async function ignite() {
         }
     });
 
-    // 5. ESCUCHA: Actualizar UI cuando cambie el estado del Bridge
-    bridge.on('sync', (data) => {
-        if (data.status === 'CONNECTED') {
+    // 5. ESCUCHA: Actualizar UI cuando cambie el estado del Bridge (ISP v2.5 Canon)
+    window.addEventListener('indra-ready', (e) => {
+        const data = e.detail || {};
+        if (data.status === 'CONNECTED' || bridge.status === 'CONNECTED') {
             authStatusChip.innerText = "CONECTADO";
             authStatusChip.style.background = "#34A853";
             authStatusChip.style.color = "white";
