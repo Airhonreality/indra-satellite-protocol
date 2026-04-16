@@ -18,23 +18,28 @@ export class ContractCortex {
     async load() {
         try {
             // 1. Cargar Configuración de Ciudadanía (JS)
-            // Usamos un query param de timestamp para romper el cache del navegador en HMR
-            const configModule = await import(`../indra_config.js?t=${Date.now()}`).catch(() => ({ INDRA_CONFIG: {} }));
-            const config = configModule.INDRA_CONFIG || {};
+            // Blindaje contra corrupción de archivo: Si el .js está mal formado, caemos a un objeto seguro.
+            let config = {};
+            try {
+                // Query param dinámico para romper caché de disco en caliente
+                const configModule = await import(`../indra_config.js?t=${Date.now()}`);
+                config = configModule.INDRA_CONFIG || {};
+            } catch (importErr) {
+                console.warn("[ContractCortex] Error cargando 'indra_config.js' (posible corrupción). Usando memoria.");
+            }
 
-            // 2. Cargar Contrato Maestro (JS)
-            // Nota: En el futuro el compilador también generará un .js
-            const response = await fetch('./_INDRA_PROTOCOL_/indra_contract.json').catch(() => null);
-            let contract = response ? await response.json() : { schemas: [], workflows: [] };
+            // 2. Cargar Contrato Maestro (ADN Declarativo)
+            const contractRes = await fetch('./_INDRA_PROTOCOL_/indra_contract.json').catch(() => null);
+            let contract = contractRes ? await contractRes.json() : { schemas: [], workflows: [] };
 
-            // 3. Inyección de Identidad
+            // 3. Inyección y Sincronía
             contract.satellite_name = config.satellite_name || contract.satellite_name || 'Satélite Anónimo';
             contract.core_id = config.core_id || contract.core_id;
             
             this.bridge.contract = contract;
             this.bridge.activeWorkspaceId = config.workspace_id || this.bridge.activeWorkspaceId;
 
-            console.log("[ContractCortex] ADN JS cargado exitosamente.");
+            console.log("[ContractCortex] ADN JS sincronizado.");
             return contract;
         } catch (e) {
             console.error('[ContractCortex] Error cargando ADN:', e);
