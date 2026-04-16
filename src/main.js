@@ -30,9 +30,17 @@ async function ignite() {
     const authStatusChip = document.getElementById('auth-status-chip');
 
     // AUTO-RELLENAR: Si hay pacto previo, mostrarlo en pantalla
-    if (bridge.coreUrl && bridge.coreUrl !== "https://airhonreality.github.io/indra-os") {
+    if (bridge.coreUrl && bridge.coreUrl.includes("github.io")) {
+        // AUTO-HEALING: Purgar localStorage si se infectó con la URL estática de GitHub
+        // Esto previene los horribles errores 405 y fallos de JSON de forma automática.
+        console.warn("⚠️ URL venenosa detectada en LocalStorage. Purgando y Reiniciando motor...");
+        localStorage.removeItem('INDRA_SATELLITE_LINK');
+        bridge.coreUrl = null;
+        inputCoreUrl.value = '';
+    } else if (bridge.coreUrl) {
         inputCoreUrl.value = bridge.coreUrl;
     }
+
     if (bridge.satelliteToken) {
         inputToken.value = bridge.satelliteToken;
     } else {
@@ -51,7 +59,7 @@ async function ignite() {
         }
     });
 
-    // 4. EVENTO: Pacto Manual (Direct Link)
+    // 4. EVENTO: Pacto Manual (Direct Link - CANON ISP v2.5)
     btnManualLink.addEventListener('click', async () => {
         const url = inputCoreUrl.value.trim();
         const token = inputToken.value.trim();
@@ -65,7 +73,18 @@ async function ignite() {
             btnManualLink.innerText = "FIRMANDO...";
             btnManualLink.disabled = true;
             
-            await bridge.establishManualHandshake(url, token);
+            // 1. Escribir directamente en la memoria operativa
+            bridge.coreUrl = url;
+            bridge.satelliteToken = token;
+            
+            // 2. Persistir en el Almacenamiento Soberano
+            localStorage.setItem('INDRA_SATELLITE_LINK', JSON.stringify({
+                coreUrl: url,
+                token: token
+            }));
+            
+            // 3. Re-ignición forzada del Motor
+            await bridge.init();
             
             btnManualLink.innerText = "PACTO FIRMADO";
             btnManualLink.style.background = "#34A853";
