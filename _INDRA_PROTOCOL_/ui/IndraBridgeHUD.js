@@ -359,6 +359,14 @@ class IndraBridgeHUD extends HTMLElement {
             projector.bridge = this._bridge;
         }
 
+        if (capManifest) {
+            const caps = this._bridge.capabilities?.protocols || [];
+            const tags = caps.map(c => `<span class="cap-tag">${c.replace('SYSTEM_', '').replace('ATOM_', '')}</span>`).join('');
+            capManifest.innerHTML = tags;
+            const headerCaps = this.shadowRoot.getElementById('capabilities-manifest-header');
+            if (headerCaps) headerCaps.innerHTML = tags;
+        }
+
         switch (this._mode) {
             case 'GHOST':
                 if (masterStatus) { masterStatus.innerText = 'Desconectado'; masterStatus.className = 'status-badge status--ghost'; }
