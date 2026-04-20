@@ -103,13 +103,13 @@ class IndraBridgeHUD extends HTMLElement {
 
     async _silentLocalSync() {
         try {
-            await fetch('/api/indra/sync', { method: 'POST' });
+            await fetch('/api/indra/scan', { method: 'POST' });
             if (this._bridge?.contractCortex) {
                 await this._bridge.contractCortex.load();
                 this.updateUI();
             }
         } catch (e) {
-            console.warn("🚜 [HUD] Cosecha automática fallida. Operando con memoria de snapshot.");
+            console.warn("⚠️ [HUD] Escaneo automático de disco fallido.");
         }
     }
 
@@ -137,10 +137,9 @@ class IndraBridgeHUD extends HTMLElement {
     }
 
     async handleRefreshLocal() {
-        console.log("🚜 [HUD] Cosechando ADN fresco del disco...");
-        // Disparar comando de servidor vía Vite API si existe
-        await fetch('/api/indra/sync', { method: 'POST' });
-        location.reload(); // Recargar para obtener el nuevo ADN
+        console.log("🔍 [HUD] Escaneando ADN local en disco...");
+        await fetch('/api/indra/scan', { method: 'POST' });
+        location.reload(); 
     }
 
     logHandshake(detail) {

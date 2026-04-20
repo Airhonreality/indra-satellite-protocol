@@ -55,11 +55,11 @@ const indraDevServerPlugin = () => {
         }
       });
 
-      // 3. Sincronización (Compilador Local)
-      server.middlewares.use('/api/indra/sync', (req, res) => {
+      // 3. Escaneo de ADN (Cosecha Local)
+      server.middlewares.use('/api/indra/scan', (req, res) => {
         if (req.method === 'POST') {
           const { exec } = require('child_process');
-          exec('node sync_core.js', (error, stdout) => {
+          exec('node local_scanner.js', (error, stdout) => {
             if (error) {
               res.statusCode = 500;
               res.end(JSON.stringify({ status: 'error', message: error.message }));
