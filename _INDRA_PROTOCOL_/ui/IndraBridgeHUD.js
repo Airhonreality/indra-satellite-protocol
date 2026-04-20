@@ -220,10 +220,17 @@ const TEMPLATE = `
         <div class="main-grid">
             <!-- COLUMNA 1: IDENTIDAD -->
             <aside class="col col-identity">
-                <header class="panel-header">Ciudadanía e Identidad</header>
+                <header class="panel-header">
+                    IDENTIDAD: <span id="sat-name" style="color:var(--indra-accent);">---</span>
+                </header>
                 <div class="panel-content">
                     <indra-workspace-selector id="workspace-ctrl" style="margin-bottom:40px;"></indra-workspace-selector>
                     <indra-keychain-widget id="keychain-ctrl"></indra-keychain-widget>
+                </div>
+                <div style="padding: 20px; font-size: 8px; font-family: monospace; opacity: 0.5; border-top: 1px solid var(--indra-border);">
+                    CORE: <span id="core-url">---</span><br>
+                    RESONANCIA: <span id="resonance-status">INIT</span>
+                    <div id="capabilities-manifest" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:10px;"></div>
                 </div>
             </aside>
 
@@ -313,15 +320,17 @@ class IndraBridgeHUD extends HTMLElement {
         const status = this.shadowRoot.getElementById('resonance-status');
         const satNameDisplay = this.shadowRoot.getElementById('sat-name');
         const coreUrlDisplay = this.shadowRoot.getElementById('core-url');
-        const container = this.shadowRoot.getElementById('hud-body');
+        const body = this.shadowRoot.getElementById('hud-body');
+        const actionBtn = this.shadowRoot.getElementById('btn-master-action');
+        const capManifest = this.shadowRoot.getElementById('capabilities-manifest');
 
         // Hidratación de Componentes
         const picker = this.shadowRoot.getElementById('universal-picker');
         const ribbon = this.shadowRoot.getElementById('workflow-ribbon');
         const projector = this.shadowRoot.getElementById('schema-projector');
 
-        satNameDisplay.innerText = this._bridge.contract?.satellite_name || 'Satélite Desconocido';
-        coreUrlDisplay.innerText = this._bridge.coreUrl || 'Sin conexión activa';
+        if (satNameDisplay) satNameDisplay.innerText = this._bridge.contract?.satellite_name || 'Satélite Desconocido';
+        if (coreUrlDisplay) coreUrlDisplay.innerText = this._bridge.coreUrl || 'Sin conexión activa';
 
         // Sincronía Continua de Datos
         if (this._bridge.contract && this._bridge.contract.schemas) {
@@ -336,35 +345,27 @@ class IndraBridgeHUD extends HTMLElement {
 
         switch (this._mode) {
             case 'GHOST':
-                status.innerText = 'Desconectado';
-                status.className = 'status-badge status--ghost';
-                actionBtn.innerText = 'CONECTAR AL CORE';
-                actionBtn.className = 'btn-indra';
-                body.classList.add('locked');
+                if (status) { status.innerText = 'Desconectado'; status.className = 'status-badge status--ghost'; }
+                if (actionBtn) { actionBtn.innerText = 'CONECTAR AL CORE'; actionBtn.className = 'btn-indra'; }
+                if (body) body.classList.add('locked');
                 break;
 
             case 'DISCOVERY':
-                status.innerText = 'Buscando...';
-                status.className = 'status-badge status--orphan';
-                actionBtn.innerText = 'ELEGIR WORKSPACE';
-                actionBtn.className = 'btn-indra';
-                body.classList.remove('locked');
+                if (status) { status.innerText = 'Buscando...'; status.className = 'status-badge status--orphan'; }
+                if (actionBtn) { actionBtn.innerText = 'ELEGIR WORKSPACE'; actionBtn.className = 'btn-indra'; }
+                if (body) body.classList.remove('locked');
                 break;
 
             case 'STABLE':
-                status.innerText = 'Conectado';
-                status.className = 'status-badge status--stable';
-                actionBtn.innerText = 'SESIÓN ACTIVA';
-                actionBtn.className = 'btn-indra stable';
-                body.classList.remove('locked');
+                if (status) { status.innerText = 'Conectado'; status.className = 'status-badge status--stable'; }
+                if (actionBtn) { actionBtn.innerText = 'SESIÓN ACTIVA'; actionBtn.className = 'btn-indra stable'; }
+                if (body) body.classList.remove('locked');
                 break;
             
             case 'ERROR_LEDGER':
-                status.innerText = 'Error de Enlace';
-                status.className = 'status-badge status--error';
-                actionBtn.innerText = 'REINTENTAR';
-                actionBtn.className = 'btn-indra';
-                body.classList.add('locked');
+                if (status) { status.innerText = 'Error de Enlace'; status.className = 'status-badge status--error'; }
+                if (actionBtn) { actionBtn.innerText = 'REINTENTAR'; actionBtn.className = 'btn-indra'; }
+                if (body) body.classList.add('locked');
                 break;
         }
 
