@@ -88,13 +88,15 @@ export class ResonanceSync {
             });
 
             if (response.metadata?.status === 'OK') {
-                // Capturamos el resultado del motor natural
-                const ticket = response.metadata.ticket;
-                const schemaAtom = response.metadata.schema_atom;
-                const siloId = schemaAtom.payload?.silo_id;
+                // Capturamos el resultado del universo cristalizado
+                const universe = response.metadata.universe || {};
+                const schemaAtom = response.items?.[0];
+
+                const siloId = universe.silo_id;
+                const bridgeId = universe.bridge_id;
 
                 if (!siloId) {
-                    throw new Error("El motor industrial no devolvió un Silo ID válido.");
+                    throw new Error("El motor industrial no devolvió un Silo ID (Materia) válido.");
                 }
 
                 console.log(`[ResonanceSync] Esquema ${schemaName} cristalizado con éxito en [${options.provider || 'drive'}]: ${siloId}`);
@@ -104,7 +106,8 @@ export class ResonanceSync {
                 bridge.ignitions[schemaName] = {
                     silo_id: siloId,
                     provider: options.provider || 'drive',
-                    bridge_id: schemaAtom.payload?.bridge_id,
+                    bridge_id: bridgeId,
+                    metadata: schemaAtom?.metadata,
                     materialized_at: new Date().toISOString()
                 };
 
@@ -157,10 +160,12 @@ export class ResonanceSync {
 
             if (response.metadata?.status === 'OK') {
                 console.log(`[ResonanceSync] Resonancia completada para ${schemaName}.`);
+                // Persistencia de Soberanía: Guardamos para que sobreviva a refrescos
+                localStorage.setItem('INDRA_IGNITIONS', JSON.stringify(bridge.ignitions));
                 return response;
+            } else {
+                throw new Error(response.metadata?.error || "INDUSTRIAL_SYNC_FAILED");
             }
-
-            throw new Error(response.metadata?.error || "INDUSTRIAL_SYNC_FAILED");
 
         } catch (e) {
             console.error(`[ResonanceSync:IndustrialResonance] Colapso en resonancia de ${schemaName}:`, e);
