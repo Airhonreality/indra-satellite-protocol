@@ -1,11 +1,3 @@
-/**
- * =============================================================================
- * INDRA SATELLITE BRIDGE (v3.3) - BRANCHING NEXUS
- * =============================================================================
- * Responsibilidad: Orquestación modular con separación de ramas de soberanía.
- * =============================================================================
- */
-
 import { TransportLayer } from './bridge_modules/TransportLayer.js';
 import { IdentityNode } from './bridge_modules/IdentityNode.js';
 import { ContractCortex } from './bridge_modules/ContractCortex.js';
@@ -38,17 +30,12 @@ class IndraBridge {
 
     // --- RAMAS DE SOBERANÍA ---
     async ignite() { 
-        this.transport.purgeQueue(); // Limpiar ruidos previos
+        this.transport.purgeQueue(); 
         return await this.identity.ignite(); 
     }
     
-    // RAMA A: Anclaje de nueva identidad
     async anchorCitizenship() { return await this.resonanceSync.anchorCitizenship(); }
-    
-    // RAMA B: Cristalización Tabular (Soberanía)
     async crystallizeResonance() { return await this.resonanceSync.crystallizeResonance(); }
-    
-    // @deprecated Usa crystallizeResonance
     async syncDNA() { return await this.resonanceSync.syncDNA(); }
 
     clearState() {
@@ -60,10 +47,6 @@ class IndraBridge {
 
     async loadContract(path) { return await this.contractCortex.load(path); }
     
-    /**
-     * @dharma "La Senda de la Eficiencia Suprema".
-     * Delega el renderizado de un módulo de alta tecnología al Core de Indra.
-     */
     async invokeUI(module, payload = {}) {
         return await this.execute({
             protocol: 'UI_INVOKE',
@@ -73,11 +56,9 @@ class IndraBridge {
     }
     
     async execute(uqo, options) { 
-        // --- VALIDACIÓN DE SORDERA (Anti-Patrón) ---
         if (this.allowedProtocols.length > 0 && !this.allowedProtocols.includes(uqo.protocol)) {
-            // Bypass para SYSTEM_MANIFEST y SYSTEM_RESONANCE_CRYSTALLIZE que son de infraestructura base
             if (uqo.protocol !== 'SYSTEM_MANIFEST' && uqo.protocol !== 'SYSTEM_RESONANCE_CRYSTALLIZE') {
-                console.error(`[IndraBridge:Aduana] El protocolo '${uqo.protocol}' no está permitido en el estado actual del núcleo o para tu tipo de jurisdicción.`);
+                console.error(`[IndraBridge:Aduana] El protocolo '${uqo.protocol}' no está permitido.`);
                 throw new Error("PROTOCOL_NOT_ALLOWED_BY_GATEWAY");
             }
         }
@@ -85,8 +66,7 @@ class IndraBridge {
     }
 
     /**
-     * @dharma Inicializar el nexo celular (Identidad y Vínculo).
-     * @v4.0 El inicio es pasivo y minimalista. No hay sincronía de ADN automática.
+     * @dharma Ignición Síncrona (Axioma de Sinceridad).
      */
     async init() {
         if (this._initializing) return this._initPromise;
@@ -96,42 +76,44 @@ class IndraBridge {
             console.log("🚀 [IndraBridge] Iniciando Ignición Síncrona...");
             
             try {
-                // PASO 1: Red y Manifiesto Global (Capa 0)
-                console.log("🔍 [1/3] Validando Nexo Core...");
+                // PASO 0: Carga del contrato
+                await this.loadContract();
+
+                // Recuperar pacto desde localStorage
+                const linkData = localStorage.getItem('INDRA_SATELLITE_LINK');
+                if (linkData) {
+                    try {
+                        const parsed = JSON.parse(linkData);
+                        this.coreUrl = parsed.coreUrl || this.coreUrl;
+                        this.satelliteToken = parsed.token || this.satelliteToken;
+                        this.activeWorkspaceId = parsed.workspaceId || this.activeWorkspaceId;
+                    } catch (e) { /* Fail silently */ }
+                }
+
+                if (!this.coreUrl || !this.satelliteToken) {
+                    throw new Error("GHOST: Sin nexo configurado.");
+                }
+
+                // PASO 1: Validación de Red
                 const statusPulse = await this.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' });
                 this.capabilities = statusPulse.metadata || {};
                 this.allowedProtocols = this.capabilities.allowed_protocols || [];
-                console.log("✅ [1/3] Nexo Estable.");
 
-                // PASO 2: Identidad (Capa 1)
-                // (Ya validada implícitamente por el statusPulse si el Core requiere token)
-                console.log("🔍 [2/3] Verificando Identidad...");
-                if (!this.satelliteToken) {
-                    throw new Error("GHOST_MODE: Sin llave de acceso.");
-                }
-                console.log("✅ [2/3] Identidad Cristalizada.");
-
-                // PASO 3: Soberanía de Datos (Capa 2 - El Ledger)
+                // PASO 2: Validación de Ledger
                 if (this.activeWorkspaceId) {
-                    console.log(`🔍 [3/3] Validando Existencia de Célula: ${this.activeWorkspaceId}...`);
                     try {
-                        // Intentamos una lectura mínima para validar el Ledger
                         await this.execute({ 
                             protocol: 'ATOM_EXISTS', 
                             context_id: this.activeWorkspaceId, 
                             data: { ids: [this.activeWorkspaceId] } 
                         });
-                        console.log("✅ [3/3] Realidad Sincronizada.");
                         window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
                     } catch (error) {
-                        console.error("🚨 [3/3] FALLO DE REALIDAD: El Ledger no responde.");
                         window.dispatchEvent(new CustomEvent("indra-resonance-sync", { 
                             detail: { mode: 'ERROR_LEDGER', error: error.message, id: this.activeWorkspaceId } 
                         }));
-                        // IMPORTANTE: No limpiamos el ID. Dejamos que el usuario vea el fallo.
                     }
                 } else {
-                    console.log("⚠️ [3/3] Sin espacio asignado. Modo Huérfano.");
                     window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'ORPHAN' } }));
                 }
 
