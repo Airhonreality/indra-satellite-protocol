@@ -58,18 +58,18 @@ const TEMPLATE = `
                     <indra-keychain-widget id="keychain-ctrl"></indra-keychain-widget>
                 </div>
                 <div style="padding: 20px; font-size: 8px; font-family: monospace; opacity: 0.5; border-top: 1px solid var(--indra-border);">
-                    RESONANCIA: <span id="resonance-status">INIT</span>
+                    ESTADO: <span id="resonance-status">INIT</span>
                     <div id="capabilities-manifest" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:10px;"></div>
                 </div>
             </aside>
 
             <section class="col col-dna">
-                <header class="panel-header">ADN Estructural (Genoma)</header>
+                <header class="panel-header">MODELO DE DATOS (ESQUEMAS)</header>
                 <indra-schema-projector id="schema-projector"></indra-schema-projector>
             </section>
 
             <aside class="col col-actions">
-                <header class="panel-header">Universo y Acciones</header>
+                <header class="panel-header">FLUJOS Y ACCIONES</header>
                 <div class="panel-content" style="padding: 20px;">
                     <indra-universal-picker id="universal-picker" style="margin-bottom:30px;"></indra-universal-picker>
                     <indra-workflow-ribbon id="workflow-ribbon"></indra-workflow-ribbon>

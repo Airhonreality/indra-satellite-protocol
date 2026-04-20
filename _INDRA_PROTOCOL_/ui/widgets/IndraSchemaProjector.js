@@ -1,6 +1,8 @@
 /**
  * =============================================================================
- * INDRA SCHEMA PROJECTOR (SINCERITY EDITION v5.5 - GENOME EXPLORER)
+ * INDRA SCHEMA PROJECTOR (v6.0 - TOTAL REVELATION)
+ * =============================================================================
+ * Responsabilidad: Visor técnico de metadatos y control de sincronía atómica.
  * =============================================================================
  */
 
@@ -21,8 +23,6 @@ class IndraSchemaProjector extends HTMLElement {
         if (JSON.stringify(this._schemas) === JSON.stringify(newData)) return;
         this._schemas = newData;
         this.render();
-
-        // AXIOMA: Sondeo Pasivo de Realidades (Señales del Core)
         this._autoDiscoverRemoteSignals();
     }
 
@@ -35,194 +35,206 @@ class IndraSchemaProjector extends HTMLElement {
         });
     }
 
-    /**
-     * Compara Atómicamente las definiciones (Metadata de campos)
-     */
-    diffField(localField, remoteField) {
-        if (!remoteField) return 'NEW';
-        if (localField.type !== remoteField.type || localField.label !== remoteField.label) return 'DIVERGENT';
-        return 'STABLE';
-    }
-
     render() {
         if (this._schemas === null) {
-            this.shadowRoot.innerHTML = `<div style="padding:40px; text-align:center; opacity:0.5; font-size:11px;">📡 Buscando ADN Local...</div>`;
+            this.shadowRoot.innerHTML = `<div style="padding:40px; text-align:center; opacity:0; animation: fadeIn 0.5s forwards;">⌛ Escaneando Estructuras...</div>
+            <style>@keyframes fadeIn { to { opacity: 0.5; } }</style>`;
             return;
         }
 
         this.shadowRoot.innerHTML = `
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
             
-            :host { display: block; font-family: 'Inter', sans-serif; --indra-accent: #007AFF; --indra-border: rgba(0,0,0,0.1); }
-            
-            .projector-container { display: flex; flex-direction: column; gap: 15px; padding: 10px 0 40px 0; }
-            
-            .projector-header { 
-                display: flex; justify-content: space-between; align-items: center; 
-                margin-bottom: 5px; padding: 0 5px;
+            :host { 
+                display: block; font-family: 'Inter', sans-serif; 
+                --indra-accent: #007AFF; 
+                --indra-border: rgba(0,0,0,0.1); 
+                --indra-bg-soft: #f9f9fb;
+                --indra-warning: #ff9f0a;
             }
-            .header-title { font-size: 10px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
             
-            .btn-refresh {
-                background: none; border: 1px solid var(--indra-border); border-radius: 8px;
-                padding: 6px 12px; font-size: 9px; font-weight: 800; cursor: pointer; color: var(--indra-text-dim);
-                transition: all 0.2s; text-transform: uppercase;
+            .projector-container { display: flex; flex-direction: column; gap: 20px; padding: 20px 0; }
+            
+            .header-info { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+            .header-info h3 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #8e8e93; margin: 0; }
+            
+            .btn-scan {
+                background: white; border: 1px solid var(--indra-border); border-radius: 8px;
+                padding: 8px 14px; font-size: 10px; font-weight: 600; cursor: pointer; color: #1c1c1e;
+                transition: all 0.2s;
             }
-            .btn-refresh:hover { background: var(--indra-accent); color: white; border-color: var(--indra-accent); }
+            .btn-scan:hover { background: #f2f2f7; border-color: #8e8e93; }
 
+            /* --- CARDS --- */
             .schema-card { 
-                background: white; border: 1px solid var(--indra-border); border-radius: 16px; 
-                overflow: hidden; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                background: white; border: 1px solid var(--indra-border); 
+                border-radius: 12px; margin: 10px;
+                display: flex; flex-direction: column;
+                overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
             }
             
             .card-header { 
-                padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 1px solid var(--indra-border); background: #fff;
+                padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+                background: white; border-bottom: 1px solid var(--indra-border);
             }
             
-            .schema-id { font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-            .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
-            .status--synced { background: #32d74b; box-shadow: 0 0 10px #32d74b; }
-            .status--divergent { background: #ff9f0a; box-shadow: 0 0 10px #ff9f0a; }
+            .schema-identity { display: flex; align-items: center; gap: 12px; }
+            .status-indicator { width: 8px; height: 8px; border-radius: 50%; background: #d1d1d6; }
+            .status-indicator.synced { background: #34c759; box-shadow: 0 0 8px rgba(52, 199, 89, 0.4); }
+            .status-indicator.divergent { background: var(--indra-warning); box-shadow: 0 0 8px rgba(255, 159, 10, 0.4); }
+            
+            .schema-name { font-size: 13px; font-weight: 800; color: #1c1c1e; }
+            .schema-file { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #8e8e93; }
 
-            .btn-main-sync {
-                padding: 8px 16px; border-radius: 10px; font-size: 9px; font-weight: 800; 
-                cursor: pointer; border: 1px solid var(--indra-accent); background: white; 
-                color: var(--indra-accent); text-transform: uppercase; transition: 0.2s;
+            .btn-action-main {
+                background: var(--indra-accent); color: white; border: none; border-radius: 10px;
+                padding: 8px 18px; font-size: 10px; font-weight: 700; cursor: pointer;
+                transition: filter 0.2s; text-transform: uppercase;
             }
-            .btn-main-sync:hover { background: var(--indra-accent); color: white; }
-            .btn-main-sync.divergent { background: #ff9f0a; color: white; border-color: #ff9f0a; }
+            .btn-action-main:hover { filter: brightness(1.1); }
+            .btn-action-main.outline { background: white; color: var(--indra-accent); border: 1px solid var(--indra-accent); }
 
-            summary {
-                padding: 12px 20px; font-size: 9px; font-weight: 800; color: #8e8e93;
-                cursor: pointer; background: #fafafa; border-top: 1px solid var(--indra-border);
-                display: flex; justify-content: space-between; align-items: center; text-transform: uppercase;
-                list-style: none;
+            /* --- METADATA GRID --- */
+            .metadata-inspector { padding: 0; }
+            
+            table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: auto; }
+            th { 
+                text-align: left; padding: 1rem; color: #8e8e93; font-weight: 600; 
+                background: var(--indra-bg-soft); border-bottom: 1px solid var(--indra-border);
+                text-transform: uppercase; font-size: 9px;
+            }
+            td { padding: 1rem; border-bottom: 1px solid rgba(0,0,0,0.03); vertical-align: middle; }
+            
+            .id-badge { font-family: 'IBM Plex Mono', monospace; color: #8e8e93; font-size: 10px; }
+            .type-badge { 
+                padding: 4px 8px; background: #f2f2f7; border-radius: 6px; 
+                font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+            }
+            
+            .divergence-row { background: rgba(255, 159, 10, 0.05); }
+            .divergence-label { color: var(--indra-warning); font-weight: 800; font-size: 8px; margin-top: 4px; }
+
+            /* --- BUTTONS --- */
+            .action-cell { display: flex; gap: 8px; justify-content: flex-end; }
+            .btn-trad {
+                padding: 6px 12px; border-radius: 6px; border: 1px dotted var(--indra-border);
+                background: white; color: #1c1c1e; font-size: 10px; font-weight: 600; 
+                cursor: pointer; transition: 0.2s;
+            }
+            .btn-trad:hover { background: #1c1c1e; color: white; border-color: #1c1c1e; }
+            .btn-trad.accent { border-style: solid; color: var(--indra-accent); border-color: var(--indra-accent); }
+            .btn-trad.accent:hover { background: var(--indra-accent); color: white; }
+
+            details { border-top: 1px solid var(--indra-border); }
+            summary { 
+                padding: 12px 25px; font-size: 10px; font-weight: 700; color: #8e8e93;
+                cursor: pointer; list-style: none; user-select: none;
             }
             summary:hover { color: var(--indra-accent); }
-            
-            .fields-list { padding: 10px 20px; background: white; }
-            
-            .field-row { 
-                display: flex; align-items: center; padding: 10px 0;
-                border-bottom: 1px solid rgba(0,0,0,0.03); gap: 12px;
-            }
-            .field-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-            .field-label { font-size: 11px; font-weight: 600; color: #1c1c1e; }
-            .field-meta { font-family: 'JetBrains Mono', monospace; font-size: 9px; opacity: 0.5; }
-            
-            .field-actions { display: flex; gap: 6px; }
-            
-            .btn-atomic {
-                width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-                border-radius: 6px; border: 1px solid var(--indra-border); background: white;
-                font-size: 10px; cursor: pointer; transition: 0.2s;
-            }
-            .btn-atomic:hover { background: #f2f2f7; border-color: #8e8e93; }
-            .btn-atomic.active { color: var(--indra-accent); border-color: var(--indra-accent); }
-
-            .divergence-indicator {
-                width: 4px; height: 100%; position: absolute; left: 0; background: #ff9f0a;
-                display: none;
-            }
-            .field-row.divergent .divergence-indicator { display: block; }
-            .field-row.divergent .field-label { color: #ff9f0a; }
-
-            .metadata-box {
-                padding: 15px 20px; background: #fdfdfd; border-top: 1px solid var(--indra-border);
-                font-family: 'JetBrains Mono', monospace; font-size: 9px;
-            }
-            .meta-item { display: flex; gap: 10px; margin-bottom: 6px; color: #8e8e93; }
-            .meta-val { color: #1c1c1e; }
         </style>
 
         <div class="projector-container">
-            <header class="projector-header">
-                <div class="header-title">Leyes de Datos Detectadas (ADN)</div>
-                <button class="btn-refresh" id="btn-refresh-local">Volver a Escanear Disco</button>
-            </header>
+            <div class="header-info">
+                <h3>Esquemas Detectados en Proyecto</h3>
+                <button class="btn-scan" id="btn-scan-root">Refrescar Escaneo Local</button>
+            </div>
 
-            ${this._schemas.map(s => this._renderSchemaCard(s)).join('')}
+            ${this._schemas.map(s => this._renderSchemaInspector(s)).join('')}
         </div>
         `;
 
         this._setupListeners();
     }
 
-    _renderSchemaCard(s) {
+    _renderSchemaInspector(s) {
         const meta = s.metadata || {};
         const isSynced = !!meta.drive_id;
         const remote = s._remoteState || null;
-        const fields = s.fields || s.payload?.fields || [];
+        const fields = s.payload?.fields || s.fields || [];
         const remoteFields = remote?.fields || remote?.payload?.fields || [];
 
-        // Detección de Divergencia Global
+        // Identificar Divergencias
         let hasDivergence = false;
         if (isSynced && remote) {
             hasDivergence = fields.some(f => {
                 const rf = remoteFields.find(r => r.id === f.id);
-                return this.diffField(f, rf) === 'DIVERGENT';
+                return this._checkDivergence(f, rf);
             }) || fields.length !== remoteFields.length;
         }
 
         return `
         <div class="schema-card">
             <div class="card-header">
-                <div class="schema-id">
-                    <span class="status-dot ${isSynced ? (hasDivergence ? 'status--divergent' : 'status--synced') : ''}"></span>
-                    <span>${(s.handle?.alias || s.id).toUpperCase()}</span>
+                <div class="schema-identity">
+                    <div class="status-indicator ${isSynced ? (hasDivergence ? 'divergent' : 'synced') : ''}"></div>
+                    <div>
+                        <div class="schema-name">${(s.handle?.alias || s.id).toUpperCase()}</div>
+                        <div class="schema-file">${s._source?.file || 'manual_entry.js'}</div>
+                    </div>
                 </div>
-                <button class="btn-main-sync ${hasDivergence ? 'divergent' : ''}" onclick="this.getRootNode().host.handleFullSync('${s.id}')">
-                    ${isSynced ? (hasDivergence ? 'Actualizar Core' : 'Sincronizado') : 'Subir al Core'}
-                </button>
+                <div class="header-actions">
+                    <button class="btn-action-main ${isSynced ? 'outline' : ''}" onclick="this.getRootNode().host.handleFullSync('${s.id}')">
+                        ${isSynced ? (hasDivergence ? 'Actualizar Core' : 'Sincronizado') : 'Exportar al Core'}
+                    </button>
+                </div>
             </div>
 
-            <div class="card-body">
-                <details open>
-                    <summary>Definición de Arquitectura</summary>
-                    <div class="fields-list">
-                        ${fields.map(f => {
-                            const rf = remoteFields.find(r => r.id === f.id);
-                            const fieldStatus = isSynced && remote ? this.diffField(f, rf) : 'STABLE';
-                            return `
-                                <div class="field-row ${fieldStatus === 'DIVERGENT' ? 'divergent' : ''}" style="position:relative;">
-                                    <div class="divergence-indicator"></div>
-                                    <div class="field-info">
-                                        <div class="field-label">${f.label || f.id}</div>
-                                        <div class="field-meta">${f.id.toUpperCase()} • ${f.type}</div>
-                                    </div>
-                                    <div class="field-actions">
-                                        <button class="btn-atomic active" title="Bajar del Core" onclick="this.getRootNode().host.handleAtomicPull('${s.id}', '${f.id}')">↓</button>
-                                        <button class="btn-atomic active" title="Subir al Core" onclick="this.getRootNode().host.handleAtomicPush('${s.id}', '${f.id}')">↑</button>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </details>
-
-                ${isSynced ? `
-                <details>
-                    <summary>Evidencia del Core (Sincronía)</summary>
-                    <div class="metadata-box">
-                        <div class="meta-item"><span>ID DRIVE:</span> <span class="meta-val">${meta.drive_id}</span></div>
-                        <div class="meta-item"><span>SYNCED_AT:</span> <span class="meta-val">${meta.synced_at || '--'}</span></div>
-                        <div style="margin-top:10px;">
-                            <button class="btn-refresh" style="font-size:8px;" onclick="this.getRootNode().host.handleRefreshRemote('${s.id}')">Validar contra Core (PULL)</button>
-                        </div>
-                    </div>
-                </details>
-                ` : ''}
+            <div class="metadata-inspector">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propiedad / Metadatos</th>
+                            <th>ID Átomo</th>
+                            <th>Tipo de Dato</th>
+                            <th>Mapeo Drive</th>
+                            <th style="text-align:right;">Sincronía Atómica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${fields.map(f => this._renderFieldRow(s.id, f, remoteFields.find(rf => rf.id === f.id), isSynced)).join('')}
+                    </tbody>
+                </table>
             </div>
+
+            <details>
+                <summary>PROPIEDADES DEL TRONCO (JSON)</summary>
+                <div style="padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #444; background: #fafafa;">
+                    <pre style="margin:0;">${JSON.stringify(s, null, 2)}</pre>
+                </div>
+            </details>
         </div>
         `;
     }
 
+    _renderFieldRow(schemaId, local, remote, isSynced) {
+        const isDivergent = isSynced && remote && this._checkDivergence(local, remote);
+        return `
+            <tr class="${isDivergent ? 'divergence-row' : ''}">
+                <td>
+                    <div style="font-weight: 600; color: #1c1c1e;">${local.label}</div>
+                    ${isDivergent ? `<div class="divergence-label">⚠️ DIVERGENCIA DETECTADA</div>` : ''}
+                </td>
+                <td class="id-badge">${local.id}</td>
+                <td><span class="type-badge">${local.type}</span></td>
+                <td style="opacity:0.5; font-size:9px;">${local.mapping?.drive || '--'}</td>
+                <td class="action-cell">
+                    <button class="btn-trad" onclick="this.getRootNode().host.handleAtomicPull('${schemaId}', '${local.id}')">IMPORTAR</button>
+                    <button class="btn-trad accent" onclick="this.getRootNode().host.handleAtomicPush('${schemaId}', '${local.id}')">EXPORTAR</button>
+                </td>
+            </tr>
+        `;
+    }
+
+    _checkDivergence(f1, f2) {
+        if (!f2) return true;
+        return f1.type !== f2.type || f1.label !== f2.label;
+    }
+
     _setupListeners() {
-        const refreshBtn = this.shadowRoot.getElementById('btn-refresh-local');
-        if (refreshBtn) {
-            refreshBtn.onclick = () => {
+        const scanBtn = this.shadowRoot.getElementById('btn-scan-root');
+        if (scanBtn) {
+            scanBtn.onclick = () => {
                 this.dispatchEvent(new CustomEvent('indra-refresh-local', { bubbles: true, composed: true }));
             };
         }
@@ -231,35 +243,30 @@ class IndraSchemaProjector extends HTMLElement {
     async handleAtomicPush(schemaId, fieldId) {
         const schema = this._schemas.find(s => s.id === schemaId);
         const field = (schema.fields || schema.payload?.fields || []).find(f => f.id === fieldId);
-        console.log(`🚀 [Sincerity:Atomic] Subiendo definición del campo '${fieldId}' en ${schemaId}...`);
-        
         try {
             await this._bridge.resonanceSync.patchSchemaField(schemaId, field);
-            this.handleRefreshRemote(schemaId); // Refrescar estado remoto tras el parche
+            this.handleRefreshRemote(schemaId);
         } catch (e) {
-            alert("Fallo la sincronización atómica: " + e.message);
+            alert("Error en Exportación: " + e.message);
         }
     }
 
     async handleAtomicPull(schemaId, fieldId) {
-        alert("PULL ATÓMICO: Esta acción sobreescribirá tu archivo JS local para el campo '" + fieldId + "'.");
-        // Lógica de manipulación de archivo local (vía Vite API) a implementar si es necesario.
+        alert("Comando 'IMPORTAR': Esta acción requiere escritura en disco local. No implementada en cliente puro.");
     }
 
     async handleFullSync(schemaId) {
-        const schema = this._schemas.find(s => s.id === schemaId);
         try {
             await this._bridge.resonanceSync.anchorSchema(schemaId);
             this.handleRefreshRemote(schemaId);
         } catch (e) {
-            alert("Fallo el anclaje global: " + e.message);
+            alert("Fallo en Exportación Global: " + e.message);
         }
     }
 
     async handleRefreshRemote(schemaId) {
         const schema = this._schemas.find(s => s.id === schemaId);
         if (!schema || !schema.metadata?.drive_id) return;
-
         try {
             const resp = await this._bridge.execute({
                 protocol: 'ATOM_READ',
@@ -267,12 +274,11 @@ class IndraSchemaProjector extends HTMLElement {
                 context_id: schema.metadata.drive_id
             });
             if (resp.metadata?.status === 'OK') {
-                const remoteAtom = resp.items?.[0];
-                schema._remoteState = remoteAtom.payload;
+                schema._remoteState = resp.items?.[0]?.payload;
                 this.render();
             }
         } catch (e) {
-            console.error("Fallo el refresco remoto:", e);
+            console.warn("Fallo el sondeo del Core para " + schemaId);
         }
     }
 }
