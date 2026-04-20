@@ -43,6 +43,27 @@ const TEMPLATE = `
         animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
+    .main-grid {
+        display: flex;
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        gap: 1px; /* Espacio micelar entre columnas */
+        background: rgba(60, 60, 67, 0.1);
+    }
+
+    .col {
+        display: flex;
+        flex-direction: column;
+        background: var(--indra-bg);
+        overflow-y: auto;
+    }
+    
+    .col-identity { flex: 0 0 25%; min-width: 200px; }
+    .col-dna      { flex: 0 0 45%; border-left: 1px solid var(--indra-border); border-right: 1px solid var(--indra-border); }
+    .col-actions  { flex: 0 0 30%; min-width: 250px; }
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px) scale(0.98); }
         to { opacity: 1; transform: translateY(0) scale(1); }
@@ -216,7 +237,7 @@ const TEMPLATE = `
         </div>
     </section>
 
-    <main class="hud-container locked" id="hud-body">
+    <main class="hud-body-wrapper locked" id="hud-body">
         <div class="main-grid">
             <!-- COLUMNA 1: IDENTIDAD -->
             <aside class="col col-identity">
@@ -235,23 +256,17 @@ const TEMPLATE = `
             </aside>
 
             <!-- COLUMNA 2: TERRITORIO (Los Esquemas) -->
-            <section class="col col-adn">
+            <section class="col col-dna">
                 <header class="panel-header">ADN Local (Leyes de Datos)</header>
-                <div class="panel-content">
-                    <indra-schema-projector id="schema-projector"></indra-schema-projector>
-                </div>
+                <indra-schema-projector id="schema-projector"></indra-schema-projector>
             </section>
 
             <!-- COLUMNA 3: ACCIONES -->
             <aside class="col col-actions">
-                <header class="panel-header">Manifiesto del Universo</header>
-                <div class="panel-content">
+                <header class="panel-header">Universo y Acciones</header>
+                <div class="panel-content" style="padding: 20px;">
                     <indra-universal-picker id="universal-picker" style="margin-bottom:30px;"></indra-universal-picker>
-                </div>
-
-                <header class="panel-header">Secuencias de Trabajo</header>
-                <div class="panel-content" style="flex: 1; display: flex; flex-direction: column;">
-                    <indra-workflow-ribbon id="workflow-ribbon" style="flex: 1;"></indra-workflow-ribbon>
+                    <indra-workflow-ribbon id="workflow-ribbon"></indra-workflow-ribbon>
                 </div>
             </aside>
         </div>
