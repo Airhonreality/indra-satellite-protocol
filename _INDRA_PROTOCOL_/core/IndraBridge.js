@@ -93,67 +93,55 @@ class IndraBridge {
         this._initializing = true;
         
         this._initPromise = (async () => {
-            console.log("[IndraBridge:Nexus] Analizando Vias de Vínculo Celular...");
+            console.log("🚀 [IndraBridge] Iniciando Ignición Síncrona...");
             
-            // 1. Cargamos la verdad del Repositorio (Prioridad Alta)
-            await this.loadContract();
+            try {
+                // PASO 1: Red y Manifiesto Global (Capa 0)
+                console.log("🔍 [1/3] Validando Nexo Core...");
+                const statusPulse = await this.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' });
+                this.capabilities = statusPulse.metadata || {};
+                this.allowedProtocols = this.capabilities.allowed_protocols || [];
+                console.log("✅ [1/3] Nexo Estable.");
 
-            // 2. Intentamos recuperar sesión y nexo
-            if (!this.coreUrl || !this.satelliteToken || !this.activeWorkspaceId) {
-                const linkData = localStorage.getItem('INDRA_SATELLITE_LINK');
-                if (linkData) {
-                    if (linkData.startsWith('{')) {
-                        try {
-                            const parsed = JSON.parse(linkData);
-                            this.coreUrl = parsed.coreUrl || this.coreUrl;
-                            this.satelliteToken = parsed.token || this.satelliteToken;
-                            this.activeWorkspaceId = parsed.workspaceId || this.activeWorkspaceId;
-                            console.log("♻️ [Bridge] Sesión restaurada desde Pacto Manual.");
-                        } catch (e) { /* Fallback */ }
-                    } else if (!this.activeWorkspaceId) {
-                        this.activeWorkspaceId = linkData;
-                    }
+                // PASO 2: Identidad (Capa 1)
+                // (Ya validada implícitamente por el statusPulse si el Core requiere token)
+                console.log("🔍 [2/3] Verificando Identidad...");
+                if (!this.satelliteToken) {
+                    throw new Error("GHOST_MODE: Sin llave de acceso.");
                 }
-            }
+                console.log("✅ [2/3] Identidad Cristalizada.");
 
-            if (this.coreUrl && this.satelliteToken) {
-                try {
-                    // Solo pedimos un pulso de salud y capacidades base
-                    const statusPulse = await this.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' });
-                    
-                    this.capabilities = statusPulse.metadata || {};
-                    this.allowedProtocols = this.capabilities.allowed_protocols || [];
-
-                    // --- ESTADO CELULAR (Laminar) ---
-                    if (!this.activeWorkspaceId) {
-                        // Estado Huérfano: Registrado pero sin tierra (Workspace)
-                        window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'ORPHAN' } }));
-                    } else {
-                        // Estado Residente: Vínculo establecido
+                // PASO 3: Soberanía de Datos (Capa 2 - El Ledger)
+                if (this.activeWorkspaceId) {
+                    console.log(`🔍 [3/3] Validando Existencia de Célula: ${this.activeWorkspaceId}...`);
+                    try {
+                        // Intentamos una lectura mínima para validar el Ledger
+                        await this.execute({ 
+                            protocol: 'ATOM_EXISTS', 
+                            context_id: this.activeWorkspaceId, 
+                            data: { ids: [this.activeWorkspaceId] } 
+                        });
+                        console.log("✅ [3/3] Realidad Sincronizada.");
                         window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
+                    } catch (error) {
+                        console.error("🚨 [3/3] FALLO DE REALIDAD: El Ledger no responde.");
+                        window.dispatchEvent(new CustomEvent("indra-resonance-sync", { 
+                            detail: { mode: 'ERROR_LEDGER', error: error.message, id: this.activeWorkspaceId } 
+                        }));
+                        // IMPORTANTE: No limpiamos el ID. Dejamos que el usuario vea el fallo.
                     }
-
-                } catch (e) {
-                    console.warn(`⚠️ [IndraBridge] Handshake fallido: ${e.message}`);
-                    
-                    // AXIOMA DE RESILIENCIA: Si el ID ya no existe en el universo Indra,
-                    // limpiamos la sesión local para permitir un nuevo Génesis.
-                    if (e.message.indexOf('NOT_FOUND') !== -1 || e.message.indexOf('NUC') !== -1) {
-                        console.log("♻️ [IndraBridge] Sesión muerta detectada. Liberando anclaje.");
-                        this.activeWorkspaceId = null;
-                        localStorage.removeItem('INDRA_SATELLITE_LINK'); // Purgar configuración tóxica
-                        window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'GHOST', error: e.message } }));
-                    } else {
-                        window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'OFFLINE', error: e.message } }));
-                    }
+                } else {
+                    console.log("⚠️ [3/3] Sin espacio asignado. Modo Huérfano.");
+                    window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'ORPHAN' } }));
                 }
-            } else {
-                console.log("[IndraBridge:Nexus] Sin credenciales. Entrando en modo GHOST.");
-                window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'GHOST' } }));
-            }
 
-            this._notify('sync', { status: this.satelliteToken ? 'CONNECTED' : 'DISCONNECTED' });
-            this._initializing = false;
+            } catch (e) {
+                console.warn(`❌ [Bridge] Ignición abortada: ${e.message}`);
+                window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'GHOST', error: e.message } }));
+            } finally {
+                this._notify('sync', { status: this.satelliteToken ? 'CONNECTED' : 'DISCONNECTED' });
+                this._initializing = false;
+            }
         })();
 
         return this._initPromise;
