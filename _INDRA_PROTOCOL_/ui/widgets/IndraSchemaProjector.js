@@ -1,6 +1,6 @@
 /**
  * =============================================================================
- * INDRA SCHEMA PROJECTOR (Standard UI v4.5 - STABILITY EDITION)
+ * INDRA SCHEMA PROJECTOR (SINCERITY EDITION v5.0 - THE PURE SEED)
  * =============================================================================
  */
 
@@ -24,48 +24,50 @@ class IndraSchemaProjector extends HTMLElement {
     }
 
     render() {
-        const isLoading = this._schemas === null;
-        
+        if (this._schemas === null) {
+            this.shadowRoot.innerHTML = `<div style="padding:40px; text-align:center; opacity:0.5; font-family:inherit; font-size:11px;">📡 Sincronizando con el Manifiesto...</div>`;
+            return;
+        }
+
         this.shadowRoot.innerHTML = `
         <style>
             :host { display: block; font-family: inherit; }
             .projector-container { 
                 display: flex; 
                 flex-direction: column; 
-                gap: 12px; 
+                gap: 16px; 
                 padding: 10px 20px 30px 20px;
-                max-height: 80vh; 
+                max-height: calc(100vh - 150px);
                 overflow-y: auto; 
             }
-            /* Custom Scrollbar Premium */
             .projector-container::-webkit-scrollbar { width: 6px; }
-            .projector-container::-webkit-scrollbar-track { background: transparent; }
             .projector-container::-webkit-scrollbar-thumb { background: var(--indra-border); border-radius: 10px; }
 
             .schema-card { 
                 background: white;
                 border: 1px solid var(--indra-border); 
-                border-radius: 14px; 
+                border-radius: 16px; 
                 overflow: hidden; 
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             }
             .schema-card:hover { border-color: var(--indra-accent); }
 
             .header { 
-                padding: 10px 16px; 
+                padding: 12px 20px; 
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 border-bottom: 1px solid var(--indra-border);
             }
-            .schema-title { display: flex; align-items: center; font-size: 10px; font-weight: 800; color: var(--indra-text-main); letter-spacing: 0.05em; }
+            .schema-title { display: flex; align-items: center; font-size: 11px; font-weight: 800; color: var(--indra-text-main); letter-spacing: 0.05em; }
             
             .body { background: #fafafa; }
             
             summary {
-                padding: 10px 16px;
-                font-size: 10px;
-                font-weight: 700;
+                padding: 10px 20px;
+                font-size: 9px;
+                font-weight: 800;
                 color: var(--indra-text-dim);
                 cursor: pointer;
                 background: white;
@@ -73,23 +75,22 @@ class IndraSchemaProjector extends HTMLElement {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                text-transform: uppercase;
                 list-style: none;
             }
-            summary:hover { background: #fdfdfd; color: var(--indra-accent); }
-            summary::after { content: '↓'; font-size: 12px; opacity: 0.5; transition: transform 0.3s; }
+            summary:hover { color: var(--indra-accent); }
+            summary::after { content: '↓'; font-size: 10px; opacity: 0.5; transition: transform 0.3s; }
             details[open] summary::after { transform: rotate(180deg); }
             
             .fields-list { 
-                padding: 12px 16px; 
-                max-height: 180px; 
-                overflow-y: auto; 
+                padding: 12px 20px; 
                 background: #fff;
                 border-top: 1px solid var(--indra-border);
             }
             .field-row { 
                 display: flex; 
                 justify-content: space-between; 
-                padding: 4px 0;
+                padding: 6px 0;
                 border-bottom: 1px solid rgba(0,0,0,0.03);
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 10px;
@@ -97,61 +98,70 @@ class IndraSchemaProjector extends HTMLElement {
             .field-type { color: var(--indra-accent); font-weight: 600; font-size: 9px; opacity: 0.8; }
 
             .metadata-box {
-                padding: 12px 16px;
-                background: #f8f9fa;
+                padding: 15px 20px;
+                background: #fdfdfd;
                 border-top: 1px solid var(--indra-border);
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 9px;
             }
-            .meta-item { display: flex; gap: 8px; margin-bottom: 4px; overflow-wrap: break-word; word-break: break-all; }
-            .meta-key { color: var(--indra-text-dim); font-weight: 800; min-width: 70px; }
-            .meta-val { color: #444; flex: 1; }
+            .meta-item { display: flex; gap: 8px; margin-bottom: 6px; }
+            .meta-key { color: var(--indra-text-dim); font-weight: 800; min-width: 80px; }
+            .meta-val { color: #444; word-break: break-all; }
 
-            .actions-row { display: flex; align-items: center; gap: 6px; }
-            .btn-action {
-                padding: 6px 12px;
-                border-radius: 8px;
-                font-size: 9px;
+            .btn-sync {
+                padding: 8px 20px;
+                border-radius: 10px;
+                font-size: 10px;
                 font-weight: 800;
                 cursor: pointer;
-                border: none;
+                border: 1px solid var(--indra-accent);
+                background: white;
+                color: var(--indra-accent);
                 transition: all 0.2s;
                 text-transform: uppercase;
+                letter-spacing: 0.05em;
             }
-            .btn-ignite { background: var(--indra-accent); color: white; }
-            .btn-update { background: white; color: var(--indra-accent); border: 1px solid var(--indra-accent); }
-            .btn-unlink { background: transparent; color: var(--indra-danger); border: 1px solid transparent; font-size: 12px; padding: 4px; }
-            .btn-unlink:hover { background: rgba(255, 59, 48, 0.1); border-radius: 4px; }
+            .btn-sync:hover { background: var(--indra-accent); color: white; }
+            .btn-sync.synced { background: var(--indra-success); color: white; border-color: var(--indra-success); }
             
-            .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 10px; position: relative; }
-            .status-sync { background: var(--indra-success); box-shadow: 0 0 10px var(--indra-success); }
-            .status-local { background: var(--indra-text-dim); opacity: 0.4; }
-
-            .igniting { opacity: 0.6; pointer-events: none; }
-            
-            .target-selector {
-                font-size: 9px;
+            .btn-unlink { 
+                background: transparent; 
+                color: var(--indra-danger); 
+                border: none; 
+                font-size: 14px; 
+                cursor: pointer;
                 padding: 4px 8px;
-                border: 1px solid var(--indra-border);
-                border-radius: 8px;
-                background: #fdfdfd;
-                font-weight: 700;
+                opacity: 0.4;
             }
+            .btn-unlink:hover { opacity: 1; background: rgba(255, 59, 48, 0.1); border-radius: 6px; }
+            
+            .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; }
+            .status-sync { background: var(--indra-success); box-shadow: 0 0 10px var(--indra-success); }
+            .status-local { background: var(--indra-text-dim); opacity: 0.3; }
 
-            .badge-real-time {
+            .badge-sync {
                 font-size: 8px;
                 background: #000;
                 color: #fff;
-                padding: 2px 5px;
+                padding: 2px 6px;
                 border-radius: 4px;
-                margin-left: 8px;
+                margin-left: 10px;
+            }
+
+            .error-banner {
+                padding: 10px 20px;
+                background: #fff5f5;
+                color: #c53030;
+                font-size: 9px;
+                border-top: 1px solid #feb2b2;
+                font-weight: 600;
             }
         </style>
         <div class="projector-container">
-            ${isLoading ? `<div style="padding:40px; text-align:center; opacity:0.5; font-size:11px;">📡 Sincronizando con el Manifiesto del Universo...</div>` : 
-            (this._schemas.map(s => {
+            ${this._schemas.map(s => {
                 const meta = s.metadata || {};
-                const isSynced = !!meta.silo_id;
+                const isSynced = !!meta.drive_id;
+                const error = s._lastError;
                 
                 return `
                 <div class="schema-card" id="card-${s.id}">
@@ -159,29 +169,18 @@ class IndraSchemaProjector extends HTMLElement {
                         <div class="schema-title">
                             <span class="status-dot ${isSynced ? 'status-sync' : 'status-local'}"></span>
                             <span>${(s.handle?.alias || s.id).toUpperCase()}</span>
-                            ${isSynced ? `<span class="badge-real-time">SINCERIDAD: ON</span>` : ''}
+                            ${isSynced ? `<span class="badge-sync">NATIVO WORKSPACE</span>` : ''}
                         </div>
-                        <div class="actions-row">
-                            ${!isSynced ? `
-                                <select class="target-selector" id="target-${s.id}">
-                                    <option value="drive">Drive</option>
-                                    <option value="notion" disabled>Notion</option>
-                                </select>
-                                <button class="btn-action btn-ignite" onclick="this.getRootNode().host.handleExport('${s.id}')">
-                                    Exportar
-                                </button>
-                            ` : `
-                                <button class="btn-unlink" title="Desanclar Memoria" onclick="this.getRootNode().host.handleUnlink('${s.id}')">
-                                    ✕
-                                </button>
-                                <button class="btn-action btn-update" onclick="this.getRootNode().host.handleSync('${s.id}')">
-                                    Sincronizar
-                                </button>
-                            `}
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${isSynced ? `<button class="btn-unlink" title="Desvincular" onclick="this.getRootNode().host.handleUnlink('${s.id}')">✕</button>` : ''}
+                            <button class="btn-sync ${isSynced ? 'synced' : ''}" onclick="this.getRootNode().host.handleSync('${s.id}')">
+                                ${isSynced ? 'Actualizar' : 'Sincronizar'}
+                            </button>
                         </div>
                     </div>
+                    ${error ? `<div class="error-banner">⚠ ERROR: ${error}</div>` : ''}
                     <div class="body">
-                        <details name="indra-global-accordion">
+                        <details name="indra-accordion">
                             <summary>Estructura de Datos</summary>
                             <div class="fields-list">
                                 ${(s.fields || s.payload?.fields || []).map(f => `
@@ -194,63 +193,50 @@ class IndraSchemaProjector extends HTMLElement {
                         </details>
                         
                         ${isSynced ? `
-                        <details name="indra-global-accordion">
-                            <summary>Metadatos de Soberanía</summary>
+                        <details name="indra-accordion">
+                            <summary>Evidencia Física (Sinceridad)</summary>
                             <div class="metadata-box">
-                                <div class="meta-item"><span class="meta-key">SILO_ID:</span> <span class="meta-val">${meta.silo_id}</span></div>
-                                <div class="meta-item"><span class="meta-key">BRIDGE:</span> <span class="meta-val" style="color:var(--indra-accent);">${meta.bridge_id || '---'}</span></div>
-                                <div class="meta-item"><span class="meta-key">FOLDER:</span> <span class="meta-val">${meta.artifacts_folder || 'Desconocida'}</span></div>
+                                <div class="meta-item"><span class="meta-key">DRIVE_FILE_ID:</span> <span class="meta-val">${meta.drive_id}</span></div>
+                                <div class="meta-item"><span class="meta-key">SYNCED_AT:</span> <span class="meta-val">${meta.synced_at || 'Desconocido'}</span></div>
+                                <div class="meta-item"><span class="meta-key">LOCATION:</span> <span class="meta-val">${meta.artifacts_folder || 'Workspace Folder'}</span></div>
                             </div>
                         </details>
                         ` : ''}
                     </div>
                 </div>
                 `;
-            }).join('') || '<div style="opacity:0.3; font-size:11px; text-align:center; padding: 60px;">No se encontraron leyes de datos.</div>')}
+            }).join('')}
         </div>
         `;
     }
 
-    async handleUnlink(schemaId) {
-        if (!confirm(`¿Deseas desanclar '${schemaId}'? Se borrará la memoria local.`)) return;
-        const bridge = this._bridge;
-        const schema = bridge.contract.schemas.find(s => s.id === schemaId);
-        if (schema) schema.metadata = {};
-        if (bridge.ignitions && bridge.ignitions[schemaId]) {
-            delete bridge.ignitions[schemaId];
-            localStorage.setItem('INDRA_IGNITIONS', JSON.stringify(bridge.ignitions));
-        }
-        window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
-        this.render();
-    }
-
-    async handleExport(schemaId) {
-        const bridge = this._bridge;
-        const target = this.shadowRoot.getElementById(`target-${schemaId}`).value;
-        const card = this.shadowRoot.getElementById(`card-${schemaId}`);
-        card.classList.add('igniting');
-        try {
-            await bridge.resonanceSync.materializeSchema(schemaId, { provider: target });
-        } catch (e) {
-            alert("Error al exportar: " + e.message);
-        } finally {
-            card.classList.remove('igniting');
-            this.render();
-        }
-    }
-
     async handleSync(schemaId) {
         const bridge = this._bridge;
-        const card = this.shadowRoot.getElementById(`card-${schemaId}`);
-        card.classList.add('igniting');
+        const schema = this._schemas.find(s => s.id === schemaId);
+        if (!schema) return;
+
         try {
-            await bridge.resonanceSync.resonateSchema(schemaId);
+            schema._lastError = null;
+            this.render();
+            console.log(`[Sincerity] Sincronizando semilla: ${schemaId}...`);
+            await bridge.resonanceSync.anchorSchema(schemaId);
         } catch (e) {
-            alert("Error de sincronización: " + e.message);
+            schema._lastError = e.message;
         } finally {
-            card.classList.remove('igniting');
             this.render();
         }
+    }
+
+    async handleUnlink(schemaId) {
+        if (!confirm(`¿Deseas desvincular físicamente '${schemaId}' de este Workspace?`)) return;
+        const bridge = this._bridge;
+        const schema = this._schemas.find(s => s.id === schemaId);
+        if (schema) {
+            schema.metadata = {};
+            if (bridge.ignitions) delete bridge.ignitions[schemaId];
+            localStorage.setItem('INDRA_IGNITIONS', JSON.stringify(bridge.ignitions));
+        }
+        this.render();
     }
 }
 
