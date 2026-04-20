@@ -1,6 +1,6 @@
 /**
  * =============================================================================
- * INDRA SCHEMA PROJECTOR (Standard UI v4.0 - SINCERITY EDITION)
+ * INDRA SCHEMA PROJECTOR (Standard UI v4.5 - STABILITY EDITION)
  * =============================================================================
  */
 
@@ -32,7 +32,7 @@ class IndraSchemaProjector extends HTMLElement {
             .projector-container { 
                 display: flex; 
                 flex-direction: column; 
-                gap: 16px; 
+                gap: 12px; 
                 padding: 10px 20px 30px 20px;
                 max-height: 80vh; 
                 overflow-y: auto; 
@@ -45,26 +45,25 @@ class IndraSchemaProjector extends HTMLElement {
             .schema-card { 
                 background: white;
                 border: 1px solid var(--indra-border); 
-                border-radius: 16px; 
+                border-radius: 14px; 
                 overflow: hidden; 
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .schema-card:hover { border-color: var(--indra-accent); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+            .schema-card:hover { border-color: var(--indra-accent); }
 
             .header { 
-                padding: 16px 20px; 
+                padding: 10px 16px; 
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 border-bottom: 1px solid var(--indra-border);
             }
-            .schema-title { display: flex; align-items: center; font-size: 11px; font-weight: 800; color: var(--indra-text-main); letter-spacing: 0.05em; }
+            .schema-title { display: flex; align-items: center; font-size: 10px; font-weight: 800; color: var(--indra-text-main); letter-spacing: 0.05em; }
             
             .body { background: #fafafa; }
             
             summary {
-                padding: 12px 20px;
+                padding: 10px 16px;
                 font-size: 10px;
                 font-weight: 700;
                 color: var(--indra-text-dim);
@@ -81,8 +80,8 @@ class IndraSchemaProjector extends HTMLElement {
             details[open] summary::after { transform: rotate(180deg); }
             
             .fields-list { 
-                padding: 15px 20px; 
-                max-height: 200px; 
+                padding: 12px 16px; 
+                max-height: 180px; 
                 overflow-y: auto; 
                 background: #fff;
                 border-top: 1px solid var(--indra-border);
@@ -90,7 +89,7 @@ class IndraSchemaProjector extends HTMLElement {
             .field-row { 
                 display: flex; 
                 justify-content: space-between; 
-                padding: 6px 0;
+                padding: 4px 0;
                 border-bottom: 1px solid rgba(0,0,0,0.03);
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 10px;
@@ -98,58 +97,54 @@ class IndraSchemaProjector extends HTMLElement {
             .field-type { color: var(--indra-accent); font-weight: 600; font-size: 9px; opacity: 0.8; }
 
             .metadata-box {
-                padding: 15px 20px;
+                padding: 12px 16px;
                 background: #f8f9fa;
                 border-top: 1px solid var(--indra-border);
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 9px;
-                overflow: hidden;
             }
-            .meta-item { display: flex; gap: 8px; margin-bottom: 6px; overflow-wrap: break-word; word-break: break-all; }
-            .meta-key { color: var(--indra-text-dim); font-weight: 800; min-width: 80px; }
+            .meta-item { display: flex; gap: 8px; margin-bottom: 4px; overflow-wrap: break-word; word-break: break-all; }
+            .meta-key { color: var(--indra-text-dim); font-weight: 800; min-width: 70px; }
             .meta-val { color: #444; flex: 1; }
 
-            .actions-row { display: flex; align-items: center; gap: 8px; }
+            .actions-row { display: flex; align-items: center; gap: 6px; }
             .btn-action {
-                padding: 8px 16px;
-                border-radius: 10px;
-                font-size: 10px;
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 9px;
                 font-weight: 800;
                 cursor: pointer;
                 border: none;
                 transition: all 0.2s;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
             }
-            .btn-ignite { background: var(--indra-accent); color: white; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2); }
+            .btn-ignite { background: var(--indra-accent); color: white; }
             .btn-update { background: white; color: var(--indra-accent); border: 1px solid var(--indra-accent); }
-            .btn-unlink { background: transparent; color: var(--indra-danger); border: 1px solid transparent; font-size: 12px; padding: 4px 8px; }
-            .btn-unlink:hover { background: rgba(255, 59, 48, 0.1); border-radius: 6px; }
+            .btn-unlink { background: transparent; color: var(--indra-danger); border: 1px solid transparent; font-size: 12px; padding: 4px; }
+            .btn-unlink:hover { background: rgba(255, 59, 48, 0.1); border-radius: 4px; }
             
-            .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 12px; position: relative; }
+            .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 10px; position: relative; }
             .status-sync { background: var(--indra-success); box-shadow: 0 0 10px var(--indra-success); }
             .status-local { background: var(--indra-text-dim); opacity: 0.4; }
 
-            .igniting { opacity: 0.6; pointer-events: none; filter: blur(1px); }
+            .igniting { opacity: 0.6; pointer-events: none; }
             
             .target-selector {
-                font-size: 10px;
-                padding: 6px 10px;
+                font-size: 9px;
+                padding: 4px 8px;
                 border: 1px solid var(--indra-border);
-                border-radius: 10px;
+                border-radius: 8px;
                 background: #fdfdfd;
                 font-weight: 700;
-                color: #555;
             }
 
             .badge-real-time {
                 font-size: 8px;
                 background: #000;
                 color: #fff;
-                padding: 2px 6px;
+                padding: 2px 5px;
                 border-radius: 4px;
                 margin-left: 8px;
-                vertical-align: middle;
             }
         </style>
         <div class="projector-container">
@@ -169,14 +164,14 @@ class IndraSchemaProjector extends HTMLElement {
                         <div class="actions-row">
                             ${!isSynced ? `
                                 <select class="target-selector" id="target-${s.id}">
-                                    <option value="drive">Drive (Sheets)</option>
+                                    <option value="drive">Drive</option>
                                     <option value="notion" disabled>Notion</option>
                                 </select>
                                 <button class="btn-action btn-ignite" onclick="this.getRootNode().host.handleExport('${s.id}')">
                                     Exportar
                                 </button>
                             ` : `
-                                <button class="btn-unlink" title="Desanclar y Borrar Memoria Falsa" onclick="this.getRootNode().host.handleUnlink('${s.id}')">
+                                <button class="btn-unlink" title="Desanclar Memoria" onclick="this.getRootNode().host.handleUnlink('${s.id}')">
                                     ✕
                                 </button>
                                 <button class="btn-action btn-update" onclick="this.getRootNode().host.handleSync('${s.id}')">
@@ -186,7 +181,7 @@ class IndraSchemaProjector extends HTMLElement {
                         </div>
                     </div>
                     <div class="body">
-                        <details>
+                        <details name="indra-global-accordion">
                             <summary>Estructura de Datos</summary>
                             <div class="fields-list">
                                 ${(s.fields || s.payload?.fields || []).map(f => `
@@ -199,59 +194,42 @@ class IndraSchemaProjector extends HTMLElement {
                         </details>
                         
                         ${isSynced ? `
-                        <details>
-                            <summary>Metadatos de Soberanía (Core ID)</summary>
+                        <details name="indra-global-accordion">
+                            <summary>Metadatos de Soberanía</summary>
                             <div class="metadata-box">
                                 <div class="meta-item"><span class="meta-key">SILO_ID:</span> <span class="meta-val">${meta.silo_id}</span></div>
-                                <div class="meta-item"><span class="meta-key">BRIDGE_ID:</span> <span class="meta-val" style="color:var(--indra-accent);">${meta.bridge_id || '---'}</span></div>
+                                <div class="meta-item"><span class="meta-key">BRIDGE:</span> <span class="meta-val" style="color:var(--indra-accent);">${meta.bridge_id || '---'}</span></div>
                                 <div class="meta-item"><span class="meta-key">FOLDER:</span> <span class="meta-val">${meta.artifacts_folder || 'Desconocida'}</span></div>
-                                <div class="meta-item"><span class="meta-key">DRIVE_ID:</span> <span class="meta-val">${meta.drive_id || '---'}</span></div>
                             </div>
                         </details>
                         ` : ''}
                     </div>
                 </div>
                 `;
-            }).join('') || '<div style="opacity:0.3; font-size:11px; text-align:center; padding: 60px;">No se encontraron leyes de datos en el territorio.</div>')}
+            }).join('') || '<div style="opacity:0.3; font-size:11px; text-align:center; padding: 60px;">No se encontraron leyes de datos.</div>')}
         </div>
         `;
     }
 
     async handleUnlink(schemaId) {
-        if (!confirm(`¿Deseas desanclar '${schemaId}'? Esto borrará la memoria de sincronización local.`)) return;
-        
+        if (!confirm(`¿Deseas desanclar '${schemaId}'? Se borrará la memoria local.`)) return;
         const bridge = this._bridge;
-        if (!bridge) return;
-
-        // 1. Borrar de la memoria viva
         const schema = bridge.contract.schemas.find(s => s.id === schemaId);
-        if (schema) {
-            schema.metadata = {};
-        }
-
-        // 2. Borrar de las igniciones persistentes
+        if (schema) schema.metadata = {};
         if (bridge.ignitions && bridge.ignitions[schemaId]) {
             delete bridge.ignitions[schemaId];
             localStorage.setItem('INDRA_IGNITIONS', JSON.stringify(bridge.ignitions));
         }
-
-        console.log(`[Projector] Memoria de '${schemaId}' purgada.`);
-        
-        // 3. Notificar refresco de UI
         window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
         this.render();
     }
 
     async handleExport(schemaId) {
         const bridge = this._bridge;
-        if (!bridge) return alert("Error: No se detectó conexión con el Bridge.");
-
         const target = this.shadowRoot.getElementById(`target-${schemaId}`).value;
         const card = this.shadowRoot.getElementById(`card-${schemaId}`);
         card.classList.add('igniting');
-
         try {
-            console.log(`[Projector] Iniciando Ignición Industrial de '${schemaId}'...`);
             await bridge.resonanceSync.materializeSchema(schemaId, { provider: target });
         } catch (e) {
             alert("Error al exportar: " + e.message);
@@ -263,11 +241,8 @@ class IndraSchemaProjector extends HTMLElement {
 
     async handleSync(schemaId) {
         const bridge = this._bridge;
-        if (!bridge) return;
-
         const card = this.shadowRoot.getElementById(`card-${schemaId}`);
         card.classList.add('igniting');
-
         try {
             await bridge.resonanceSync.resonateSchema(schemaId);
         } catch (e) {
