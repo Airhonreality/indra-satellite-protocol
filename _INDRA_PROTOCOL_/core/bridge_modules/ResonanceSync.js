@@ -42,8 +42,8 @@ export class ResonanceSync {
             // Establecer el vínculo atómico
             bridge.activeWorkspaceId = response.metadata.generated_workspace_id;
             
-            // Persistencia Ferroso en Disco
-            await this.persistMetadata();
+            // Persistencia Ferroso en Disco (Suspendida para evitar recarga de Vite)
+            // await this.persistMetadata();
             
             // Notificar estabilidad de vínculo
             window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'STABLE' } }));
@@ -143,8 +143,8 @@ export class ResonanceSync {
                 
                 console.log(`🚀 [ResonanceSync] Sincronía estable cimentada: ${schemaName} -> ${bridgeId}`);
 
-                // Persistencia Ferroso (indra_config.js)
-                await this.persistMetadata();
+                // Persistencia Ferroso (Suspendida temporalmente para evitar recargas de Vite)
+                // await this.persistMetadata();
                 
                 return siloId;
             }
