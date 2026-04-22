@@ -191,7 +191,7 @@ class IndraBridge {
                 const localDNA = await this.contractCortex.load({ use_cache: options.use_cache });
                 
                 if (!this.vault) {
-                    const { AgnosticVault } = await import('../../src/score/logic/AgnosticVault.js');
+                    const { AgnosticVault } = await import('./bridge_modules/AgnosticVault.js');
                     this.vault = new AgnosticVault(this);
                 }
 
