@@ -42,10 +42,18 @@ const TEMPLATE = `
         <button id="btn-toggle-settings" style="background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.5;">⚙️ Configuración</button>
     </div>
 
-    <section class="config-card" id="settings-panel">
+    <section class="config-card active" id="settings-panel">
         <div class="form-group">
-            <label>ALIAS DEL NODO</label>
+            <label>ALIAS DEL NODO (OPCIONAL)</label>
             <input type="text" id="config-sat-name" placeholder="Nombre local...">
+        </div>
+        <div class="form-group">
+            <label>CORE URL (WEB APP)</label>
+            <input type="text" id="config-core-url" placeholder="https://script.google.com/macros/s/...">
+        </div>
+        <div class="form-group">
+            <label>SATELLITE TOKEN (SESSION SECRET)</label>
+            <input type="text" id="config-core-token" placeholder="Token de seguridad...">
         </div>
     </section>
 
@@ -177,14 +185,23 @@ class IndraBridgeHUD extends HTMLElement {
     _updateIdentityLabels() {
         const name = this._bridge.contract?.satellite_name || '--';
         const url = this._bridge.coreUrl || 'Desconectado';
-        ['display-sat-name', 'sat-name'].forEach(id => {
+        ['display-sat-name'].forEach(id => {
             const el = this.shadowRoot.getElementById(id);
             if (el) el.innerText = name;
         });
-        ['display-core-url', 'core-url'].forEach(id => {
+        ['display-core-url'].forEach(id => {
             const el = this.shadowRoot.getElementById(id);
             if (el) el.innerText = url;
         });
+
+        const nameInput = this.shadowRoot.getElementById('config-sat-name');
+        if (nameInput && !nameInput.value && name !== '--') nameInput.value = name;
+        
+        const urlInput = this.shadowRoot.getElementById('config-core-url');
+        if (urlInput && !urlInput.value && this._bridge.coreUrl) urlInput.value = this._bridge.coreUrl;
+
+        const tokenInput = this.shadowRoot.getElementById('config-core-token');
+        if (tokenInput && !tokenInput.value && this._bridge.satelliteToken) tokenInput.value = this._bridge.satelliteToken;
     }
 
     _updateProtocolTags() {
@@ -242,7 +259,8 @@ class IndraBridgeHUD extends HTMLElement {
         const states = {
             'GHOST': { text: 'Desconectado', class: 'status--ghost', action: 'CONECTAR AL CORE', locked: true },
             'DISCOVERY': { text: 'Buscando...', class: 'status--orphan', action: 'ELEGIR WORKSPACE', locked: false },
-            'STABLE': { text: 'Conectado', class: 'status--stable', action: 'SESIÓN ACTIVA', locked: false }
+            'STABLE': { text: 'Conectado', class: 'status--stable', action: 'SESIÓN ACTIVA', locked: false },
+            'READY': { text: 'Soberano (Ready)', class: 'status--stable', action: 'MODALIDAD LOCAL', locked: false }
         };
 
         const current = states[this._mode] || states['GHOST'];
@@ -272,6 +290,21 @@ class IndraBridgeHUD extends HTMLElement {
         this.shadowRoot.getElementById('config-sat-name').oninput = (e) => {
             if (this._bridge) this._bridge.contract.satellite_name = e.target.value;
             this._updateIdentityLabels();
+        };
+        this.shadowRoot.getElementById('config-core-url').oninput = (e) => {
+            if (this._bridge) {
+                this._bridge.coreUrl = e.target.value;
+                this._hasChanges = true;
+                this._updateSaveButton();
+            }
+            this._updateIdentityLabels();
+        };
+        this.shadowRoot.getElementById('config-core-token').oninput = (e) => {
+            if (this._bridge) {
+                this._bridge.satelliteToken = e.target.value;
+                this._hasChanges = true;
+                this._updateSaveButton();
+            }
         };
     }
 }

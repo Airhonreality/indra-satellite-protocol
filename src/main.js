@@ -6,16 +6,24 @@
 import IndraBridge from '../_INDRA_PROTOCOL_/core/IndraBridge.js';
 import { IndraKernel } from './score/IndraKernel.js';
 
+import '../_INDRA_PROTOCOL_/ui/IndraBridgeHUD.js';
+
 // 1. Instanciación del Ecosistema
 const bridge = new IndraBridge();
 const kernel = new IndraKernel(bridge);
+
+// Inyección Topológica Aislada (El HUD no debe ir dentro del app reactivo/vanilla)
+const hud = document.createElement('indra-bridge-hud');
+hud.style.position = 'relative';
+hud.style.zIndex = '99999';
+document.body.appendChild(hud);
+hud.bridge = bridge;
 
 /**
  * Dharma: El Satélite se auto-configura si detecta un pacto previo.
  */
 async function bootstrap() {
     console.log("🧬 [Seed] Iniciando secuencia de auto-configuración...");
-
 
     try {
         // Ignición Silenciosa (Usa localStorage internamente si existe)

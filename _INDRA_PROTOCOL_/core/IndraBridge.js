@@ -116,35 +116,33 @@ class IndraBridge {
     }
 
     /**
-     * AXIOMA DE RESOLUCIÓN DE IDENTIDAD (v16.2)
+     * AXIOMA DE RESOLUCIÓN DE IDENTIDAD (v16.1)
      * Resuelve un alias de esquema a su identidad física real.
-     * Blindado contra colisiones de red antes de firma de pacto.
      */
     resolveSilo(alias) {
         const schemaAlias = String(alias).trim().toLowerCase();
-        const schema = (this.contract.schemas || []).find(s => 
-            (s.handle?.alias || '').toLowerCase() === schemaAlias
+        
+        const localSchemas = this.contract.schemas || [];
+        const remoteSchemas = this.contract.remote_schemas || [];
+        const allSchemas = [...localSchemas, ...remoteSchemas];
+
+        const schema = allSchemas.find(s => 
+            (s.handle?.alias || '').toLowerCase() === schemaAlias ||
+            (s.id || '').toLowerCase() === schemaAlias
         );
 
         if (!schema) {
-            console.error(`[IndraBridge:Error] El esquema "${alias}" no existe.`);
+            console.error(`[IndraBridge:Error] El esquema "${alias}" no ha sido proyectado en este Satélite.`);
             throw new Error(`SCHEMA_NOT_FOUND: ${alias}`);
         }
 
         const siloId = schema.payload?.target_silo_id;
         const provider = schema.payload?.target_provider || 'sheets';
 
-        // 🛡️ AXIOMA DE MATERIA REAL (Anti-IllegalID)
-        const isPlaceholder = !siloId || siloId === alias || siloId === 'project';
-        
-        if (isPlaceholder) {
-            console.warn(`[IndraBridge:Warn] "${alias}" no tiene base de datos física vinculada.`);
+        // Escudo de Materia (Anti-Illegal ID)
+        if (!siloId || siloId === 'unlinked' || siloId === 'project' || siloId === 'temp_id' || siloId === 'undefined') {
+            console.warn(`[IndraBridge:Warn] El esquema "${alias}" existe pero carece de MATERIA FÍSICA activa (${siloId || 'null'}).`);
             throw new Error(`MATTER_NOT_IGNITED: ${alias}`);
-        }
-
-        // 🛡️ AXIOMA DE AUTORIZACIÓN
-        if (!this.satelliteToken && provider !== 'system') {
-             throw new Error(`SATELLITE_NOT_LINKED: Se requiere firma de pacto para acceder a "${alias}"`);
         }
 
         return { id: siloId, provider: provider };
@@ -197,11 +195,11 @@ class IndraBridge {
                     this.vault = new AgnosticVault(this);
                 }
 
-                if (localDNA && (localDNA.schemas?.length > 0 || localDNA.workflows?.length > 0)) {
-                    console.log("🟢 [Bridge] Modo SOBERANO ready.");
-                    this._setStatus('READY'); 
-                    window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'LOCAL_READY' } }));
-                }
+                // AXIOMA DE IGNICIÓN INCONDICIONAL: 
+                // Aún sin schemas, el Satélite asume control y la UI debe montar.
+                console.log("🟢 [Bridge] Modo SOBERANO ready.");
+                this._setStatus('READY'); 
+                window.dispatchEvent(new CustomEvent("indra-resonance-sync", { detail: { mode: 'LOCAL_READY' } }));
 
                 // --- FASE 2: RESONANCIA AGRUPADA (EL RAYO) ---
                 const linkData = localStorage.getItem('INDRA_SATELLITE_LINK');
