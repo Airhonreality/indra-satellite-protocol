@@ -1,11 +1,11 @@
 /**
  * ARTEFACTO: AgnosticVault.js
  * CAPA: Lógica de Negocio (Soberanía) / Dispatcher de Estado
- * AXIOMA APLICADO: Soberanía del Satélite
+ * AXIOMA APLICADO: Soberanía del Satélite (v15.0)
  * 
  * RESPONSABILIDAD:
  * Fuente de verdad única y proactiva. Permite suscripciones granulares
- * y gestiona la persistencia local automática.
+ * y gestiona la persistencia local automática (Hidratación Silenciosa).
  */
 
 export class AgnosticVault {
@@ -13,6 +13,8 @@ export class AgnosticVault {
         this.bridge = bridge;
         this.listeners = new Map();
         this.data = this._loadFromStorage();
+        
+        console.log("🔒 [AgnosticVault] Memoria Soberana hidratada.");
     }
 
     /**
@@ -40,6 +42,7 @@ export class AgnosticVault {
             this._saveToStorage();
         }
 
+        // Notificación de Reactividad
         if (this.listeners.has(key)) {
             this.listeners.get(key).forEach(callback => callback(value));
         }
@@ -48,6 +51,9 @@ export class AgnosticVault {
         if (this.listeners.has('*')) {
             this.listeners.get('*').forEach(callback => callback(key, value));
         }
+
+        // Emitir evento global para reactividad nativa (Zero Config)
+        window.dispatchEvent(new CustomEvent(`indra-vault-change:${key}`, { detail: value }));
     }
 
     /**
@@ -58,6 +64,7 @@ export class AgnosticVault {
     }
 
     _saveToStorage() {
+        console.log("💾 [Vault] Snapshot persistido en silencio.");
         localStorage.setItem('INDRA_VAULT_SNAPSHOT', JSON.stringify(this.data));
     }
 
