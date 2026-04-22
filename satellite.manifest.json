@@ -1,0 +1,34 @@
+{
+  "entity": "INDRA_SATELLITE",
+  "metadata": {
+    "name": "Indra Satellite Seed",
+    "version": "1.0.0",
+    "required_core": "v16.2.0-shield",
+    "status": "INDUSTRIAL_READY",
+    "last_resonance": "2026-04-22"
+  },
+  "structure": {
+    "bootloader": "./_INDRA_PROTOCOL_/indra_hub.js",
+    "config": "./indra_config.js",
+    "entry_point": "./src/app_veta.js"
+  },
+  "agent_directives": {
+    "bootstrap_priority": [
+      "README.md",
+      "satellite.manifest.json",
+      "git_protocol.md",
+      "docs/IGNITION_FLOW.md",
+      "docs/REACTIVITY_GUIDE.md"
+    ],
+    "protection_rules": [
+      "READ_ONLY: _INDRA_PROTOCOL_ folder is the core engine.",
+      "WRITE_ALLOWED: /src/ is the business satellite area.",
+      "CONFIG_OVERRIDE: Always use indra_config.js for local pathing."
+    ],
+    "canonical_sync_routine": [
+      "1. Check required_core vs HUB_VERSION in _INDRA_PROTOCOL_/indra_hub.js",
+      "2. Run 'git submodule update --remote' if out of sync",
+      "3. Verify indra_config.js exists (copy from sample if missing)"
+    ]
+  }
+}

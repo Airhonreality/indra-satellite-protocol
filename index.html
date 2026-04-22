@@ -76,20 +76,10 @@
     <!-- Contenedor Maestro para el SmartShell -->
     <div id="app-root"></div>
 
-    <!-- Scripts de la Semilla -->
-    <script type="module" src="./src/main.js"></script>
-
-    <script>
-        // Ocultar loader cuando el Bridge reporte READY
-        window.addEventListener('indra-resonance-sync', (e) => {
-            if (e.detail && (e.detail.mode === 'STABLE' || e.detail.mode === 'READY')) {
-                const loader = document.getElementById('indra-loader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 500);
-                }
-            }
-        });
-    </script>
+    <!-- 
+       BOOSTRAP AXIAL (SDK v16.1) 
+       El Hub se encarga de cargar el Satélite definido en indra_config.js
+    -->
+    <script type="module" src="./_INDRA_PROTOCOL_/indra_hub.js"></script>
 </body>
 </html>

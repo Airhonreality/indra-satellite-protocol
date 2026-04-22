@@ -5,8 +5,8 @@
  * AXIOMA: Hidratación Bajo Demanda (On-Demand Hydration)
  * =============================================================================
  */
-import { appState } from './app_state.js';
-import { AgnosticVault, PersistencePolicy } from './logic/AgnosticVault.js';
+import { AgnosticVault, PersistencePolicy } from './bridge_modules/AgnosticVault.js';
+
 
 export class IndraKernel {
     constructor(bridge) {
@@ -60,11 +60,6 @@ export class IndraKernel {
                 // El Vault decide si persiste basado en la política
                 const policy = options.policy || PersistencePolicy.VOLATILE;
                 this.vault.commit(schemaAlias, response.items, policy);
-                
-                // Notificar al estado reactivo (appState) para compatibilidad
-                if (typeof appState?.resonateWithCore === 'function') {
-                    appState.resonateWithCore(response.items, schemaAlias);
-                }
                 
                 return response.items;
             }

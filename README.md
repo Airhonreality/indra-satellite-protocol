@@ -1,16 +1,22 @@
-# 🛰️ INDRA SATELLITE PROTOCOL (v5.0_RESONANCE - Live DNA)
+# 🛰️ INDRA SATELLITE OS (SDK v16.3 Industrial)
 
-![Indra](https://img.shields.io/badge/Status-Live_Resonant-purple)
-![Architecture](https://img.shields.io/badge/Architecture-Direct_Nexus-blue)
-![DNA](https://img.shields.io/badge/DNA-Logic_Native_JS-emerald)
+> [!IMPORTANT]
+> **🤖 AGENCY_BOOTSTRAP (LLM Entry Point)**
+> Si eres un agente de IA, sigue esta secuencia lineal para entender e interactuar con este repositorio:
+> 1. Leer `satellite.manifest.json` (DNI y Directivas).
+> 2. Leer `git_protocol.md` (Mantenimiento de Órbita).
+> 3. Consultar `docs/IGNITION_FLOW.md` (Jerarquía de Carga).
+> 4. **REGLA DE ORO**: No edites nada dentro de `_INDRA_PROTOCOL_`. Toda personalización ocurre en `/src/` o `indra_config.js`.
 
-## 🧬 El Paradigma de "Resonancia en Vivo"
-En la versión 5.0, Indra abandona definitivamente la necesidad de procesos de construcción intermedios para el desarrollo. El ADN del satélite es **Código Vivo** que el navegador orquesta directamente con el Core.
+## 🧬 El Paradigma de "Resonancia Autónoma"
+En la versión 16.3, Indra se consolida como un **SDK Industrial**. El Satélite ya no es una "página con scripts", es una entidad soberana que corre sobre el **Indra Hub (Bootloader)**.
 
-### ⚡ Beneficios Clave
-1.  **Latencia Cero**: Los cambios en tus esquemas se reflejan al instante gracias al cargador dinámico.
-2.  **Lógica en ADN**: Puedes incluir funciones de transformación y validación directamente en tus objetos de esquema JS.
-3.  **Sincronización Core-Direct**: El satélite puede comunicarse directamente con el Core de Indra para obtener la verdad global sin pasar por scripts de Node.
+### ⚡ Pilares de la v16.3
+1.  **Hub-Centricity**: Un único punto de entrada (`indra_hub.js`) que orquesta el Bridge, el Kernel y el HUD.
+2.  **Shadow Isolation**: La interfaz de control (HUD) está blindada en un Shadow DOM, inmune al CSS del satélite.
+3.  **Zero-Config Ignition**: Capacidad de arranque automático sin archivos de configuración obligatorios.
+4.  **Agentic Discovery**: Arquitectura diseñada para que IAs puedan mantener y escalar el código sin fricción.
+
 
 ---
 
@@ -35,29 +41,26 @@ Para que un Satélite sea verdaderamente soberano, **no debe asumir nada** sobre
 
 ---
 
-## 🏗️ Cómo usar el Bridge en tu App (Patrón onReady)
+## 🏗️ Cómo crear tu Satélite (Contrato de Ignición)
+
+Para que el Hub pueda cargar tu lógica, tu archivo principal (ej. `/src/app.js`) debe exportar una función estándar:
 
 ```javascript
-import IndraBridge from './_INDRA_PROTOCOL_/core/IndraBridge.js';
+/* src/app.js */
 
-// 1. Instanciar (Se auto-ignicia si hay sesión previa)
-const bridge = new IndraBridge();
+export async function ignite(bridge, kernel) {
+    console.log("🚀 Motor Indra listo. Iniciando negocio.");
+    
+    // 1. Usar el Bridge para traer datos
+    const data = await bridge.execute({ protocol: 'TABULAR_STREAM', schema_id: 'master_inventory' });
 
-// 2. Renderizar Chasis Inmediatamente
-renderChasis(); 
-
-// 3. Suscribirse a la Gasolina
-bridge.onReady((b) => {
-    console.log("🚀 Motor listo. Hidratando datos...");
-    const inventory = await b.execute({ protocol: 'TABULAR_STREAM', ... });
-    renderContent(inventory);
-});
-
-// 4. (Opcional) Reaccionar a cambios de estado
-bridge.onStateChange = (b, event, data) => {
-    console.log(`Estado: ${b.status}`); // GHOST, IGNITING, READY, ERROR
-};
+    // 2. Usar el Kernel para hidratar esquemas reactivos
+    await kernel.hydrateSchema('ventas');
+    
+    // 3. Montar tu UI (React, Vanilla, etc.)
+}
 ```
+
 
 ---
 

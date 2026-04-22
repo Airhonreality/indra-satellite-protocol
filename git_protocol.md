@@ -1,49 +1,40 @@
-# PROTOCOLO DE CONCURRENCIA GIT // INDRA OS
-**Versión:** 1.0 (Refinería Satélite)
-**Responsable:** Antigravity (IA de Onboarding)
+# 🛰️ INDRA GIT PROTOCOL (Mantenimiento de Órbita)
 
-## 1. ESTRUCTURA DE RAMAS (DOMINIOS)
+Este documento define el canon para mantener la sincronía entre el **Satélite** (tu proyecto) y el **Core** (el motor Indra).
 
-El sistema opera bajo un modelo de **Neural Split**, donde la lógica del Core y del Satélite deben coexistir sin colisionar:
+## 1. La Arquitectura Dual
+Indra OS no vive en tu repositorio principal, vive en un **Submódulo**. Esto permite que el motor evolucione independientemente de tu lógica de negocio.
 
-- `main`: (SAGRADA) Solo código que ha pasado el Centinela (Linter) y el Build de producción.
-- `dev/ledger`: Cambios en la persistencia (clase `Ledger` y `SovereignIntelligenceProvider`).
-- `dev/video-engine`: Refactorizaciones del motor de transcodificación y workers.
-- `feat/ui-v6`: Todas las implementaciones estéticas de HUD y Proyecciones.
+*   **Tu Repo (Satélite)**: Contiene tu carpeta `/src`, tus estilos y tu configuración.
+*   **Carpeta `_INDRA_PROTOCOL_`**: Es un túnel hacia el motor oficial.
 
-## 2. EL CENTINELA (BUILD & LINT)
+## 2. Flujos Canónicos para Humanos e IAs
 
-**REGLA DE ORO:** Nunca realices un `git push` sin que el Satélite esté en verde.
+### A. Actualizar el Motor (Core Pull)
+Si sale una nueva versión del Bridge o del Hub, debes traerla sin romper tu código:
+```bash
+# Desde la raíz del Satélite
+git submodule update --remote --merge
+```
 
-### Comandos de Validación:
-1. `npm run lint`: Valida la sintaxis. Solo se permiten `warnings` de variables no usadas (deuda técnica). Cero `errors` permitidos.
-2. `npm run build`: Valida la compilación productiva de Vite. Si este comando falla, el despliegue en GitHub Actions fallará inevitablemente.
+### B. Guardar Cambios del Satélite
+Cuando termines una funcionalidad en tu carpeta `/src`:
+```bash
+git add .
+git commit -m "feat: nueva lógica de cotización en veta"
+git push
+```
 
-## 3. EL AXIOMA DEL "ÍNDICE 0"
+### C. Contribuir al Core (Solo Desarrolladores Senior)
+Si encuentras un bug en el motor y quieres arreglarlo para todos:
+1. Entra en `_INDRA_PROTOCOL_`.
+2. Haz tus cambios.
+3. Haz commit y push **dentro** de esa carpeta.
+4. Sal a la raíz y haz commit del "pointer" del submódulo.
 
-Al realizar cambios en `provider_system_ledger.gs` o en componentes que consumen datos del Core:
-- Siempre verifica que el mapeo de columnas respete el desfase de la cabecera.
-- Las funciones de `DataProjector` son las únicas autorizadas para mutar estructuras de arrays crudos en objetos de UI.
-
-## 4. PROCEDIMIENTO DE PUSH
-
-1. **Sincronización:** `git pull origin main`.
-2. **Purificación:** `npx eslint "src/**/*.{js,jsx}" --quiet`.
-3. **Cimentación:** `npm run build`.
-4. **Ignición:** `git add . && git commit -m "feat/fix: [Componente] Descripción técnica breve" && git push`.
-
-## 5. NOTA PARA AUDITORES
-
-Si encuentras bloques `catch(e) { /* ignore */ }`, es un diseño deliberado para evitar interrupciones en el flujo de "Handshake Micelar" durante fallos de red menores que el sistema está preparado para reintentar.
-
----
-## 6. LEYES PARA AGENTES AI (ANTIGRAVITY)
-
-Como entidad de asistencia codificante, el Agente debe seguir estas leyes para garantizar la estabilidad del sistema:
-
-1. **Axioma del Balance Visual:** Antes de proponer un `replace_file_content` sobre JSX, el Agente debe realizar un conteo mental de apertura y cierre de etiquetas. Ningún componente debe quedar con un `header`, `div` o `section` huérfano.
-2. **Purificación Preventiva:** Antes de cada `git push`, el Agente TIENE la obligación de intentar correr `npx eslint` sobre los archivos modificados. El desconocimiento del error no exime de la responsabilidad del fallo en el build.
-3. **Sinceridad de Commit:** Si un build falla en producción por culpa del Agente, el commit de reparación debe ser explícito: `fix: [Agent Correction] Sintaxis JSX restaurada`.
+## 3. Resolución de Conflictos
+*   **REGLA DE ORO**: Nunca hagas commit de cambios en `_INDRA_PROTOCOL_` a menos que sepas que estás modificando el motor global.
+*   Si un `git pull` falla por archivos en el protocolo, usa `git checkout _INDRA_PROTOCOL_` para resetear el motor a su estado oficial.
 
 ---
-*Independencia, Sinceridad, Soberanía.*
+*Indra OS - Git Protocol v16.3*
