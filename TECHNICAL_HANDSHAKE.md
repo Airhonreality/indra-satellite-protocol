@@ -1,4 +1,4 @@
-# 🤝 TECHNICAL HANDSHAKE: Guía de Programación Industrial (v15.0)
+# 🤝 TECHNICAL HANDSHAKE: Guía de Programación Industrial (v16.0)
 
 Este documento es el manual de operaciones tácticas para desarrolladores de Satélites Indra. Aquí termina la filosofía y empieza el determinismo.
 
@@ -16,19 +16,21 @@ bridge.execute({
 });
 ```
 
-### ✅ El Estándar Industrial (Enrutamiento por Identidad)
-Usa el método `resolveSilo()` para obtener la dirección física antes de llamar al Core.
+### ✅ El Estándar Industrial (v16.0)
+Usa `resolveSilo()` para obtener la identidad y `kernel.hydrateSchema()` para bajar los datos solo cuando sea necesario.
 
 ```javascript
-// 1. Obtener la llave maestra desde el contrato local
+// 1. Resolver Identidad
 const silo = bridge.resolveSilo('master_inventory');
 
-// 2. Ejecutar con puntería láser
-const response = await bridge.execute({
-    protocol: 'TABULAR_STREAM',
-    provider: silo.provider, // 'sheets'
-    context_id: silo.id      // '1ABC_ID_REAL_DE_LA_HOJA'
+// 2. Hidratar bajo demanda (v16.0)
+// Esto descarga los datos y los guarda en el Vault siguiendo políticas LRU
+await kernel.hydrateSchema('master_inventory', { 
+    policy: 'PERMANENT' // O 'TRANSIENT' para datos volátiles
 });
+
+// 3. Ejecutar (Opcional, si necesitas streaming puro)
+const data = vault.get('master_inventory');
 ```
 
 ---

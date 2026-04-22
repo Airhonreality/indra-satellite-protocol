@@ -1,7 +1,7 @@
-# 🧘 AXIOMAS Y DHARMAS DE INDRA (v15.0-INDUSTRIAL)
+# 🧘 AXIOMAS Y DHARMAS DE INDRA (v16.0-INDUSTRIAL)
 ### Constitución Existencial del Protocolo Satélite
 
-Este documento es tu **Ley Primera**. Define la naturaleza de la realidad en Indra v15.0. Cualquier desviación genera corrupción de datos y fallo en la sincronización.
+Este documento es tu **Ley Primera**. Define la naturaleza de la realidad en Indra v16.0. Cualquier desviación genera corrupción de datos y fallo en la sincronización.
 
 ---
 
@@ -45,6 +45,7 @@ Este documento es tu **Ley Primera**. Define la naturaleza de la realidad en Ind
 *   **Axioma de Resurrección de Sesión**: Toda transferencia peristáltica debe ser persistente. Si el Satélite muere, el Ticket de Ingesta debe permitir la reanudación exacta desde el último átomo cristalizado.
 *   **Axioma de la Transparencia Industrial**: El desarrollador del Satélite no debe gestionar la ráfaga; el Bridge debe automatizar la fragmentación basándose en el descubrimiento de capacidades del Núcleo.
 *   **Axioma de Jerarquía de Carga (Ingesta Fractal)**: Ningún pulso de datos tabular debe transportar binarios pesados. Si un átomo requiere cristalización de media, el Núcleo devolverá un "Ticket de Media" y el Bridge deberá orquestar su flujo peristáltico en un carril paralelo e independiente.
+*   **Axioma de Memoria Peristáltica (v16.0)**: El almacenamiento local no es un basurero; es un organismo vivo. Los datos se clasifican en **PERMANENTES** (Configuración) y **VOLÁTILES** (Materia de Negocio). Estos últimos están sujetos a evicción LRU cuando el silo excede los límites físicos del navegador.
 
 ---
 

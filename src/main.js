@@ -5,12 +5,10 @@
  */
 import IndraBridge from '../_INDRA_PROTOCOL_/core/IndraBridge.js';
 import { IndraKernel } from './score/IndraKernel.js';
-import { SmartShell } from './score/ui/SmartShell.js';
 
 // 1. Instanciación del Ecosistema
 const bridge = new IndraBridge();
 const kernel = new IndraKernel(bridge);
-const shell = new SmartShell(bridge);
 
 /**
  * Dharma: El Satélite se auto-configura si detecta un pacto previo.
@@ -18,8 +16,6 @@ const shell = new SmartShell(bridge);
 async function bootstrap() {
     console.log("🧬 [Seed] Iniciando secuencia de auto-configuración...");
 
-    // Montar la UI Inteligente (Si existe el contenedor estándar)
-    shell.mount('#app-root');
 
     try {
         // Ignición Silenciosa (Usa localStorage internamente si existe)
