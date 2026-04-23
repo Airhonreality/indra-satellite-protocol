@@ -1,11 +1,16 @@
 /**
- * ARTEFACTO: AgnosticVault.js
- * CAPA: Data Persistence (Cache & State)
- * ARCHITECTURE v16.0: Peristaltic Memory & Intelligent Eviction
- * 
- * RESPONSABILIDAD:
- * Centros de datos reactivo con políticas de persistencia diferenciadas.
- * Implementa un motor LRU para evitar la saturación del LocalStorage.
+ * =============================================================================
+ * 🏛️ INDRA AXIOMATIC MODULE: AGNOSTIC VAULT (v17.5 OMEGA)
+ * =============================================================================
+ * DHARMA: Garantizar la permanencia de la materia estructural (Memoria T=0).
+ * RESPONSABILIDADES:
+ *   - Gestión de persistencia local (LocalStorage).
+ *   - Implementación de algoritmos de evicción (LRU) e integridad (TTL).
+ *   - Sincronización transparente con el Bridge.
+ * ANTI-DHARMA: 
+ *   - NO debe contener lógica de negocio ni validación de esquemas.
+ *   - NO debe emitir eventos de UI (solo eventos de sinapsis de estado).
+ * =============================================================================
  */
 
 export const PersistencePolicy = {
@@ -49,84 +54,66 @@ export class AgnosticVault {
     }
 
     /**
-     * @standard Inyecta datos en el Vault aplicando políticas de persistencia.
+     * @standard Inyecta datos en el Vault aplicando políticas de persistencia y TTL opcional.
      */
-    commit(key, value, policy = PersistencePolicy.VOLATILE) {
+    commit(key, value, policy = PersistencePolicy.VOLATILE, ttlMs = null) {
         this.cache.set(key, value);
         this.policies[key] = policy;
         this.accessRegistry[key] = Date.now();
 
+        const expires = ttlMs ? Date.now() + ttlMs : null;
+
         if (policy === PersistencePolicy.CRITICAL) {
-            this._persistToStorage(key, value);
+            this._persistToStorage(key, value, expires);
         } else {
-            // Gestión Peristáltica: Intentar persistir pero validar límites
-            this._managedPersistence(key, value);
+            this._managedPersistence(key, value, expires);
         }
 
         this._notify(key, value);
     }
 
     get(key) {
+        const entry = this.cache.get(key);
+        if (!entry) return null;
+
+        // Validación de Integridad Temporal
+        if (entry.expires && Date.now() > entry.expires) {
+            console.log(`⏳ [Vault] Expulsando materia caducada: ${key}`);
+            this.delete(key);
+            return null;
+        }
+
         this.accessRegistry[key] = Date.now();
-        return this.cache.get(key);
+        return entry.data !== undefined ? entry.data : entry;
     }
 
-    _notify(key, value) {
-        if (this.listeners.has(key)) {
-            this.listeners.get(key).forEach(cb => cb(value));
-        }
-        window.dispatchEvent(new CustomEvent(`indra-vault-change:${key}`, { detail: value }));
+    delete(key) {
+        this.cache.delete(key);
+        delete this.accessRegistry[key];
+        localStorage.removeItem(`INDRA_V16_${key}`);
+        this._notify(key, null);
     }
 
-    /**
-     * Persistencia Controlada con motor de Evicción LRU
-     */
-    _managedPersistence(key, value) {
-        try {
-            this._persistToStorage(key, value);
-            this._checkStorageLimits();
-        } catch (e) {
-            console.warn(`⚠️ [Vault] LocalStorage lleno. Iniciando Evicción de materia vieja...`);
-            this._evictOldest();
-            try { this._persistToStorage(key, value); } catch (err) { console.error("❌ [Vault] Fallo crítico de persistencia."); }
-        }
-    }
-
-    _persistToStorage(key, value) {
+    _persistToStorage(key, value, expires = null) {
         const storageKey = `INDRA_V16_${key}`;
-        localStorage.setItem(storageKey, JSON.stringify(value));
+        const entry = {
+            data: value,
+            expires: expires,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(storageKey, JSON.stringify(entry));
         localStorage.setItem('INDRA_VAULT_REGISTRY', JSON.stringify(this.accessRegistry));
     }
 
-    _checkStorageLimits() {
-        let totalSize = 0;
-        for (let i = 0; i < localStorage.length; i++) {
-            totalSize += localStorage.getItem(localStorage.key(i)).length;
-        }
-        
-        if (totalSize > STORAGE_LIMIT_BYTES) {
+    _managedPersistence(key, value, expires = null) {
+        try {
+            this._persistToStorage(key, value, expires);
+            this._checkStorageLimits();
+        } catch (e) {
+            console.warn(`⚠️ [Vault] LocalStorage lleno. Iniciando Evicción...`);
             this._evictOldest();
+            try { this._persistToStorage(key, value, expires); } catch (err) { console.error("❌ [Vault] Fallo crítico."); }
         }
-    }
-
-    /**
-     * Algoritmo LRU: Elimina el elemento TRANSIENTE menos usado recientemente.
-     */
-    _evictOldest() {
-        const transientes = Object.keys(this.accessRegistry).filter(k => 
-            this.policies[k] === PersistencePolicy.VOLATILE
-        );
-
-        if (transientes.length === 0) return;
-
-        const oldestKey = transientes.reduce((a, b) => 
-            this.accessRegistry[a] < this.accessRegistry[b] ? a : b
-        );
-
-        console.log(`🧹 [Vault:Eviction] Liberando espacio: Eliminando "${oldestKey}"`);
-        localStorage.removeItem(`INDRA_V16_${oldestKey}`);
-        delete this.accessRegistry[oldestKey];
-        // Nota: Mantenemos en RAM (cache) pero liberamos disk
     }
 
     _hydrateFromStorage() {
@@ -138,12 +125,19 @@ export class AgnosticVault {
                 const key = localStorage.key(i);
                 if (key.startsWith('INDRA_V16_')) {
                     const cleanKey = key.replace('INDRA_V16_', '');
-                    const data = JSON.parse(localStorage.getItem(key));
-                    this.cache.set(cleanKey, data);
+                    const entry = JSON.parse(localStorage.getItem(key));
+                    
+                    // Si ha caducado durante el letargo, lo purgamos
+                    if (entry.expires && Date.now() > entry.expires) {
+                        localStorage.removeItem(key);
+                        continue;
+                    }
+                    
+                    this.cache.set(cleanKey, entry);
                 }
             }
         } catch (e) {
-            console.warn("[Vault] Error en hidratación inicial.");
+            console.warn("[Vault] Error en hidratación.");
         }
     }
 }

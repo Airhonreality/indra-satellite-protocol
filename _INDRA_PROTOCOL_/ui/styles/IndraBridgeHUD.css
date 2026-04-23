@@ -4,8 +4,14 @@
  * =============================================================================
  */
 
-:host {
+indra-bridge-hud {
     display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100000;
+    pointer-events: none;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     --indra-accent: #007AFF;
     --indra-success: #34C759;
@@ -20,6 +26,7 @@
 }
 
 .hud-container {
+    pointer-events: auto;
     display: flex;
     flex-direction: column;
     background: var(--indra-bg);

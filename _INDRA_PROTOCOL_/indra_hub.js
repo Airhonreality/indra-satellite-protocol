@@ -1,109 +1,100 @@
 /**
- * ☢️ INDRA HUB (The Bootloader) - SDK v16.2 Industrial Shield
- * RESPONSABILIDAD: Orquestación axial, aislamiento y carga defensiva.
- * -----------------------------------------------------------------------------
- * ⚠️ ADVERTENCIA: Este es un archivo del Núcleo de Indra OS.
- * Su modificación compromete la estabilidad industrial y las actualizaciones.
- * -----------------------------------------------------------------------------
+ * =============================================================================
+ * 🏛️ INDRA AXIOMATIC MODULE: INDRA HUB (v17.5 OMEGA)
+ * =============================================================================
+ * DHARMA: Actuar como el punto de ignición único (Bootloader) para el 
+ *         despertar del ecosistema Indra en el entorno local.
+ * RESPONSABILIDADES:
+ *   - Orquestación de la carga inicial de Identidad y Configuración.
+ *   - Inyección del panel de control (BridgeHUD).
+ *   - Despertar de la aplicación del satélite vía ignite().
+ * ANTI-DHARMA: 
+ *   - NO debe contener lógica de negocio específica.
+ *   - NO debe manejar peticiones de red directas (debe usar el Bridge).
+ * =============================================================================
  */
 
 import IndraBridge from './core/IndraBridge.js';
 import { IndraKernel } from './core/IndraKernel.js';
-
-const HUB_VERSION = "16.2.0";
-
-// --- MOTOR DE EMERGENCIA ---
-const EMERGENCY_TIMEOUT = 6000;
-let bootTimedOut = false;
-
-function showEmergencyUI(errorType, message) {
-    bootTimedOut = true;
-    const overlay = document.createElement('div');
-    overlay.style = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: #000; color: #ff3b30; z-index: 1000000;
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-        font-family: 'JetBrains Mono', monospace; padding: 40px; text-align: center;
-    `;
-    overlay.innerHTML = `
-        <div style="font-size: 40px; margin-bottom: 20px;">⚠️</div>
-        <div style="font-size: 14px; font-weight: bold; margin-bottom: 15px;">HUB_BOOT_FAILURE: ${errorType}</div>
-        <div style="font-size: 11px; color: #fff; max-width: 600px; line-height: 1.6;">${message}</div>
-        <button onclick="location.reload()" style="margin-top: 30px; background: #fff; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold;">REINTENTAR IGNICIÓN</button>
-    `;
-    document.body.appendChild(overlay);
-}
+import { UI } from './IndraUI.js';
 
 async function bootstrap() {
-    console.log(`%c 💎 INDRA HUB v${HUB_VERSION} `, "background: #000; color: #00ffc8; font-weight: bold; padding: 4px; border-radius: 4px;");
+    console.log("%c 💎 [PROTOCOLO] INDRA HUB V17.0 - AXIOMATIC CARGADO ", "background: #000; color: #007AFF; font-weight: bold; padding: 10px; border: 1px solid #007AFF;");
 
-    // 1. Instanciación del Ecosistema
+    // 1. Instanciación
+    console.log("🚀 [HUB] 1. Instanciando ecosistema...");
     const bridge = new IndraBridge();
     const kernel = new IndraKernel(bridge);
+    kernel.UI = UI; // Inyectamos el catálogo dinámico
     window.indra = { bridge, kernel };
 
-    // 2. Inyección Defensiva (Punto 3: Shadow DOM)
+    // 2. HUD
+    console.log("🚀 [HUB] 2. Inyectando panel de control...");
     try {
-        await import('./ui/IndraBridgeHUD.js');
-        const container = document.createElement('div');
-        container.id = "indra-os-shield";
-        // Aislamos el HUD en un Shadow Root para que el CSS del usuario no lo rompa
-        const shadow = container.attachShadow({ mode: 'open' });
-        
-        // El HUD webcomponent se monta dentro del shadow
-        const hud = document.createElement('indra-bridge-hud');
-        shadow.appendChild(hud);
-        
-        // Inyectamos el CSS del HUD dentro del Shadow para aislamiento total
-        const styleLink = document.createElement('link');
-        styleLink.rel = 'stylesheet';
-        styleLink.href = './_INDRA_PROTOCOL_/ui/styles/IndraBridgeHUD.css';
-        shadow.appendChild(styleLink);
-
-        document.body.appendChild(container);
+        await import('./ui/IndraBridgeHUD.js?v=V17_OMEGA_ZERO');
+        const hud = document.createElement('indra-bridge-v17');
+        // Obligamos a que sea un bloque visible sobre todo
+        hud.style = "position: fixed; top: 0; left: 0; z-index: 1000000; display: block; width: 100%; height: 100%; pointer-events: none;";
+        document.body.appendChild(hud);
         hud.bridge = bridge;
+
+        // Escuchamos la acción principal del HUD (Botón Connect)
+        hud.addEventListener('indra-master-action', async () => {
+            console.log("⚡ [HUB] Acción maestra recibida del HUD. Iniciando Bridge...");
+            await bridge.init();
+            hud.sync(); // Forzamos actualización visual
+        });
+
+        console.log("✅ [HUB] 2.1. Panel inyectado y vinculado.");
     } catch(e) {
-        console.warn("🛡️ [Hub] Fallo en inyección de escudo visual.");
+        console.error("❌ [HUB] 2.2. ERROR cargando HUD:", e);
     }
 
-    // 3. Resolución de Órbita (Lógica Inteligente)
-    let config = { active_satellite: '../src/app_veta.js' }; 
-    const bootTimer = setTimeout(() => {
-        if (!bootTimedOut) showEmergencyUI("SATELLITE_TIMEOUT", "El satélite está tardando demasiado en responder. Revisa la ruta en indra_config.js.");
-    }, EMERGENCY_TIMEOUT);
+    // 3. Ignición y Carga de ADN (Manifiesto)
+    let hubConfig = { active_satellite: '../src/app.js' };
+    let manifestData = {};
 
     try {
-        const customConfig = await import('../indra_config.js');
-        config = { ...config, ...customConfig.INDRA_CONFIG };
+        const manifestRes = await fetch('../satellite.manifest.json');
+        manifestData = await manifestRes.json();
+        console.log("🧬 [HUB] ADN del Satélite cargado:", manifestData.metadata?.name);
     } catch (e) {
-        console.log("ℹ️ [Hub] Modo Zero-Config.");
+        console.log("ℹ️ [HUB] 3. Usando configuración por defecto (Inercia detectada).");
     }
 
-    // 4. Ignición y Handshake (Punto 4: Versiones)
     try {
+        console.log("🚀 [HUB] 4. Sincronizando puente con el Core...");
+        
+        // Identidad básica del manifiesto
+        bridge.contract = { 
+            ...(bridge.contract || {}), 
+            satellite_name: manifestData.metadata?.name || "Indra Nodo",
+            version: manifestData.metadata?.version 
+        };
+
+        // El Bridge se encarga de su propia hidratación física vía Cortex
         await bridge.init();
         
-        if (config.active_satellite) {
-            const satellite = await import(config.active_satellite);
-            
-            // Handshake de Versión: Exigimos una versión mínima si está definida
-            const minCore = satellite.METADATA?.min_core_version || "16.1.0";
-            if (minCore > HUB_VERSION) {
-                clearTimeout(bootTimer);
-                showEmergencyUI("CORE_OUTDATED", `El satélite requiere la versión ${minCore} de Indra Hub. Estás ejecutando la ${HUB_VERSION}. Por favor, haz Git Pull del protocolo.`);
-                return;
-            }
-
-            if (typeof satellite.ignite === 'function') {
-                await satellite.ignite(bridge, kernel);
-                clearTimeout(bootTimer); // Ignición exitosa
-            } else {
-                showEmergencyUI("CONTRACT_VIOLATION", "El satélite no exporta la función 'ignite'.");
-            }
+        if (bridge.status === 'READY') {
+            console.log("✅ [HUB] 4.1. Puente RESONANTE (Conexión establecida).");
+            window.dispatchEvent(new CustomEvent('indra-core-synced'));
+        } else if (bridge.status === 'ORPHAN') {
+            console.log("🟡 [HUB] 4.1. Puente HUÉRFANO (Operando en Modo Local).");
+            window.dispatchEvent(new CustomEvent('indra-core-synced'));
+        }
+        
+        console.log("🚀 [HUB] 5. Despertando Satélite:", hubConfig.active_satellite);
+        const satellite = await import(/* @vite-ignore */ hubConfig.active_satellite);
+        
+        if (satellite && typeof satellite.ignite === 'function') {
+            console.log("🚀 [HUB] 6. Ejecutando ignite()...");
+            await satellite.ignite(bridge, kernel);
+            console.log("✅ [HUB] 6.1. Ignición exitosa.");
+        } else {
+            console.warn("⚠️ [HUB] 6.2. El satélite no exporta la función ignite().");
         }
     } catch (error) {
-        clearTimeout(bootTimer);
-        showEmergencyUI("CRITICAL_CRASH", error.message);
+        console.error("❌ [HUB] CRASH EN LOGICA DE IGNICIÓN:", error);
     }
 }
 
