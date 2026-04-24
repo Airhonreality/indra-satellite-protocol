@@ -146,7 +146,7 @@ export default defineConfig({
   server: {
     port: 3005, // Puerto independiente virgen para evitar colisión de caché
     watch: {
-      ignored: ['**/indra_config.js', '**/scores/**']
+      ignored: ['**/indra_config.js', '**/score/**']
     }
   }
 });
