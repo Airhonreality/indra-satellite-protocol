@@ -1,47 +1,47 @@
-# 🛰️ INDRA GIT PROTOCOL (Handbook Operativo v17.0)
+# 🛰️ INDRA GIT PROTOCOL (Handbook Operativo v1.0 SEED)
 
-Este documento define el canon para construir, mantener y sincronizar Satélites Indra. Es la "Semilla de Instrucciones" para desarrolladores e IAs.
+Este documento es el mapa para que cualquier Arquitecto, desde cualquier rincón de la Malla (incluyendo zonas de baja conectividad como la Patagonia), pueda levantar y mantener su Satélite con total soberanía.
 
-## 1. Bootstrap de Satélite (Cold Start)
-Para levantar un satélite desde cero en un repositorio vacío, sigue esta secuencia:
+## 1. El Portal de Entrada (Descarga Quirúrgica)
+Para no contaminar tu disco y ahorrar ancho de banda, descarga **únicamente** la semilla del Satélite:
 
 ```bash
-# 1. Clonación del Motor y Estructura Base
-git clone --recursive https://github.com/Airhonreality/indra-os.git .
+# 1. Clonación del Satélite Semilla (Lanzamiento Independiente)
+git clone https://github.com/Airhonreality/indra-satellite-protocol.git MiSatelite
 
-# 2. Instalación de Dependencias del Núcleo
-cd system_core/client
+# 2. Entrada al Nodo
+cd MiSatelite
+
+# 3. Instalación de Dependencias (Motor Vite)
 npm install
 
-# 3. Ignición del Servidor de Sincronía (Vite)
+# 4. Ignición
 npm run dev
 ```
 
-## 2. El Ciclo de Sincronía Automática
-A diferencia de los frameworks tradicionales, el Satélite Indra no requiere edición manual de archivos de configuración inicial.
+## 2. El Axioma de la Paz Estructural (Soberanía de Código)
+Para que puedas actualizar tu Satélite sin que el motor oficial borre tu lógica de negocio, el sistema se divide en dos dimensiones:
 
-1.  **Handshake**: Abre `localhost:3000` y sube los datos al HUD.
-2.  **Persistencia Física**: Al pulsar "PERSISTIR EN DISCO", el servidor Vite reescribirá automáticamente `indra_config.js`. No lo hagas a mano.
-3.  **Escritura de Esquemas (PULL)**: Usa el botón **PULL** en el HUD para materializar esquemas del Core en tu carpeta `src/scores/`. El sistema creará los archivos `.js` por ti.
+| Dimensión | Carpeta | Regla de Oro |
+| :--- | :--- | :--- |
+| **EL MOTOR** | `/_INDRA_PROTOCOL_/` | **NO TOCAR.** Esta carpeta pertenece al Núcleo de Indra. Cualquier actualización oficial solo impactará aquí. |
+| **EL ALMA** | `/src/` | **TU SOBERANÍA.** Aquí construyes tu flujo, tus pantallas y tus esquemas. Git respetará tus cambios aquí. |
 
-## 3. Reglas de Soberanía (Mantenimiento)
+## 3. Protocolo de Actualización (Safe Pull)
+Cuando el equipo de Indra lance una mejora en el motor (ej: parches de resiliencia de red), sigue este ritual para actualizarte sin miedo:
 
-### A. Actualización del Motor (Submódulos)
-Indra evoluciona de forma independiente. Si hay cambios en el núcleo:
-```bash
-git submodule update --remote --merge
-```
+1.  **Asegura tu Materia**: Haz un commit de tus cambios en `/src`.
+    `git add . && git commit -m "Mi progreso local"`
+2.  **Invoca la Actualización**:
+    `git pull origin main`
+3.  **Resolución de Resonancia**: 
+    - Si hay conflictos en `/_INDRA_PROTOCOL_`, prioriza siempre `ours` (lo oficial).
+    - Si hay conflictos en `src/app.js` (el punto de encuentro), fúndelos con cuidado. Tu lógica vive en tus Materializadores.
 
-### B. Mantenimiento del Satélite (Tu Negocio)
-Todo lo que ocurra fuera de `_INDRA_PROTOCOL_` es tu territorio. 
-*   **Carpeta `/src`**: Tu lógica soberana.
-*   **Carpeta `/public`**: Tus assets.
-*   **Precepto**: Nunca modifiques el contenido de la carpeta `/public/indra-satellite-protocol/_INDRA_PROTOCOL_` a menos que desees proponer cambios al núcleo global.
-
-## 4. Resolución de Conflictos Industriales
-*   **Reset de Motor**: Si el protocolo se corrompe en tu local, usa `git checkout -- _INDRA_PROTOCOL_`.
-*   **Drift de Sincronía**: Si el HUD muestra un error de handshake, verifica que tu `indra_config.js` coincide con el puerto de tu servidor de datos remoto.
-*   **Integridad Visual**: No introduzcas CSS que rompa la fluidez del chasis de Indra. Cualquier hardcodeo de `px` se considera un "Drift Maligno" que debe ser corregido antes del push.
+## 4. Despliegue en Producción (GitHub Pages)
+Este repositorio está pre-configurado para Producción. 
+- Al subirlo a GitHub Pages, el sitio servirá `index.html` (Tu App).
+- Conservarás el acceso a `architect.html` para configuración privada.
 
 ---
-*Indra OS - Git Protocol v17.0 Axiomatic* 🛰️💎🔥
+*Indra OS - Git Protocol v1.0 Sovereign Seed* 🛰️💎🔥
