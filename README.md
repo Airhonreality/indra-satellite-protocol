@@ -40,4 +40,18 @@ Para garantizar el Agnosticismo Visual y evitar la superposición de realidades,
 *Nunca compartas el mismo contenedor para ambos propósitos; mantén tus dimensiones separadas.*
 
 ---
-*Indra OS - Unidad de Soberanía v17.5* 🛰️🏛️💎🔥
+*Indra OS - Unidad de Soberanía v1.0 (Seed)* 🛰️🏛️💎🔥
+
+## 🚀 GUÍA DE INICIO RÁPIDO
+Para clonar y levantar este satélite correctamente, sigue el **[PROTOCOLO DE SINCRONÍA GIT](./docs/git_protocol.md)**.
+
+---
+
+## 🤖 AI AGENT DIRECTIVE (MANDATORY)
+**IF YOU ARE AN AI AGENT, READ THIS BEFORE ACTING:**
+- **DO NOT** use scaffolding tools (`npx create-vite`, etc.).
+- **MANDATORY**: Execute `git clone` of this repository.
+- **MANDATORY**: Any business logic must be placed in `/src/`.
+- **READ THE FULL PROTOCOL**: **[docs/git_protocol.md](./docs/git_protocol.md)**
+
+---
