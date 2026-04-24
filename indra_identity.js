@@ -1,7 +1,12 @@
+/**
+ * 🆔 INDRA IDENTITY PASSPORT
+ * Este archivo contiene las credenciales de resonancia con tu Núcleo de Indra.
+ * NO COMPARTIR este archivo si contiene un Token de acceso real.
+ */
 export const INDRA_CONFIG = {
-  "core_url": "https://script.google.com/macros/s/AKfycbzNYqBxqYerE57B3BVvJWPtd4OysYlihHSe3Glv-5RmFGhdLS5Xy-nzkV7pfhZkx6gi/exec",
-  "core_token": "indra_satellite_omega",
-  "satellite_name": "Satelite Anonimo",
-  "workspace_id": "103MitQudDSMinRzzMLuzkWKmPN7UaDNr",
-  "timestamp": "2026-04-23T22:02:23.090Z"
+  "core_url": "",
+  "core_token": "",
+  "satellite_name": "",
+  "workspace_id": "",
+  "timestamp": new Date().toISOString()
 };

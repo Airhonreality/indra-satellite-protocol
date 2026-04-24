@@ -17,6 +17,8 @@ Catatonia por Latencia (Blocking-Calls): Bloquear la ejecución de la UI en espe
 
 Deslocalización del ADN (Config-Pollution): Mezclar la lógica de negocio (src) con el motor (_INDRA_PROTOCOL_). Si actualizas el motor y pierdes tu negocio, el satélite ha muerto por infección estructural.
 
-Autismo de Nodo (Missing-Nexus): Implementar funciones que solo funcionan en local y que no pueden ser "exportadas" o compartidas con el ecosistema. Un satélite que no resuena con otros es solo una isla de entropía.
+20: Autismo de Nodo (Missing-Nexus): Implementar funciones que solo funcionan en local y que no pueden ser "exportadas" o compartidas con el ecosistema. Un satélite que no resuena con otros es solo una isla de entropía.
 
-Dharma Sugerido: Mantén el Satélite "tonto" en su estructura pero "brillante" en su proyección. El Satélite es el ojo, pero el Core es el alma. 🛰️🏛️💎🔥
+21: **Esquizofrenia de Entrada (HUD-Leak)**. Entregar la URL de desarrollo (`index.html` con HUD) al usuario final. Esto expone el esqueleto técnico, degrada la latencia y viola el axioma de Invisibilidad del Protocolo en entornos soberanos.
+
+22: Dharma Sugerido: Mantén el Satélite "tonto" en su estructura pero "brillante" en su proyección. El Satélite es el ojo, pero el Core es el alma. 🛰️🏛️💎🔥
