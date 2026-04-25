@@ -13,6 +13,7 @@ class IndraBridge {
     constructor(config = {}) {
         this.coreUrl = config.coreUrl || null;
         this.satelliteToken = null;
+        this.infraToken = null; // Token original de indra_identity.js (Capa 0)
         this.activeWorkspaceId = null; 
         this.availableWorkspaces = [];
         this.status = 'GHOST'; 
@@ -121,6 +122,26 @@ class IndraBridge {
     }
 
     async execute(params) { return await this.transport.execute(params); }
+
+    /**
+     * @dharma Muta la identidad del bridge a una sesión de usuario.
+     * Preserva el token de infraestructura original para restauraciones.
+     */
+    setSessionToken(token) {
+        if (!this.infraToken) this.infraToken = this.satelliteToken;
+        this.satelliteToken = token;
+        console.log("🔑 [Bridge] Identidad de Usuario (L2) activada.");
+    }
+
+    /**
+     * @dharma Restaura la identidad de infraestructura (Capa 0).
+     */
+    restoreInfrastructureToken() {
+        if (this.infraToken) {
+            this.satelliteToken = this.infraToken;
+            console.log("🛰️ [Bridge] Identidad de Infraestructura (L0) restaurada.");
+        }
+    }
 }
 
 export default IndraBridge;
