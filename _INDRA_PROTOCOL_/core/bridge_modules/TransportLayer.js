@@ -139,7 +139,8 @@ export class TransportLayer {
         };
 
         try {
-            console.log(`📡 [Transport:Wire] Llamando a Core (SANITIZED): ${cleanCoreUrl} [Protocol: ${uqo.protocol}]`);
+            const obfuscatedUrl = cleanCoreUrl.replace(/(https?:\/\/)[^\/]+/, "$1***.google.com");
+            console.log(`📡 [Transport:Wire] Llamando a Core (SANITIZED): ${obfuscatedUrl} [Protocol: ${uqo.protocol}]`);
             const response = await fetch(cleanCoreUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },

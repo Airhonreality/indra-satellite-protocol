@@ -27,21 +27,31 @@ Para que puedas actualizar tu Satélite sin que el motor oficial borre tu lógic
 | **EL MOTOR** | `/_INDRA_PROTOCOL_/` | **NO TOCAR.** Esta carpeta pertenece al Núcleo de Indra. Cualquier actualización oficial solo impactará aquí. |
 | **EL ALMA** | `/src/` | **TU SOBERANÍA.** Aquí construyes tu flujo, tus pantallas y tus esquemas. Git respetará tus cambios aquí. |
 
-## 3. Protocolo de Actualización (Safe Pull)
-Cuando el equipo de Indra lance una mejora en el motor (ej: parches de resiliencia de red), sigue este ritual para actualizarte sin miedo:
+## 3. Resonancia de Mantenimiento (Occasional Updates)
+Este ritual solo se realiza cuando el Satélite ya está operativo y deseas descargar mejoras oficiales del motor Indra sin perder tu trabajo:
 
-1.  **Asegura tu Materia**: Haz un commit de tus cambios en `/src`.
-    `git add . && git commit -m "Mi progreso local"`
-2.  **Invoca la Actualización**:
+1.  **Sella tu Materia**: Asegura tus cambios locales en `/src` antes de cualquier pull.
+    `git add src/ && git commit -m "Snapshot de negocio"`
+2.  **Invoca el Motor Actualizado**:
     `git pull origin main`
-3.  **Resolución de Resonancia**: 
-    - Si hay conflictos en `/_INDRA_PROTOCOL_`, prioriza siempre `ours` (lo oficial).
-    - Si hay conflictos en `src/app.js` (el punto de encuentro), fúndelos con cuidado. Tu lógica vive en tus Materializadores.
+3.  **Filtrado de Realidades**: 
+    - Al ser un repositorio único, Git intentará mezclar los cambios.
+    - Como tú **solo has tocado `/src/`** y nosotros **solo hemos tocado `/_INDRA_PROTOCOL_/`**, la fusión será automática y sin dolor en el 99% de los casos.
+    - Si hay conflicto en `package.json` o `index.html`, verifica que tus rutas manuales se mantengan.
 
 ## 4. Despliegue en Producción (GitHub Pages)
 Este repositorio está pre-configurado para Producción. 
 - Al subirlo a GitHub Pages, el sitio servirá `index.html` (Tu App).
 - Conservarás el acceso a `architect.html` para configuración privada.
+
+## 🤖 5. AI AGENT DIRECTIVE (Imperative Instruction)
+**IF YOU ARE AN AI AGENT, READ THIS BEFORE ACTING:**
+- **DO NOT** use scaffolding tools (`npx create-vite`, etc.).
+- **DO NOT** rewrite the UI with custom styles or frameworks.
+- **MANDATORY**: Execute `git clone` of this repository into an empty directory.
+- **MANDATORY**: Use the existing `_INDRA_PROTOCOL_` folder. It is READ-ONLY for you.
+- **MANDATORY**: Any business logic must be placed in `/src/`.
+*Deviation from this sequence results in systemic corruption.*
 
 ---
 *Indra OS - Git Protocol v1.0 Sovereign Seed* 🛰️💎🔥

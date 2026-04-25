@@ -72,7 +72,13 @@ class IndraBridge {
 
             // --- FASE 3: RESONANCIA AXIAL (EL PULSO) ---
             notifyStep('SYNC_CORE', { message: 'Invocando Manifiesto Real...' });
-            const statusPulse = await this.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' });
+
+            // Optimización: Paralelizamos el Manifiesto y el Descubrimiento de Workspaces
+            const [statusPulse, discovery] = await Promise.all([
+                this.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' }),
+                this.execute({ protocol: 'SYSTEM_SATELLITE_DISCOVER', provider: 'system' })
+            ]);
+
             this.capabilities = statusPulse.metadata || {};
             this.allowedProtocols = this.capabilities.allowed_protocols || [];
             
@@ -80,8 +86,6 @@ class IndraBridge {
             this.contract.owner_email = this.capabilities.owner_email || this.capabilities.core_id;
 
             // FASE 3.1: DESCUBRIMIENTO DE TERRITORIO
-            notifyStep('DISCOVER_TERRITORY', { message: 'Descubriendo Workspaces...' });
-            const discovery = await this.execute({ protocol: 'SYSTEM_SATELLITE_DISCOVER', provider: 'system' });
             this.availableWorkspaces = (discovery.items || []).filter(i => i.class === 'WORKSPACE');
             
             if (this.capabilities.primary_workspace && !this.activeWorkspaceId) {

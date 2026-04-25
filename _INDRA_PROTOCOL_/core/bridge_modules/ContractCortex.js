@@ -30,6 +30,7 @@ export class ContractCortex {
                 console.log("🔍 [Cortex:Reality] 2. Ruta de importación:", configPath);
 
                 // AUDITORÍA DE MATERIA: Intentamos leer el archivo como texto plano primero
+                /* 
                 try {
                     const rawRes = await fetch(configPath);
                     const rawText = await rawRes.text();
@@ -37,6 +38,7 @@ export class ContractCortex {
                 } catch (fetchErr) {
                     console.error("❌ [Cortex:Reality] Fallo en auditoría de materia (fetch):", fetchErr);
                 }
+                */
 
                 // IMPORTACIÓN DINÁMICA
                 const configModule = await import(/* @vite-ignore */ configPath);
@@ -46,7 +48,7 @@ export class ContractCortex {
                 const rawConfig = configModule.INDRA_CONFIG || configModule.default?.INDRA_CONFIG || configModule;
                 config = rawConfig || {};
 
-                console.log("🔍 [Cortex:Reality] 5. Handshake extraído:", config);
+                console.log("🔍 [Cortex:Reality] 5. Handshake detectado:", Object.keys(config).length > 0 ? "OK ✅" : "VACÍO ⚠️");
 
                 // INYECCIÓN DETERMINISTA: Solo si el disco TIENE materia real
                 if (config.core_url && config.core_token) {
@@ -82,8 +84,12 @@ export class ContractCortex {
             if (this.bridge.coreUrl && this.bridge.satelliteToken && contract.schemas.length === 0) {
                 try {
                     console.log("📡 [Cortex] Iniciando Resonancia Axial para actualizar ADN...");
-                    const liveManifest = await this.bridge.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' });
-                    const liveSchemas = await this.bridge.execute({ protocol: 'SYSTEM_CONFIG_SCHEMA', provider: 'system' });
+                    
+                    // Optimización: Llamadas en paralelo para reducir latencia de ignición
+                    const [liveManifest, liveSchemas] = await Promise.all([
+                        this.bridge.execute({ protocol: 'SYSTEM_MANIFEST', provider: 'system' }),
+                        this.bridge.execute({ protocol: 'SYSTEM_CONFIG_SCHEMA', provider: 'system' })
+                    ]);
 
                     contract = {
                         synced_at: new Date().toISOString(),
