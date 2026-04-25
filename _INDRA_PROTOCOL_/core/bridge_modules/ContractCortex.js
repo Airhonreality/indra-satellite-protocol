@@ -42,20 +42,31 @@ export class ContractCortex {
 
                 // IMPORTACIÓN DINÁMICA
                 const configModule = await import(/* @vite-ignore */ configPath);
-                console.log("🔍 [Cortex:Reality] 4. Módulo importado. Keys detectadas:", Object.keys(configModule));
                 
                 // DETECCIÓN MULTI-CAPA
                 const rawConfig = configModule.INDRA_CONFIG || configModule.default?.INDRA_CONFIG || configModule;
                 config = rawConfig || {};
 
-                console.log("🔍 [Cortex:Reality] 5. Handshake detectado:", Object.keys(config).length > 0 ? "OK ✅" : "VACÍO ⚠️");
-
                 // INYECCIÓN DETERMINISTA: Solo si el disco TIENE materia real
                 if (config.core_url && config.core_token) {
                     this.bridge.coreUrl = config.core_url;
-                    this.bridge.satelliteToken = config.core_token;
+                    this.bridge.infraToken = config.core_token; // Guardamos el L0 original
                     this.bridge.activeWorkspaceId = config.workspace_id || null;
-                    console.log("🔒 [Cortex] Identidad física detectada y autorizada.");
+                    
+                    // --- AXIOMA DE SINCERIDAD AL ARRANQUE (v17.8) ---
+                    // Antes de autorizar la identidad L0, verificamos si existe una sesión de usuario L2.
+                    // El satélite ID se obtiene del contrato o se asume 'indra-node' por defecto.
+                    const satelliteId = this.bridge.contract?.id || 'indra-node';
+                    const sessionKey = `indra_session_${satelliteId}`;
+                    const sessionToken = localStorage.getItem(sessionKey);
+
+                    if (sessionToken) {
+                        console.log(`⚡ [Cortex] Sesión de usuario detectada [${sessionKey}]. Escalando Privilegios L0 -> L2.`);
+                        this.bridge.satelliteToken = sessionToken;
+                    } else {
+                        this.bridge.satelliteToken = config.core_token;
+                        console.log("🔒 [Cortex] Usando identidad física de infraestructura (L0).");
+                    }
                 } else {
                     console.warn("⚠️ [Cortex] Sello vacío o incompleto en disco. Respetando memoria volátil.");
                 }

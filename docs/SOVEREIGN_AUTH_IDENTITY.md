@@ -1,151 +1,98 @@
-# 🔐 SOVEREIGN AUTH & IDENTITY — LEY DE IDENTIDAD DEL SATÉLITE
-> **Categoría:** Ley Axial de Seguridad  
-> **Versión:** 1.1 — Abril 2026 (Patch: Sinceridad Atómica)
-> **Estándar:** OMEGA_V17 / ISP v3.0  
-> **Aplica a:** Todo Satélite Indra con sistemas de usuarios propios
-
-> *"El `indra_identity.js` es la llave del Chasis. El login del usuario es el ADN del Pasajero. Gracias al Parche de Sinceridad, el Core ahora entiende que el Pasajero puede conducir el Chasis sin perder la soberanía."*
+# 🏛️ MANUAL MAESTRO: IDENTIDAD SOBERANA Y SISTEMAS MULTI-USUARIO (v1.3 OMEGA)
+> **Dharma**: Separar la materia de conexión (Infra) de la autoridad del sujeto (User) para garantizar soberanía fractal y evitar la entropía de acceso.
 
 ---
 
-## ⚠️ EL AXIOMA DE LA DOBLE IDENTIDAD
+## 🧬 1. LOS TRES PILARES DE LA IDENTIDAD
 
-Un Satélite opera bajo dos identidades simultáneas pero en planos distintos:
+En la arquitectura SUH de Indra, la identidad es jerárquica y delegada. Nunca se deben mezclar estas capas:
 
-1.  **Identidad de Nodo (Infraestructura):** Definida en `indra_identity.js`. Identifica al software.
-2.  **Identidad de Sujeto (Usuario):** Generada tras el login. Identifica a la persona.
-
-**El Gran Hallazgo:** En Indra, un usuario es técnicamente un **Satélite Humano**. Su sesión no es un simple ID, es un **Token Escopado (Scoped Token)** registrado en el Llavero del Core.
+| Capa | Identidad | Alcance | Origen | Persistencia Física |
+| :--- | :--- | :--- | :--- | :--- |
+| **L0** | **Infraestructura** | Nodo / Satélite | `indra_identity.js` | Inmutable en disco. Representa a la empresa o dueño del hardware. |
+| **L1** | **Social (Handshake)** | Validación | Google OAuth (JWT) | Volátil. Solo sirve para demostrar posesión de un email ante el Core. |
+| **L2** | **Sovereign (Session)** | Sujeto Humano | `SYSTEM_IDENTITY_SYNC` | **Persistente en Malla Local** (`localStorage`). Representa la autoridad del usuario. |
 
 ---
 
-## 🏛️ PARTE 1: ARQUITECTURA DE CAPAS Y EL CAMPO UNIVERSAL
+## 🚀 2. RUTA DE IMPLEMENTACIÓN (PASO A PASO)
 
-Tras la mutación del `AuthService`, el sistema utiliza un **Campo de Entrada Universal** para la identidad: el campo `password`.
+### Paso 1: El Registro Atómico y Santuarios Tabulares (En el Core)
+Para que un usuario pueda loguearse, debe existir previamente un átomo de clase `IDENTITY` en el Ledger del Core. Tras la reforma v18.0, las identidades **no se mezclan** con la infraestructura.
+- **Santuario Tabular**: El usuario debe estar registrado en la pestaña **`Entidades`** del Workspace.
+- **Campos Vitales**: `email` (debe coincidir con el de Google), `name` y el campo de metadatos `payload` (JSON con detalles extendidos como el rol).
+- **Hidratación de Rango**: El rol definido en el `payload` (ej: `AUDITOR_REAL`) es inyectado directamente en el Ticket de Sesión L2. El Satélite recibe este rango de forma oficial.
 
+#### 📄 Átomo Canónico de Usuario (Template)
+Si necesitas sembrar un usuario manualmente en la Sheet `Entidades`, usa esta estructura:
+```json
+{
+  "id": "USR_GENESIS_XXXX",
+  "handle": { "alias": "handle-del-usuario", "label": "Nombre Visible" },
+  "class": "IDENTITY",
+  "payload": {
+    "email": "usuario@ejemplo.com", 
+    "role": "AUDITOR_REAL",        
+    "name": "Nombre Completo",
+    "avatar_url": "...",
+    "preferences": { "theme": "dark" }
+  },
+  "status": "VALIDATED",
+  "provider": "google"
+}
 ```
-┌─────────────────────────────────────────────────────────┐
-│              CAPA 0 — INFRAESTRUCTURA (L0)              │
-│  indra_identity.js → password: satelliteToken           │
-│  Uso: Ignición del sistema y carga de ADN (Schemas).    │
-├─────────────────────────────────────────────────────────┤
-│           CAPA 1 — AUTENTICACIÓN SOCIAL (L1)            │
-│  Google OAuth → id_token                                │
-│  Uso: Intercambio único por identidad soberana.         │
-├─────────────────────────────────────────────────────────┤
-│            CAPA 2 — SESIÓN SOBERANA (L2)                │
-│  Session Token → password: userToken (vía Keychain)     │
-│  Uso: Operación diaria. Inyecta 'subject_id' en el Core.│
-└─────────────────────────────────────────────────────────┘
-```
 
-**Evolución del Transporte:** El Satélite no necesita campos extra. Simplemente sustituye en su memoria RAM el valor de `password` por el Token del Usuario tras el login.
-
----
-
-## 🧬 PARTE 2: INYECCIÓN DE SUJETO (AUTOMAGIC)
-
-Gracias al **Parche de Sinceridad**, cuando envías un Token de Usuario en el campo `password`, el Core realiza lo siguiente de forma automática:
-
-1.  **Valida el Token** contra el Llavero Maestro.
-2.  **Identifica el Vínculo Atómico** (ej: el usuario `u_javier`).
-3.  **Inyecta el Sujeto:** Añade `subject_id: 'u_javier'` y `is_user_session: true` al objeto `uqo`.
-4.  **Habilita la Lógica:** Tus Workflows ahora pueden leer `uqo.subject_id` directamente para filtrar datos de forma soberana.
-
----
-
-## 🔑 PARTE 3: RITUAL CANÓNICO DE LOGIN
-
-### Fase 1: El Intercambio (Workflow: `LOGIN_OAUTH_MATCH`)
-No crees un sistema de usuarios en una base de datos. Pídele al Core que emita una identidad:
+### Paso 2: El Intercambio de Soberanía (Login)
+El Satélite no "loguea" al usuario; facilita el intercambio de un token social por uno soberano usando el módulo `indra_auth.js`.
 
 ```javascript
-// Llamada desde AuthProvider.js
-const res = await bridge.execute({
-    protocol: 'WORKFLOW_EXECUTE',
-    data: {
-        workflow_alias: 'LOGIN_OAUTH_MATCH',
-        id_token: idToken // JWT de Google
+// Implementación recomendada usando el kit de identidad
+import { IndraAuth } from './indra_auth';
+
+const auth = new IndraAuth(bridge);
+
+async function handleLogin(googleIdToken) {
+    try {
+        const profile = await auth.login(googleIdToken);
+        console.log("Bienvenido:", profile.name);
+        // El puente ya tiene la sesión guardada para el próximo F5
+    } catch (e) {
+        console.error("Error de soberanía:", e.message);
     }
-});
-
-// El Core valida el id_token y ejecuta SYSTEM_KEYCHAIN_GENERATE internamente
-// devolviendo un nuevo token vinculado al átomo IDENTITY del usuario.
-const userToken = res.items[0].token; 
+}
 ```
 
-### Fase 2: Mutación de Identidad en el Satélite
-Una vez obtenido el token, el satélite "cambia de piel":
-
-```javascript
-// El Bridge ahora usará el Token de Usuario para todas las peticiones
-bridge.setSessionToken(userToken); 
-```
+### Paso 3: Gestión de la "Amnesia Post-Refresco"
+Gracias a la mutación en `ContractCortex.js`, el Satélite ya no olvida quién es el usuario al pulsar F5.
+- **Mecánica**: El `ContractCortex` busca la clave `indra_session_[SATELLITE_ID]` antes de autorizar la conexión. Si la encuentra, el Satélite despierta directamente en Capa L2.
 
 ---
 
-## ⚡ PARTE 4: IMPLEMENTACIÓN DEL PROVIDER (CANÓNICO)
+## 🔐 3. VECTORES DE ESQUIZOFRENIA (ERRORES A EVITAR)
 
-**Ruta:** `src/score/logic/AuthProvider.js`
+### ⚠️ Vector A: La Ilusión del Rol en el Cliente
+- **Error Común**: El desarrollador guarda `user.role` en un JSON local y lo usa para permitir acciones (ej: `if(user.role == 'admin') deleteItem()`).
+- **Consecuencia**: El usuario puede editar su `localStorage`, cambiarse el rol y hackear la UI.
+- **Sinceridad Indra**: La seguridad **siempre ocurre en el Core**. El Core ignora el rol del satélite y usa el `subject_id` vinculado al token para validar permisos en el Ledger. El rol en el satélite es SOLO para estética (mostrar/ocultar botones).
 
-```javascript
-export const AuthProvider = {
-    async login(bridge, googleIdToken) {
-        // 1. Intercambio Soberano
-        const res = await bridge.execute({
-            protocol: 'WORKFLOW_EXECUTE',
-            data: { workflow_alias: 'LOGIN_OAUTH_MATCH', id_token: googleIdToken }
-        });
+### ⚠️ Vector B: El "Token Zombi" (Expiración)
+- **Error Común**: Sesiones que duran para siempre sin validación.
+- **Sinceridad Indra**: Las sesiones L2 tienen una caducidad de 30 días configurada en el Llavero (`keychain_service.gs`). El `AuthService` purga automáticamente cualquier token que exceda su fecha de vida.
 
-        const session = res.items?.[0]; // Contiene { token, profile }
-        
-        // 2. Persistencia en Vault Local
-        localStorage.setItem('indra_user_token', session.token);
-        localStorage.setItem('indra_user_profile', JSON.stringify(session.profile));
-
-        // 3. Mutación del Bridge (Sincronización de password)
-        bridge.setSessionToken(session.token);
-
-        return session.profile;
-    },
-
-    logout(bridge) {
-        localStorage.clear();
-        // Volvemos al token de Infraestructura (el de indra_identity.js)
-        bridge.restoreInfrastructureToken();
-        window.dispatchEvent(new CustomEvent('indra-auth-logout'));
-    }
-};
-```
+### ⚠️ Vector C: El "Crisis de Personalidad" (Multi-Satélite)
+- **Error Común**: Usar una clave de `localStorage` genérica como `"token"`.
+- **Consecuencia**: Si el usuario tiene dos satélites Indra abiertos en el mismo dominio, uno podría sobreescribir la sesión del otro.
+- **Sinceridad Indra**: El sistema usa **Namespacing Atómico** basado en el `id` del satélite del manifiesto. Cada nodo es una isla de identidad independiente.
 
 ---
 
-## 🔇 PARTE 5: HIGIENE DE CONSOLA Y SEGURIDAD AXIOMÁTICA
+## 📋 4. CHECKLIST DE INTEGRACIÓN FINAL
 
-Tras la mutación, el Core y el Satélite protegen la identidad:
-
-*   **Logs Limpios:** El `TransportLayer` del Satélite y el `Gateway` del Core ocultan el contenido de `password` en los logs de depuración.
-*   **No Exposición:** Nunca imprimas `uqo.subject_id` en logs públicos. El Core lo usa internamente para seguridad.
-*   **Aislamiento:** El archivo `indra_identity.js` nunca debe ser modificado por el código de la aplicación. Se mantiene como la "Llave de Chasis" inmutable.
-
----
-
-## ⛔ ANTIPATRONES (Vectores de Esquizofrenia)
-
-1.  **Dualidad de Verdad:** Tener un `user_id` en el satélite que no coincida con el `subject_id` que ve el Core. **Solución:** Confía siempre en el `subject_id` inyectado por el Core.
-2.  **Manual Handshake:** Intentar validar el token del usuario en cada componente. **Solución:** Deja que el Core lo valide de forma implícita en cada petición de datos.
-3.  **Fuga de Identidad:** Loguear el objeto `uqo` completo en desarrollo. **Solución:** Usa el `Bridge.execute` que ya viene sanitizado.
+1. **Core**: Asegurarse de que `SYSTEM_IDENTITY_SYNC` esté registrado en el router.
+2. **Core**: Crear los átomos `IDENTITY` para los usuarios permitidos.
+3. **Satélite**: Asegurarse de que `satellite.manifest.json` tenga un `id` único.
+4. **Satélite**: Usar `bridge.setSessionToken(token)` para el login y `bridge.logout()` para el cierre.
+5. **Satélite**: **NUNCA** manipular `localStorage` directamente para temas de identidad.
 
 ---
-
-## ✅ CHECKLIST DE SOBERANÍA V1.1
-
-- [ ] El Core tiene aplicado el **Sincerity Patch** en `AuthService.gs`.
-- [ ] El Satélite usa el campo `password` para enviar tanto el token de Infra como el de Usuario.
-- [ ] Los Workflows del Core usan `uqo.subject_id` para filtrar registros.
-- [ ] El satélite vuelve a su Identidad de Infra al hacer Logout.
-- [ ] No existe código en el Satélite que haga `TABULAR_STREAM` a una tabla de usuarios para "validar" el login manualmente.
-
----
-
-*Indra OS — Ley de Identidad Soberana v1.1 | Sincerity Standard* 🛰️🔐🏛️💎🔥
+*Indra OS — Estándar de Identidad Soberana v1.3 | Sincerity Architecture* 🛰️🔐🏛️💎🔥

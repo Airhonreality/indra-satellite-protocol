@@ -124,17 +124,45 @@ class IndraBridge {
     async execute(params) { return await this.transport.execute(params); }
 
     /**
-     * @dharma Muta la identidad del bridge a una sesión de usuario.
-     * Preserva el token de infraestructura original para restauraciones.
+     * @dharma Muta la identidad del bridge a una sesión de usuario y la persiste físicamente.
+     * Preserva el token de infraestructura original para restauraciones o fallbacks.
+     * @param {string} token - El token de sesión emitido por el Core (L2).
      */
     setSessionToken(token) {
+        // Guardamos el token L0 original si es la primera vez que mutamos
         if (!this.infraToken) this.infraToken = this.satelliteToken;
+        
         this.satelliteToken = token;
-        console.log("🔑 [Bridge] Identidad de Usuario (L2) activada.");
+        
+        // --- AXIOMA DE PERSISTENCIA (v17.8) ---
+        // Guardamos la sesión con un namespace único basado en el ID del satélite.
+        // Esto evita el Vector de Esquizofrenia A (Colisión entre Workspaces/Satélites).
+        const satelliteId = this.contract?.id || 'indra-node';
+        const sessionKey = `indra_session_${satelliteId}`;
+        
+        localStorage.setItem(sessionKey, token);
+        console.log(`🔐 [Bridge] Sesión de usuario persistida en Malla Local: ${sessionKey}`);
+    }
+
+    /**
+     * @dharma Cierra la sesión de usuario, purga la persistencia física y restaura L0.
+     */
+    logout() {
+        const satelliteId = this.contract?.id || 'indra-node';
+        const sessionKey = `indra_session_${satelliteId}`;
+        
+        localStorage.removeItem(sessionKey);
+        this.restoreInfrastructureToken();
+        
+        console.log("🔓 [Bridge] Sesión cerrada. Retornando a Capa de Infraestructura (L0).");
+        
+        // Notificar a la UI del cambio de estado
+        window.dispatchEvent(new CustomEvent('indra-auth-logout'));
     }
 
     /**
      * @dharma Restaura la identidad de infraestructura (Capa 0).
+     * Útil cuando un usuario cierra sesión pero el satélite debe seguir sincronizando infra.
      */
     restoreInfrastructureToken() {
         if (this.infraToken) {

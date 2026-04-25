@@ -1,12 +1,15 @@
 /**
- * 🆔 INDRA IDENTITY PASSPORT
- * Este archivo contiene las credenciales de resonancia con tu Núcleo de Indra.
- * NO COMPARTIR este archivo si contiene un Token de acceso real.
+ * 🛰️ INDRA NODAL IDENTITY (L0)
+ * Dharma: Identificación inmutable de la Infraestructura (Nodo/Satélite).
+ * 
+ * Este archivo representa al "Hardware/App" frente al Core. 
+ * NO contiene datos de sujetos humanos, roles de usuario ni sesiones temporales.
  */
-export const INDRA_CONFIG = {
-  "core_url": "",
-  "core_token": "",
-  "satellite_name": "",
-  "workspace_id": "",
+export const INDRA_NODAL_CONFIG = {
+  "core_url": "",      // URL del Gateway del Core
+  "core_token": "",    // Token de resonancia del Satélite (App Token)
+  "satellite_id": "",  // ID único del manifiesto
+  "workspace_id": "",  // Célula de destino por defecto
+  "version": "1.0.0",
   "timestamp": new Date().toISOString()
 };
