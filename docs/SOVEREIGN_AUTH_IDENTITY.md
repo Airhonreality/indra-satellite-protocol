@@ -95,4 +95,26 @@ Gracias a la mutación en `ContractCortex.js`, el Satélite ya no olvida quién 
 5. **Satélite**: **NUNCA** manipular `localStorage` directamente para temas de identidad.
 
 ---
-*Indra OS — Estándar de Identidad Soberana v1.3 | Sincerity Architecture* 🛰️🔐🏛️💎🔥
+
+## 🏛️ 4. AXIOMAS DE SOBERANÍA L2 (LEYES DEL CORE)
+
+Para mantener la homeostasis, el desarrollador debe respetar estas cuatro leyes fundamentales:
+
+### ⚖️ Ley A: Jerarquía de la Verdad (El Nombre)
+El Core ignora las etiquetas de infraestructura para la identidad humana. La fuente de verdad absoluta es el campo **`payload.name`** dentro de la pestaña `Entidades`. 
+*   **Consecuencia**: Si cambias el nombre en el payload, el Satélite lo reflejará tras el próximo sync. El `handle.label` es solo un fallback de sistema.
+
+### ☢️ Ley B: La Extinción Física (Logout Asíncrono)
+El método `auth.logout()` no es solo amnesia local; es una **orden de ejecución** que viaja al Core para invalidar el token en el Llavero (`SYSTEM_SESSION_REVOKE`).
+*   **Consecuencia**: Siempre debe tratarse como una operación asíncrona (`await`). Si el Core no confirma la revocación, el token sigue técnicamente vivo aunque el satélite lo haya "olvidado".
+
+### 🛡️ Ley C: El Rango como Escudo (Scopes)
+El campo `role` definido en la Spreadsheet (ej: `ADMIN`, `AUDITOR`) se cristaliza automáticamente como un **Scope de Sesión** dentro del token.
+*   **Consecuencia**: El Satélite puede usar `auth.hasRole('ADMIN')` para la UI, pero el Core validará cada UQO contra ese mismo sello, garantizando que el usuario no pueda "escalar privilegios" editando su cliente.
+
+### ⏳ Ley D: Soberanía de Larga Duración (UX Industrial)
+Las sesiones L2 tienen una caducidad por defecto de **30 días**.
+*   **Consecuencia**: El sistema está diseñado para entornos industriales donde el operario no debe re-autenticarse con Google diariamente si el hardware es de confianza. La revocación física es el único método para terminar esta soberanía antes de tiempo.
+
+---
+*Indra OS — Estándar de Identidad Soberana v18.0 | Sincerity Architecture* 🛰️🔐🏛️💎🔥

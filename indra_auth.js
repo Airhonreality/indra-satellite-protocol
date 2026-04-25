@@ -22,8 +22,12 @@ export class IndraAuth {
     async login(idToken) {
         if (!idToken) throw new Error("idToken es requerido para el login.");
 
+        // Inyección de Jurisdicción (Vector F)
+        const workspaceId = this.bridge.config?.workspace_id;
+
         const response = await this.bridge.execute({
             protocol: 'SYSTEM_IDENTITY_SYNC',
+            workspace_id: workspaceId,
             data: { id_token: idToken }
         });
 
@@ -31,7 +35,6 @@ export class IndraAuth {
             const session = response.items[0];
             
             // Mutación del ContractCortex vía Bridge
-            // Esto persiste el token L2 en la membrana local
             this.bridge.setSessionToken(session.token);
             
             console.log(`✅ Soberanía reconocida: ${session.profile.email} [${session.profile.role}]`);
@@ -42,9 +45,15 @@ export class IndraAuth {
     }
 
     /**
-     * Purgado de la membrana de sesión.
+     * Purgado de la membrana de sesión con revocación física en el Core.
      */
-    logout() {
+    async logout() {
+        try {
+            // Cierre de Sesión Asíncrono (Vector G)
+            await this.bridge.execute({ protocol: 'SYSTEM_SESSION_REVOKE' });
+        } catch (e) {
+            console.warn("⚠️ No se pudo revocar la sesión en el Core, procediendo con limpieza local.", e.message);
+        }
         this.bridge.logout();
         console.log("🔒 Sesión soberana cerrada.");
     }
