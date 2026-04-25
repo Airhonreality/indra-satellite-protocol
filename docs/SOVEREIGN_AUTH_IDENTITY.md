@@ -62,7 +62,29 @@ async function handleLogin(googleIdToken) {
 }
 ```
 
-### Paso 3: Gestión de la "Amnesia Post-Refresco"
+### Paso 3: Proyección del Botón (Agnóstico)
+Para facilitar la integración en entornos Vanilla JS sin imponer estilos, el protocolo incluye el módulo `IndraAuthUI`. Este se encarga de cargar la API de Google y renderizar el botón estándar.
+
+```javascript
+import { bridge } from './indra-satellite-protocol';
+import { IndraAuth }   from './indra-satellite-protocol/indra_auth.js';
+import { IndraAuthUI } from './indra-satellite-protocol/indra_ui_auth.js';
+
+const auth = new IndraAuth(bridge);
+const ui   = new IndraAuthUI(auth);
+
+// Renderizado en un contenedor vacío
+ui.renderButton('login-container', {
+    clientId: 'TU_CLIENT_ID_DE_GOOGLE',
+    onSuccess: (profile) => {
+        console.log("Soberanía confirmada:", profile.name);
+        // El satélite ya puede acceder a datos protegidos
+    }
+});
+```
+> **Nota de Agnosticidad**: Este módulo no inyecta CSS. El botón resultante es el estándar oficial de Google, permitiendo que el Satélite mantenga su propia identidad visual.
+
+### Paso 4: Gestión de la "Amnesia Post-Refresco"
 Gracias a la mutación en `ContractCortex.js`, el Satélite ya no olvida quién es el usuario al pulsar F5.
 - **Mecánica**: El `ContractCortex` busca la clave `indra_session_[SATELLITE_ID]` antes de autorizar la conexión. Si la encuentra, el Satélite despierta directamente en Capa L2.
 
