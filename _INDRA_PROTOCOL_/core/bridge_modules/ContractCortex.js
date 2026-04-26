@@ -44,7 +44,7 @@ export class ContractCortex {
                 const configModule = await import(/* @vite-ignore */ configPath);
                 
                 // DETECCIÓN MULTI-CAPA
-                const rawConfig = configModule.INDRA_CONFIG || configModule.default?.INDRA_CONFIG || configModule;
+                const rawConfig = configModule.INDRA_NODAL_CONFIG || configModule.INDRA_CONFIG || configModule.default?.INDRA_CONFIG || configModule;
                 config = rawConfig || {};
 
                 // INYECCIÓN DETERMINISTA: Solo si el disco TIENE materia real

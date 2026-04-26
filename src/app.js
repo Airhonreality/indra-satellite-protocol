@@ -1,14 +1,14 @@
 /**
  * INDRA SATELLITE ENTRY POINT (VIRGIN STATE)
  */
-import { INDRA_CONFIG } from '../indra_identity.js';
+import { INDRA_NODAL_CONFIG } from '../indra_identity.js';
 
 export async function ignite(bridge, kernel) {
     const root = document.getElementById('app-root');
     if (!root) return;
 
     // DETECCIÓN DE ESTADO VIRGEN
-    const isVirgin = INDRA_CONFIG.core_url.includes('TU_SCRIPT_ID');
+    const isVirgin = INDRA_NODAL_CONFIG.core_url.includes('TU_SCRIPT_ID');
 
     if (isVirgin) {
         root.innerHTML = `
