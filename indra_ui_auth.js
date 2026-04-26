@@ -1,5 +1,5 @@
 /**
- * 👁️ INDRA AUTH UI (AGNOSTIC BRIDGE)
+ * INDRA AUTH UI (AGNOSTIC BRIDGE)
  * Dharma: Facilitar la proyección del botón oficial de Google sin imponer estética.
  * 
  * Este módulo carga dinámicamente la API de Google Identity Services (GSI)
@@ -50,18 +50,21 @@ export class IndraAuthUI {
 
         await this._loadGoogleScript();
 
-        // Inicialización nativa de Google
-        google.accounts.id.initialize({
-            client_id: clientId,
-            callback: async (response) => {
-                try {
-                    const profile = await this.auth.login(response.credential);
-                    if (onSuccess) onSuccess(profile);
-                } catch (e) {
-                    console.error("❌ Fallo en intercambio de soberanía:", e.message);
+        // Inicialización nativa de Google (Solo una vez por ciclo de vida de la página)
+        if (!window._indra_gsi_initialized) {
+            google.accounts.id.initialize({
+                client_id: clientId,
+                callback: async (response) => {
+                    try {
+                        const profile = await this.auth.login(response.credential);
+                        if (onSuccess) onSuccess(profile);
+                    } catch (e) {
+                        console.error("❌ Fallo en intercambio de soberanía:", e.message);
+                    }
                 }
-            }
-        });
+            });
+            window._indra_gsi_initialized = true;
+        }
 
         // Renderizado del botón estándar (Zero CSS Indra)
         google.accounts.id.renderButton(container, {
