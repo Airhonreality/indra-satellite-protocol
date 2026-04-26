@@ -62,6 +62,31 @@ async function handleLogin(googleIdToken) {
 }
 ```
 
+### Paso 2.5: Manejo del Registro Condicional (v18.0 OMEGA)
+Indra no registra usuarios "en silencio". Si un usuario se autentica con Google pero no existe en la pestaña `Entidades`, el sistema devuelve un objeto con el flag `needsRegistration: true`. 
+
+El desarrollador del satélite debe capturar esto para invitar al usuario a unirse al Workspace:
+
+```javascript
+ui.renderButton('login-container', {
+    clientId: '...',
+    onSuccess: (result) => {
+        if (result.needsRegistration) {
+            // EL USUARIO ES VÁLIDO EN GOOGLE PERO NO EN INDRA
+            const googleProfile = result.profile;
+            console.log("🎟️ Invitación pendiente para:", googleProfile.email);
+            
+            // Aquí el desarrollador puede mostrar un formulario de registro
+            // o usar el protocolo SYSTEM_IDENTITY_CREATE para darlo de alta.
+            showWelcomeMessage(googleProfile); 
+        } else {
+            // LOGIN EXITOSO Y REGISTRADO
+            console.log("🎯 Bienvenido:", result.name);
+        }
+    }
+});
+```
+
 ### Paso 3: Proyección del Botón (Agnóstico)
 Para facilitar la integración en entornos Vanilla JS sin imponer estilos, el protocolo incluye el módulo `IndraAuthUI`. Este se encarga de cargar la API de Google y renderizar el botón estándar.
 
