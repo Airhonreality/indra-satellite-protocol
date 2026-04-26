@@ -18,9 +18,9 @@ npm install
 ## 2. Anatomía de la Soberanía (Estructura Sagrada)
 Para que tu satélite sea 100% agnóstico y escalable, respeta esta jerarquía:
 
-*   **`src/schemas/`**: Los planos de tu realidad. Aquí van los JSON que definen tus entidades (Atributos, tipos de datos, validaciones). **No escribas tablas, escribe esquemas.**
-*   **`src/workflows/`**: Los pulmones del sistema. Aquí van las funciones que se ejecutan ante eventos (Triggers). **No escribas lógica de negocio en la UI, escríbela en pipes.**
-*   **`src/score/`**: El sistema de diseño y estado.
+*   **`src/score/schemas/`**: Los planos de tu realidad (JSON de entidades).
+*   **`src/score/workflows/`**: Los pulmones del sistema (Funciones y Triggers).
+*   **`src/score/ui/`**: El sistema de diseño (CSS y Componentes).
 *   **`_INDRA_PROTOCOL_`**: El chasis inmutable (Bridge y Cortex).
 
 ---
