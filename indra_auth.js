@@ -34,8 +34,8 @@ export class IndraAuth {
         if (response.metadata.status === 'OK') {
             const session = response.items[0];
             
-            // Mutación del ContractCortex vía Bridge
-            this.bridge.setSessionToken(session.token);
+            // Mutación del ContractCortex vía Bridge (Persistiendo Perfil L2)
+            this.bridge.setSessionToken(session.token, session.profile);
             
             console.log(`✅ Soberanía reconocida: ${session.profile.email} [${session.profile.role}]`);
             return session.profile;

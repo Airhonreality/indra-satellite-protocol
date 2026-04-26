@@ -127,21 +127,39 @@ class IndraBridge {
      * @dharma Muta la identidad del bridge a una sesión de usuario y la persiste físicamente.
      * Preserva el token de infraestructura original para restauraciones o fallbacks.
      * @param {string} token - El token de sesión emitido por el Core (L2).
+     * @param {Object} profile - El perfil hidratado del usuario.
      */
-    setSessionToken(token) {
+    setSessionToken(token, profile = null) {
         // Guardamos el token L0 original si es la primera vez que mutamos
         if (!this.infraToken) this.infraToken = this.satelliteToken;
         
         this.satelliteToken = token;
+        this.sessionProfile = profile;
         
-        // --- AXIOMA DE PERSISTENCIA (v17.8) ---
-        // Guardamos la sesión con un namespace único basado en el ID del satélite.
-        // Esto evita el Vector de Esquizofrenia A (Colisión entre Workspaces/Satélites).
+        // --- AXIOMA DE PERSISTENCIA (v18.0) ---
         const satelliteId = this.contract?.id || 'indra-node';
         const sessionKey = `indra_session_${satelliteId}`;
+        const profileKey = `indra_profile_${satelliteId}`;
         
         localStorage.setItem(sessionKey, token);
-        console.log(`🔐 [Bridge] Sesión de usuario persistida en Malla Local: ${sessionKey}`);
+        if (profile) localStorage.setItem(profileKey, JSON.stringify(profile));
+        
+        console.log(`🔐 [Bridge] Sesión de usuario persistida: ${sessionKey}`);
+    }
+
+    /**
+     * @dharma Recupera la sesión activa desde la memoria local.
+     */
+    getSession() {
+        const satelliteId = this.contract?.id || 'indra-node';
+        const sessionKey = `indra_session_${satelliteId}`;
+        const profileKey = `indra_profile_${satelliteId}`;
+        
+        const token = localStorage.getItem(sessionKey);
+        const profile = JSON.parse(localStorage.getItem(profileKey) || 'null');
+        
+        if (!token) return null;
+        return { token, profile };
     }
 
     /**
