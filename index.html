@@ -18,14 +18,14 @@
     <script type="module">
         import IndraBridge from './_INDRA_PROTOCOL_/core/IndraBridge.js';
         import { IndraKernel } from './_INDRA_PROTOCOL_/core/IndraKernel.js';
-        import { INDRA_CONFIG } from './indra_identity.js'; 
+        import { INDRA_NODAL_CONFIG } from './indra_identity.js'; 
         import { ignite } from './src/app.js';             
 
         async function bootstrap() {
             try {
                 const bridge = new IndraBridge({
-                    coreUrl: INDRA_CONFIG.core_url,
-                    satelliteToken: INDRA_CONFIG.core_token
+                    coreUrl: INDRA_NODAL_CONFIG.core_url,
+                    satelliteToken: INDRA_NODAL_CONFIG.core_token
                 });
                 const kernel = new IndraKernel(bridge);
                 ignite(bridge, kernel);
