@@ -39,8 +39,14 @@ export class IndraAuth {
             
             console.log(`✅ Soberanía reconocida: ${session.profile.email} [${session.profile.role}]`);
             return session.profile;
+        } else if (response.metadata.status === 'PENDING_REGISTRATION') {
+            console.warn("⚠️ Usuario no registrado en la malla local.");
+            return {
+                needsRegistration: true,
+                profile: response.items[0]
+            };
         } else {
-            throw new Error(response.metadata.error || "Sujeto no reconocido por el Core.");
+            throw new Error(response.metadata.error || response.metadata.message || "Error desconocido en el intercambio.");
         }
     }
 
