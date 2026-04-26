@@ -112,8 +112,13 @@ export class ContractCortex {
                         schemas: liveSchemas.items || [],
                         workflows: []
                     };
+                    
+                    // AXIOMA DE COLABORACIÓN: Inyectamos el pulso en el bridge para evitar re-calls
+                    this.bridge.capabilities = liveManifest.metadata || {};
+                    this.bridge.manifest_items = liveManifest.items || [];
+                    
                     usedLiveSync = true;
-                    console.log("⚡ [Cortex] ADN actualizado vía Resonancia Axial.");
+                    console.log("⚡ [Cortex] ADN actualizado y compartido con el Bridge.");
                 } catch (liveErr) {
                     console.error("⚠️ [Cortex] Falló Resonancia Axial. Usando materia local.");
                 }
