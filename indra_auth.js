@@ -59,6 +59,7 @@ export class IndraAuth {
         
         const response = await this.bridge.execute({
             protocol: 'SYSTEM_IDENTITY_REGISTER',
+            workspace_id: this.bridge.activeWorkspaceId,
             data: {
                 id_token: idToken,
                 ...userData
