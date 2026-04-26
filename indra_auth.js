@@ -22,12 +22,8 @@ export class IndraAuth {
     async login(idToken) {
         if (!idToken) throw new Error("idToken es requerido para el login.");
 
-        // Inyección de Jurisdicción (Vector F)
-        const workspaceId = this.bridge.config?.workspace_id;
-
         const response = await this.bridge.execute({
             protocol: 'SYSTEM_IDENTITY_SYNC',
-            workspace_id: workspaceId,
             data: { id_token: idToken }
         });
 
@@ -43,7 +39,8 @@ export class IndraAuth {
             console.warn("⚠️ Usuario no registrado en la malla local.");
             return {
                 needsRegistration: true,
-                profile: response.items[0]
+                profile: response.items[0],
+                idToken: idToken // PRESERVACIÓN DE MATERIA: Enviamos el token de vuelta para el registro
             };
         } else {
             throw new Error(response.metadata.error || response.metadata.message || "Error desconocido en el intercambio.");
@@ -51,35 +48,49 @@ export class IndraAuth {
     }
 
     /**
-     * Purgado de la membrana de sesión con revocación física en el Core.
+     * Realiza el auto-registro del usuario en el Workspace actual.
+     * @param {string} idToken - El token de Google verificado.
+     * @param {Object} userData - { name, picture, ... }
+     */
+    async register(idToken, userData = {}) {
+        if (!idToken) throw new Error("Se requiere el idToken para completar el registro.");
+
+        console.log("🚀 Iniciando ignición de identidad en el Core...");
+        
+        const response = await this.bridge.execute({
+            protocol: 'SYSTEM_IDENTITY_REGISTER',
+            data: {
+                id_token: idToken,
+                ...userData
+            }
+        });
+
+        if (response.metadata.status === 'OK') {
+            console.log("✅ Registro completado. Re-sincronizando soberanía...");
+            // Tras registrar, hacemos un login automático para obtener el token L2 real
+            return await this.login(idToken);
+        } else {
+            throw new Error(response.metadata.error || "Fallo en el registro físico del usuario.");
+        }
+    }
+
+    /**
+     * Termina la sesión del usuario y limpia la memoria estructural.
      */
     async logout() {
         try {
-            // Cierre de Sesión Asíncrono (Vector G)
             await this.bridge.execute({ protocol: 'SYSTEM_SESSION_REVOKE' });
         } catch (e) {
-            console.warn("⚠️ No se pudo revocar la sesión en el Core, procediendo con limpieza local.", e.message);
+            console.warn("⚠️ No se pudo invalidar la sesión en el Core, pero limpiaremos la memoria local.");
         }
         this.bridge.logout();
-        console.log("🔒 Sesión soberana cerrada.");
     }
 
     /**
-     * Recupera el perfil del usuario activo si existe una sesión válida.
-     * @returns {Object|null}
-     */
-    getUserProfile() {
-        // El bridge consulta al ContractCortex el estado de la sesión
-        const session = this.bridge.getSession();
-        return session ? session.profile : null;
-    }
-
-    /**
-     * Verifica si el usuario tiene un rango/rol específico.
-     * @param {string} role - Rol a verificar (ej: 'AUDITOR_REAL').
+     * Verifica si el usuario actual tiene un rango específico.
      */
     hasRole(role) {
-        const profile = this.getUserProfile();
-        return profile ? profile.role === role : false;
+        const session = this.bridge.getSession();
+        return session?.profile?.role === role;
     }
 }
